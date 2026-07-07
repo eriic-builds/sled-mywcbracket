@@ -55,55 +55,128 @@
 .step span{font-size:.9rem;color:#f4f7ee}
 .foothint{margin-top:34px;font-size:.8rem;color:var(--muted,#9aa2ad)}
 .foothint a{color:#7cc9ff}
+
+/* Landing choices */
+.choices{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:26px 0 12px}
+.choice{flex:1 1 260px;max-width:320px;text-align:left;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:0 12px;
+  padding:16px 18px;border-radius:16px;cursor:pointer;color:#fff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);transition:.16s}
+.choice:hover{background:rgba(255,255,255,.10);transform:translateY(-2px)}
+.choice.primary{background:linear-gradient(120deg,rgba(0,151,244,.22),rgba(0,178,145,.22));border-color:rgba(0,151,244,.5)}
+.choice.primary:hover{background:linear-gradient(120deg,rgba(0,151,244,.32),rgba(0,178,145,.32))}
+.choice .ch-ic{grid-row:1/3;font-size:1.9rem;align-self:center}
+.choice .ch-t{font-weight:800;font-size:1.06rem}
+.choice .ch-s{font-size:.82rem;color:var(--muted,#9aa2ad)}
+#drop{border:2px dashed rgba(255,255,255,.18);border-radius:14px;padding:12px;margin:2px auto 4px;max-width:360px;transition:.16s;cursor:pointer}
+#drop.over{border-color:#0097F4;background:rgba(0,151,244,.10)}
+.drop-hint{font-size:.86rem;color:var(--muted,#9aa2ad)}
+.mini-row{display:flex;gap:10px;align-items:center;justify-content:center;margin:12px 0 4px}
+.mini-row .dotsep{color:var(--muted,#9aa2ad)}
+.vb-saved{margin-left:8px;font-size:.76rem;color:#9BC72A}
+
+/* Bracket builder overlay */
+.builder{position:fixed;inset:0;z-index:120;background:rgba(12,11,15,.92);backdrop-filter:blur(4px);overflow-y:auto;padding:16px}
+.bld-inner{max-width:1040px;margin:0 auto;background:var(--panel,#1c1b21);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:18px 20px 22px;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.bld-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.bld-title{font-size:1.35rem;font-weight:800}
+.bld-sub{font-size:.86rem;color:var(--muted,#9aa2ad)}
+.bld-x{font:inherit;font-size:1.1rem;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;width:34px;height:34px;cursor:pointer;flex:0 0 auto}
+.bld-steps{display:flex;align-items:center;gap:2px;justify-content:center;margin:16px 0 6px}
+.bld-dot{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font-size:.78rem;font-weight:800;color:var(--muted,#9aa2ad);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);cursor:pointer}
+.bld-dot.on{color:#04121a;background:linear-gradient(120deg,#0097F4,#00B291);border-color:transparent}
+.bld-dot.ok:not(.on){color:#9BC72A;border-color:rgba(155,199,42,.5)}
+.bld-sep{width:16px;height:2px;background:rgba(255,255,255,.14)}
+.bld-roundhead{text-align:center;margin:6px 0 12px;font-size:1.02rem}
+.bld-roundhead span{color:var(--muted,#9aa2ad);font-size:.85rem;margin-left:6px}
+.bld-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.bld-match{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:9px 10px;position:relative}
+.bld-mc{font-size:.6rem;font-weight:700;letter-spacing:.05em;color:var(--muted,#9aa2ad);text-align:center;margin-bottom:2px}
+.bld-vs{text-align:center;font-size:.62rem;color:var(--muted,#9aa2ad);margin:3px 0}
+.bld-team{width:100%;display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:9px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);color:#fff;font:inherit;font-size:.9rem;font-weight:650;cursor:pointer;transition:.14s;text-align:left}
+.bld-team:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.25)}
+.bld-team .seed{font-size:.6rem;font-weight:700;color:var(--muted,#9aa2ad);background:rgba(255,255,255,.08);border-radius:5px;padding:2px 5px}
+.bld-team .tname{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bld-team .bld-check{opacity:0;color:#57e0c4;font-weight:800}
+.bld-team.picked{background:linear-gradient(120deg,rgba(0,178,145,.28),rgba(0,151,244,.20));border-color:rgba(0,178,145,.6)}
+.bld-team.picked .bld-check{opacity:1}
+.bld-team.dim{opacity:.5}
+.bld-team.tbd{color:var(--muted,#9aa2ad);font-style:italic;font-weight:600;cursor:default;background:transparent;border-style:dashed;justify-content:center}
+.bld-finish{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);display:grid;gap:12px;max-width:420px}
+.bld-fh{font-size:1rem}
+.bld-field{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted,#9aa2ad)}
+.bld-field small{opacity:.8}
+.bld-field input{font:inherit;font-size:1rem;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:9px 12px}
+.bld-field input:focus{outline:none;border-color:#0097F4}
+.bld-foot{display:flex;align-items:center;gap:14px;margin-top:16px}
+.bld-btn{font:inherit;font-weight:700;font-size:.92rem;border-radius:11px;padding:10px 18px;cursor:pointer;border:1px solid transparent}
+.bld-btn.ghost{color:#fff;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}
+.bld-btn.ghost:disabled{opacity:.4;cursor:default}
+.bld-btn.go{color:#04121a;background:linear-gradient(120deg,#0097F4,#00B291);margin-left:auto}
+.bld-btn.go:disabled{opacity:.45;cursor:default;filter:grayscale(.3)}
+.bld-prog{flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;max-width:260px}
+.bld-prog i{display:block;height:100%;background:linear-gradient(90deg,#0097F4,#00B291);transition:width .2s}
 </style>
 </head>
 <body>
 
 <!-- Returning-visitor / viewer control bar (hidden until a bracket is loaded) -->
 <div id="viewerbar" hidden>
-  <span class="vb-you">Viewing <b id="vb-name">your bracket</b></span>
-  <button id="vb-replace" title="Upload or pick a different bracket">Replace</button>
-  <button id="vb-export" title="Download this bracket as a JSON backup — re-import it later (e.g. on another device) without the Excel">Export JSON</button>
-  <button id="vb-clear" title="Clear and start over">Clear</button>
+  <span class="vb-you">Viewing <b id="vb-name">your bracket</b><span class="vb-saved">✓ saved on this device</span></span>
+  <button id="vb-replace" title="Start over — build or upload a different bracket">New bracket</button>
+  <button id="vb-export" title="Download a backup file — reopen it later or on another device">Save a copy</button>
+  <button id="vb-clear" title="Remove this bracket from this device">Clear</button>
 </div>
 
-<!-- Landing / upload -->
+<!-- Landing -->
 <div id="landing">
-  <span class="kicker">Bring Your Own Bracket</span>
-  <h1>Your World Cup 2026 bracket, scored live</h1>
-  <p class="tag">Drop in your filled-in <b>SLED World Cup 2026</b> bracket Excel and get your own
-  interactive dashboard — bracket map, live scoring, KPIs, the works — checked against real results.</p>
+  <span class="kicker">Your World Cup 2026 Bracket</span>
+  <h1>Pick your bracket, watch it score itself</h1>
+  <p class="tag"><b>No spreadsheet? No problem.</b> Build your bracket right here in a couple of minutes —
+  or upload your filled-in <b>SLED World Cup 2026</b> Excel. Either way you get your own live dashboard.</p>
 
-  <div id="drop" role="button" tabindex="0" aria-label="Upload your bracket Excel">
-    <div class="ball">⚽</div>
-    <div class="dh">Drop your bracket Excel here</div>
-    <div class="ds">.xlsx / .xlsm — or use the buttons below</div>
+  <div class="choices">
+    <button class="choice primary" id="build">
+      <span class="ch-ic">🏗️</span>
+      <span class="ch-t">Build my bracket</span>
+      <span class="ch-s">Tap winners round by round — nothing to download</span>
+    </button>
+    <button class="choice" id="pick">
+      <span class="ch-ic">📄</span>
+      <span class="ch-t">Upload my Excel</span>
+      <span class="ch-s">Have the SLED workbook? Drop it in</span>
+    </button>
   </div>
 
-  <div class="btnrow">
-    <button class="bigbtn" id="pick">Choose file…</button>
-    <button class="ghostbtn" id="demo">Try the demo bracket</button>
+  <div id="drop" role="button" tabindex="0" aria-label="Upload your bracket Excel">
+    <span class="drop-hint">⬆️ or drag your <b>.xlsx</b> here</span>
   </div>
   <input id="file" type="file" accept=".xlsx,.xlsm" hidden>
   <input id="importfile" type="file" accept=".json,application/json" hidden>
 
-  <p class="restore">Been here before and <b>exported</b> your bracket? <button class="linkbtn" id="import">Restore it from JSON</button> instead of re-uploading the Excel.</p>
+  <div class="mini-row">
+    <button class="linkbtn" id="demo">👀 See a demo first</button>
+    <span class="dotsep">·</span>
+    <button class="linkbtn" id="import">📂 Open a saved backup</button>
+  </div>
 
-  <p class="privacy">🔒 Your file is read <b>right here in your browser</b> — it is never uploaded anywhere.
-  Live match results are the only thing fetched (a small JSON in this repo).</p>
+  <p class="privacy">🔒 Everything stays <b>in your browser</b> — your picks are never uploaded. They're
+  saved on this device so your dashboard reopens on its own, and results auto-sync a few times a day.</p>
 
   <div id="errbox" hidden></div>
 
   <div class="steps">
-    <div class="step"><b>1 · Upload</b><span>Your “My Bracket” tab — picks, seeds, tiebreaker.</span></div>
-    <div class="step"><b>2 · Scored live</b><span>Matched to real results, refreshed a few times a day.</span></div>
-    <div class="step"><b>3 · Saved here</b><span>Reopens instantly on this device; export/clear anytime.</span></div>
+    <div class="step"><b>1 · Build or upload</b><span>Pick winners here, or drop your SLED Excel.</span></div>
+    <div class="step"><b>2 · Scored live</b><span>Matched to real results, auto-synced a few times a day.</span></div>
+    <div class="step"><b>3 · Saved for you</b><span>Reopens on this device; save a backup anytime.</span></div>
   </div>
 
-  <p class="foothint">A fan fork of
-    <a href="https://github.com/eriic-builds/wc26-bracket" target="_blank" rel="noopener">wc26-bracket</a>.
-    Same render engine, now client-side.</p>
+  <p class="foothint">A fan project. Same engine as
+    <a href="https://github.com/eriic-builds/wc26-bracket" target="_blank" rel="noopener">wc26-bracket</a>, now client-side.</p>
 </div>
+
+<!-- Interactive bracket builder overlay -->
+<div id="builder" class="builder" hidden><div class="bld-inner"></div></div>
 
 <!-- The rendered dashboard is injected here (inner HTML of .wrap) -->
 <div class="wrap" id="app" hidden></div>

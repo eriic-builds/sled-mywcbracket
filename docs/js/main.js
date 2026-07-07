@@ -4,6 +4,7 @@ import { renderDashboard } from "./render.js";
 import { initInteractions } from "./interact.js";
 import { savePicks, loadPicks, clearPicks, exportPicks, resetWhatIfsIfChanged } from "./storage.js";
 import { parseWorkbook, validateAgainstTopology, ValidationError } from "./parse-excel.js";
+import { openBuilder } from "./builder.js";
 
 const $ = (s) => document.querySelector(s);
 let TOPO = null, LIVE = null;
@@ -70,9 +71,11 @@ function toLanding() {
 
 function wire() {
   const fileInput = $("#file");
+  $("#build").onclick = () => { if (TOPO) openBuilder(TOPO, accept, () => {}); };  // build -> save+show
   $("#pick").onclick = () => fileInput.click();
   fileInput.onchange = () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); };
   const dz = $("#drop");
+  dz.addEventListener("click", () => fileInput.click());
   ["dragover", "dragenter"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("over"); }));
   ["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("over"); }));
   dz.addEventListener("drop", e => { const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) handleFile(f); });
