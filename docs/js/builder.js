@@ -78,61 +78,89 @@ export function openBuilder(topology, onDone, onCancel, resume = true) {
 
   const host = document.getElementById("builder");
   host.hidden = false;
+  let advancing = false, advToken = 0;
   const seedTag = (t) => S.seed[t] ? `<span class="seed">${esc(S.seed[t])}</span>` : "";
   const roundDone = (r) => S.rounds[r].codes.every(c => sel[c]);
   const totalPicked = () => S.rounds.reduce((n, r) => n + r.codes.filter(c => sel[c]).length, 0);
+  // first round that still has an unmade pick — also the furthest round you can jump to
+  const firstOpen = () => { for (let r = 0; r < S.rounds.length; r++) if (!roundDone(r)) return r; return S.rounds.length - 1; };
+  const SHORT = ["32", "16", "QF", "SF", "F"];
 
-  function matchCard(code) {
+  function matchCard(code, nextUp) {
     const [a, b] = teamsFor(S, code, sel);
-    const w = sel[code];
+    const w = sel[code], m = S.r32.find(x => x.code === code), fa = m ? null : S.koFeed[code];
     const teamBtn = (t, feeder) => {
       if (!t) return `<div class="bld-team tbd">Winner of ${esc(feeder)}</div>`;
-      const on = w === t ? " picked" : (w ? " dim" : "");
-      return `<button class="bld-team${on}" data-code="${esc(code)}" data-team="${esc(t)}">${seedTag(t)}<span class="tname">${esc(t)}</span><span class="bld-check">\u2713</span></button>`;
+      const cls = w === t ? " picked" : (w ? " dim" : "");
+      return `<button class="bld-team${cls}" data-code="${esc(code)}" data-team="${esc(t)}">` +
+        `${seedTag(t)}<span class="tname">${esc(t)}</span><span class="bld-adv">through \u2713</span></button>`;
     };
-    const fa = S.r32.find(x => x.code === code) ? null : S.koFeed[code];
-    return `<div class="bld-match"><div class="bld-mc">${esc(code)}</div>` +
-      teamBtn(a, fa ? fa[0] : "") + `<div class="bld-vs">vs</div>` + teamBtn(b, fa ? fa[1] : "") + `</div>`;
+    // friendly context instead of the internal match code: the date for R32, nothing later
+    const tag = m ? `<div class="bld-mc">${esc(m.date)}</div>` : "";
+    return `<div class="bld-match${w ? " done" : ""}${nextUp ? " next-up" : ""}">${tag}` +
+      teamBtn(a, fa ? fa[0] : "") + `<div class="bld-vs">or</div>` + teamBtn(b, fa ? fa[1] : "") + `</div>`;
   }
 
   function render() {
+    const maxNav = firstOpen();
+    if (step > maxNav) step = maxNav;                       // never sit on a locked round
     const r = S.rounds[step], isFinal = step === S.rounds.length - 1;
+    const complete = roundDone(step), picked = r.codes.filter(c => sel[c]).length;
     const steps = S.rounds.map((rr, i) =>
-      `<span class="bld-dot${i === step ? " on" : ""}${roundDone(i) ? " ok" : ""}" data-step="${i}" title="${esc(rr.label)}">${["32", "16", "QF", "SF", "F"][i]}</span>`).join("<span class=\"bld-sep\"></span>");
-    const picked = r.codes.filter(c => sel[c]).length;
-    const grid = `<div class="bld-grid">${r.codes.map(matchCard).join("")}</div>`;
+      `<span class="bld-dot${i === step ? " on" : ""}${roundDone(i) ? " ok" : ""}${i > maxNav ? " locked" : ""}" data-step="${i}" title="${esc(rr.label)}">${SHORT[i]}</span>`).join('<span class="bld-sep"></span>');
+    const nextCode = isFinal ? null : r.codes.find(c => !sel[c]);   // the match to guide the eye to
+    const grid = `<div class="bld-grid${isFinal ? " final" : ""}">${r.codes.map(c => matchCard(c, c === nextCode)).join("")}</div>`;
+    const champ = sel[S.finalcode];
     const finishPanel = isFinal ? `
       <div class="bld-finish">
-        <div class="bld-fh">${sel[S.finalcode] ? "\u{1F3C6} Champion: <b>" + esc(sel[S.finalcode]) + "</b>" : "Pick your champion above"}</div>
+        <div class="bld-fh">${champ ? "\u{1F3C6} Your champion: <b>" + esc(champ) + "</b>" : "\u{1F3C6} Tap your winner above to crown your champion"}</div>
         <label class="bld-field"><span>Your name</span><input id="bld-name" type="text" maxlength="40" placeholder="e.g. Alex" value="${esc(entrant)}"></label>
         <label class="bld-field"><span>Tiebreaker <small>(total goals in the Final)</small></span><input id="bld-tb" type="number" min="0" max="20" placeholder="e.g. 3" value="${esc(tiebreaker)}"></label>
-        <div class="bld-note">\u{1F512} Your bracket saves right here in <b>this browser</b> \u2014 nothing gets uploaded. Want a backup or to open it on another device? Tap <b>Save a copy</b> on your dashboard to download a file you can reopen anytime.</div>
+        <div class="bld-note">\u{1F512} Saves right here in <b>this browser</b> \u2014 nothing is uploaded. Want a backup or another device? Tap <b>Save a copy</b> on your dashboard.</div>
       </div>` : "";
+    const status = complete
+      ? `<span class="bld-ok-tag">\u2713 ${isFinal ? "bracket complete" : esc(r.label) + " done"}</span>`
+      : `<span class="bld-rprog">${picked} of ${r.codes.length} picked</span>`;
     host.querySelector(".bld-inner").innerHTML = `
       <div class="bld-head">
-        <div><div class="bld-title">Build your bracket</div><div class="bld-sub">Tap the winner of each match \u2014 no spreadsheet needed.</div></div>
+        <div><div class="bld-title">Build your bracket</div><div class="bld-sub">Tap who you think wins \u2014 winners move on for you.</div></div>
         <button class="bld-x" id="bld-cancel" title="Close">\u2715</button>
       </div>
       <div class="bld-steps">${steps}</div>
-      <div class="bld-roundhead"><b>${esc(r.label)}</b> <span>${picked}/${r.codes.length} picked</span></div>
+      <div class="bld-roundhead"><b>${esc(isFinal ? "The Final" : r.label)}</b> ${status}</div>
       <div class="bld-body">${grid}${finishPanel}</div>
       <div class="bld-foot">
         <button class="bld-btn ghost" id="bld-back"${step === 0 ? " disabled" : ""}>\u2190 Back</button>
         <div class="bld-prog"><i style="width:${Math.round(totalPicked() / 31 * 100)}%"></i></div>
+        <span class="bld-count">${totalPicked()}/31</span>
         ${isFinal
-          ? `<button class="bld-btn go" id="bld-done">See my dashboard \u2192</button>`
-          : `<button class="bld-btn go" id="bld-next"${roundDone(step) ? "" : " disabled"}>Next \u2192</button>`}
+          ? `<button class="bld-btn go" id="bld-done"${champ ? "" : " disabled"}>See my dashboard \u2192</button>`
+          : `<button class="bld-btn go${complete ? " ready" : ""}" id="bld-next"${complete ? "" : " disabled"}>Next \u2192</button>`}
       </div>`;
     wire();
+    const nu = host.querySelector(".bld-match.next-up");
+    if (nu && totalPicked() > 0) try { nu.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {}
   }
 
+  function pick(code, team) {
+    if (advancing) return;
+    sel[code] = team; repair(S, sel); saveDraft();
+    if (roundDone(step) && step < S.rounds.length - 1) {     // round finished -> glide to the next
+      advancing = true; const my = ++advToken; render();
+      setTimeout(() => {
+        if (my !== advToken) return;                         // cancelled by Back / a round jump
+        advancing = false; step = firstOpen(); render();
+        try { host.scrollTop = 0; } catch (e) {}
+      }, 680);
+    } else render();
+  }
+  function goTo(s) { advToken++; advancing = false; step = Math.max(0, Math.min(s, firstOpen())); render(); }
+
   function wire() {
-    host.querySelectorAll(".bld-team[data-team]").forEach(btn => btn.addEventListener("click", () => {
-      sel[btn.dataset.code] = btn.dataset.team; repair(S, sel); saveDraft(); render();
-    }));
-    host.querySelectorAll(".bld-dot").forEach(d => d.addEventListener("click", () => { step = +d.dataset.step; render(); }));
-    const back = host.querySelector("#bld-back"); if (back) back.onclick = () => { step = Math.max(0, step - 1); render(); };
-    const next = host.querySelector("#bld-next"); if (next) next.onclick = () => { if (roundDone(step)) { step++; saveDraft(); render(); } };
+    host.querySelectorAll(".bld-team[data-team]").forEach(btn => btn.addEventListener("click", () => pick(btn.dataset.code, btn.dataset.team)));
+    host.querySelectorAll(".bld-dot:not(.locked)").forEach(d => d.addEventListener("click", () => goTo(+d.dataset.step)));
+    const back = host.querySelector("#bld-back"); if (back) back.onclick = () => goTo(step - 1);
+    const next = host.querySelector("#bld-next"); if (next) next.onclick = () => { if (roundDone(step)) goTo(step + 1); };
     const cancel = host.querySelector("#bld-cancel"); if (cancel) cancel.onclick = () => { close(); if (onCancel) onCancel(); };
     const name = host.querySelector("#bld-name"); if (name) name.oninput = () => { entrant = name.value; saveDraft(); };
     const tb = host.querySelector("#bld-tb"); if (tb) tb.oninput = () => { tiebreaker = tb.value; saveDraft(); };
@@ -150,5 +178,6 @@ export function openBuilder(topology, onDone, onCancel, resume = true) {
   }
   function close() { host.hidden = true; host.querySelector(".bld-inner").innerHTML = ""; }
 
+  step = firstOpen();
   render();
 }

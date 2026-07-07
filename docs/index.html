@@ -105,6 +105,16 @@
 .bld-team.picked .bld-check{opacity:1}
 .bld-team.dim{opacity:.5}
 .bld-team.tbd{color:var(--muted,#9aa2ad);font-style:italic;font-weight:600;cursor:default;background:transparent;border-style:dashed;justify-content:center}
+.bld-team .bld-adv{margin-left:auto;font-size:.72rem;font-weight:800;color:var(--win-ink);opacity:0;white-space:nowrap;flex:0 0 auto}
+.bld-team.picked .bld-adv{opacity:1}
+.bld-team.dim .tname{text-decoration:line-through}
+.bld-match.done{border-color:color-mix(in srgb,var(--win) 26%,var(--border))}
+.bld-match.next-up{border-color:color-mix(in srgb,var(--blue) 48%,var(--border2));box-shadow:0 0 0 2px color-mix(in srgb,var(--blue) 20%,transparent)}
+.bld-dot.locked{opacity:.32;cursor:default}
+.bld-ok-tag{color:var(--win-ink);font-weight:800;font-size:.85rem;margin-left:6px}
+.bld-count{font-size:.78rem;font-weight:700;color:var(--muted);white-space:nowrap}
+.bld-grid.final{grid-template-columns:minmax(0,360px);justify-content:center}
+.bld-btn.go.ready{box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 22%,transparent)}
 .bld-finish{margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:grid;gap:12px;max-width:420px}
 .bld-fh{font-size:1rem}
 .bld-field{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted,#9aa2ad)}
