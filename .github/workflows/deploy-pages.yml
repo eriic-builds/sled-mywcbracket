@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: https://eriic-builds.github.io/wc26-bracket-yours/
+      url: https://eriic-builds.github.io/my-wc26-bracket/
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5

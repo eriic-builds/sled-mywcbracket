@@ -1,13 +1,13 @@
-# wc26-bracket-yours — Bring Your Own Bracket
+# my-wc26-bracket — Bring Your Own Bracket
 
-[![Sync World Cup results](https://github.com/eriic-builds/wc26-bracket-yours/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/wc26-bracket-yours/actions/workflows/sync-results.yml)
-[![Deploy GitHub Pages](https://github.com/eriic-builds/wc26-bracket-yours/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/wc26-bracket-yours/actions/workflows/deploy-pages.yml)
+[![Sync World Cup results](https://github.com/eriic-builds/my-wc26-bracket/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/my-wc26-bracket/actions/workflows/sync-results.yml)
+[![Deploy GitHub Pages](https://github.com/eriic-builds/my-wc26-bracket/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/my-wc26-bracket/actions/workflows/deploy-pages.yml)
 
 > Upload your own filled-in **SLED World Cup 2026** bracket Excel and get your personal,
 > live-scored dashboard — bracket map, KPIs, scorecard, round-by-round results, themes — all
 > rendered **in your browser**. Your file is never uploaded anywhere.
 
-**Live site:** https://eriic-builds.github.io/wc26-bracket-yours/
+**Live site:** https://eriic-builds.github.io/my-wc26-bracket/
 
 This is a client-side fork of [**wc26-bracket**](https://github.com/eriic-builds/wc26-bracket)
 (which renders one person's dashboard in Python at build time). Here the same render engine runs
