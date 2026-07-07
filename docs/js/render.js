@@ -628,16 +628,18 @@ export function renderDashboard(picks, live, topology) {
     '<div class="upd-group">' +
     `<div class="refreshed glass" id="topRefreshed" title="When live results were last synced"><span class="rf-dot"></span>Updated ${D.REFRESHED}</div>` +
     syncBtn + '</div>' +
-    '<div class="modes glass"><button data-mode="dark" class="on">Dark</button><button data-mode="light">Light</button>' +
-    '<button data-mode="easy" title="Reading mode">Easy</button>' +
-    '<div class="fun-wrap" id="funWrap"><button class="fun-btn" id="funBtn" aria-haspopup="true" aria-expanded="false" title="Fun themes">Fun <span class="fun-car">\u25BE</span></button>' +
+    '<div class="modes glass">' +
+    '<div class="theme-toggle" role="group" aria-label="Light or dark theme">' +
+    '<button data-mode="light" class="tg-ic" title="Light">\u2600\uFE0F</button>' +
+    '<button data-mode="dark" class="tg-ic on" title="Dark">\u{1F319}</button>' +
+    '</div>' +
+    '<button data-mode="easy" class="mode-lbl" title="Easy reading mode \u2014 larger, higher-contrast text"><span class="mi">\u{1F453}</span> Easy</button>' +
+    '<div class="fun-wrap" id="funWrap"><button class="fun-btn" id="funBtn" aria-haspopup="true" aria-expanded="false" title="Fun themes"><span class="mi">\u{1F3A8}</span> Fun <span class="fun-car">\u25BE</span></button>' +
     '<div class="fun-menu glass" id="funMenu" role="menu">' +
     '<button data-mode="geocities" role="menuitem"><span class="fm-em">\u{1F310}</span> GeoCities</button>' +
     '<button data-mode="minecraft" role="menuitem"><span class="fm-em">\u26CF\uFE0F</span> Minecraft</button>' +
     '<button data-mode="winxp" role="menuitem"><span class="fm-em">\u{1FA9F}</span> Windows XP</button>' +
     '<button data-mode="doodle" role="menuitem"><span class="fm-em">\u270F\uFE0F</span> Doodle</button>' +
-    '<button data-mode="hongkong" role="menuitem"><span class="fm-em">\u{1F303}</span> Hong Kong 1989</button>' +
-    '<button data-mode="bart" role="menuitem"><span class="fm-em">\u26A1</span> BART \u00b7 Third Rail</button>' +
     '</div></div></div></div>' +
     '<div class="shell"><nav class="rail glass" id="rail">' +
     '<button class="navtoggle" id="navToggle" aria-expanded="false" aria-controls="railLinks">\u{1F4D1} Contents \u2630</button>' +

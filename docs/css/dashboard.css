@@ -37,23 +37,6 @@ html[data-theme="doodle"]{--bg:#F4EFE1;--panel:#FBF7EC;--text:#333029;--text2:#4
  --gold:#b1892f;--gold-ink:#8a6a20;--win:#5f7d40;--win-ink:#48602f;--out:#9a948a;--lose-ink:#a6453b;--g1:rgba(58,54,47,.05);--g2:rgba(58,54,47,.04);--g3:rgba(58,54,47,.03);
  --blue:#3b5a78;--purple:#5b4a6b;--pink:#a6453b;--orange:#b1732f;--green:#5f7d40;--teal:#3f6b64;--grad:linear-gradient(90deg,#4a463d,#6f6a60);
  --radius:14px;--radius-sm:10px;--fs:16px;--lh:1.55;--ls:.01em;--fstack:"Segoe Print","Bradley Hand","Comic Sans MS","Chalkboard SE",cursive;}
-/* Fun · Hong Kong 1989 — neon-noir Kowloon nightscape: deep-midnight sky, glowing neon-sign colours (electric red, jade, cyan, gold), Chinese-friendly font and a 香港 · 1989 badge for nostalgia */
-html[data-theme="hongkong"]{--bg:#0a0a14;--panel:#14121f;--text:#F6ECD8;--text2:#FFE3B3;--muted:#8a90b5;--border:#FF2D6B;--border2:#00E5FF;
- --glass:linear-gradient(160deg,rgba(40,10,42,.72),rgba(10,10,26,.86));--shadow:0 0 0 1px rgba(255,45,107,.45),0 0 22px rgba(255,45,107,.30),0 12px 34px rgba(0,0,0,.62);--hover:rgba(255,45,107,.16);
- --gold:#FFC531;--gold-ink:#FFD75E;--win:#00E5A0;--win-ink:#5affc7;--out:#6b7398;--lose-ink:#FF4D6D;--g1:rgba(255,45,107,.30);--g2:rgba(0,229,255,.22);--g3:rgba(255,197,49,.20);
- --blue:#00E5FF;--purple:#C77DFF;--pink:#FF2D6B;--orange:#FF7A1A;--green:#00E5A0;--teal:#00E5FF;
- --grad:linear-gradient(120deg,#FF2D6B,#FFC531,#00E5A0);
- --radius:14px;--radius-sm:10px;--fs:16px;--lh:1.55;--ls:.01em;--fstack:"PingFang HK","Hiragino Sans GB","Microsoft JhengHei","Noto Sans HK","Segoe UI",system-ui,sans-serif;}
-/* Fun · BART Third Rail — SF BART traction-power control room for an electrician / electrical
-   engineer: deep tunnel-dark with a faint blueprint grid, high-voltage hazard yellow, BART
-   route-line accents (yellow/orange/red/green/blue), monospace schematic type, and a 1000V DC
-   third-rail badge. */
-html[data-theme="bart"]{--bg:#0B0F17;--panel:#131A24;--text:#EAF2FA;--text2:#CFE0EF;--muted:#8497A8;--border:#22303F;--border2:#FFD21E;
- --glass:linear-gradient(180deg,#131A24,#0E141D);--shadow:0 0 0 1px rgba(255,210,30,.12),0 10px 30px rgba(0,0,0,.55);--hover:rgba(255,210,30,.12);
- --gold:#FFD21E;--gold-ink:#FFDE5A;--win:#4DB748;--win-ink:#79E06E;--out:#7789a0;--lose-ink:#FF5A4D;--g1:rgba(255,210,30,.14);--g2:rgba(0,114,188,.16);--g3:rgba(229,0,43,.09);
- --blue:#2E9BE6;--purple:#7A5CFF;--pink:#E4002B;--orange:#F57F00;--green:#4DB748;--teal:#00B3C4;
- --grad:linear-gradient(90deg,#FFCF00,#F57F00,#E4002B,#4DB748,#0072BC);
- --radius:8px;--radius-sm:6px;--fs:15px;--lh:1.5;--ls:.01em;--fstack:ui-monospace,"SFMono-Regular","Consolas","Roboto Mono","Courier New",monospace;}
 *{box-sizing:border-box}html,body{margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:24px}
 body{font-family:var(--fstack);font-size:var(--fs);line-height:var(--lh);letter-spacing:var(--ls);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
@@ -69,6 +52,9 @@ body::before{content:"";position:fixed;inset:-20% -10% auto -10%;height:70vh;z-i
 .modes button{font-family:inherit;font-size:.82rem;font-weight:600;color:var(--muted);background:transparent;border:0;padding:7px 15px;border-radius:999px;cursor:pointer;transition:.16s}
 .modes button:hover{color:var(--text);background:var(--hover)}
 .modes button.on{color:#fff;background:var(--blue);box-shadow:0 4px 14px rgba(0,151,244,.4)}
+.theme-toggle{display:inline-flex;gap:2px;background:var(--hover);border-radius:999px;padding:2px}
+.modes .theme-toggle button{padding:6px 10px;font-size:1rem;line-height:1}
+.modes .mi{font-size:1.02em;margin-right:1px}
 .fun-wrap{position:relative;display:inline-flex}
 .fun-btn{font-family:inherit;font-size:.82rem;font-weight:600;color:var(--muted);background:transparent;border:0;padding:7px 13px;border-radius:999px;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:5px}
 .fun-btn:hover{color:var(--text);background:var(--hover)}
@@ -404,30 +390,3 @@ html[data-theme="doodle"] h1,html[data-theme="doodle"] h2,html[data-theme="doodl
 html[data-theme="doodle"] a{color:#3b5a78;text-decoration:underline wavy}
 html[data-theme="doodle"] img,html[data-theme="doodle"] .flag{filter:grayscale(1) contrast(1.15) brightness(.98)}
 html[data-theme="doodle"] .orb,html[data-theme="doodle"] .pill.live .dot,html[data-theme="doodle"] .rf-dot{filter:grayscale(1)}
-/* ---- Fun · Hong Kong 1989 look — neon-noir Kowloon night, glowing signage, bilingual 香港 badge ---- */
-html[data-theme="hongkong"] body::before{display:none}
-html[data-theme="hongkong"] body{background-color:#0a0a14;background-image:radial-gradient(circle at 12% 16%,rgba(255,45,107,.22),transparent 40%),radial-gradient(circle at 86% 24%,rgba(0,229,255,.16),transparent 42%),radial-gradient(circle at 70% 82%,rgba(255,197,49,.14),transparent 44%),radial-gradient(circle at 24% 80%,rgba(0,229,160,.14),transparent 44%),repeating-linear-gradient(90deg,transparent 0 40px,rgba(255,255,255,.02) 40px 41px)}
-html[data-theme="hongkong"] .glass{backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);border:1px solid rgba(255,45,107,.5)}
-html[data-theme="hongkong"] h1,html[data-theme="hongkong"] h2,html[data-theme="hongkong"] .story-title,html[data-theme="hongkong"] .hero h1,html[data-theme="hongkong"] .shead h2{background:none;color:#fff;-webkit-text-fill-color:#fff;text-shadow:0 0 3px #fff,0 0 9px #FF2D6B,0 0 20px #FF2D6B,0 0 40px rgba(255,45,107,.65);font-weight:800;letter-spacing:.02em}
-html[data-theme="hongkong"] .eyebrow{color:#00E5FF;text-shadow:0 0 6px rgba(0,229,255,.85)}
-html[data-theme="hongkong"] a{color:#00E5FF;text-shadow:0 0 6px rgba(0,229,255,.7)}
-html[data-theme="hongkong"] .modes button,html[data-theme="hongkong"] .fun-btn,html[data-theme="hongkong"] .chip,html[data-theme="hongkong"] .seg button{border:1px solid rgba(0,229,255,.35);background:rgba(255,255,255,.03);color:var(--text)}
-html[data-theme="hongkong"] .modes button.on,html[data-theme="hongkong"] .fun-btn.on,html[data-theme="hongkong"] .fun-menu button.on,html[data-theme="hongkong"] .seg button.on{background:#FF2D6B;color:#0a0a14;border-color:#FF2D6B;box-shadow:0 0 12px rgba(255,45,107,.8)}
-html[data-theme="hongkong"] .team{border:1px solid rgba(0,229,255,.30)}
-html[data-theme="hongkong"] .orb{background:var(--grad);box-shadow:0 0 10px #FF2D6B,0 0 22px rgba(255,45,107,.55)}
-html[data-theme="hongkong"] .pill.live .dot,html[data-theme="hongkong"] .rf-dot{box-shadow:0 0 8px currentColor,0 0 16px rgba(0,229,160,.6)}
-html[data-theme="hongkong"] .brand>div{position:relative}
-html[data-theme="hongkong"] .brand>div::after{content:"香港 · 1989 · HONG KONG";display:block;margin-top:3px;font-size:.7rem;font-weight:800;letter-spacing:.14em;color:#FF2D6B;text-shadow:0 0 6px rgba(255,45,107,.9),0 0 14px rgba(255,45,107,.55)}
-html[data-theme="bart"] body::before{display:none}
-html[data-theme="bart"] body{background-color:#0B0F17;background-image:linear-gradient(rgba(255,210,30,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(46,155,230,.05) 1px,transparent 1px),radial-gradient(circle at 84% 6%,rgba(255,210,30,.12),transparent 40%),radial-gradient(circle at 10% 92%,rgba(0,114,188,.14),transparent 44%);background-size:28px 28px,28px 28px,auto,auto}
-html[data-theme="bart"] .glass{background:linear-gradient(180deg,#131A24,#0E141D);backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid rgba(255,210,30,.22)}
-html[data-theme="bart"] .hero{border-top:4px solid transparent;border-image:repeating-linear-gradient(45deg,#FFD21E 0 14px,#0B0F17 14px 28px) 4}
-html[data-theme="bart"] h1,html[data-theme="bart"] h2,html[data-theme="bart"] h3,html[data-theme="bart"] .story-title,html[data-theme="bart"] .shead h2{background:none;color:#FFD21E;-webkit-text-fill-color:#FFD21E;text-shadow:0 0 8px rgba(255,210,30,.4);letter-spacing:.02em}
-html[data-theme="bart"] .eyebrow,html[data-theme="bart"] .kicker{color:#2E9BE6;text-shadow:0 0 6px rgba(46,155,230,.55);text-transform:uppercase;letter-spacing:.16em}
-html[data-theme="bart"] a{color:#2E9BE6}
-html[data-theme="bart"] .modes button,html[data-theme="bart"] .fun-btn,html[data-theme="bart"] .chip,html[data-theme="bart"] .seg button,html[data-theme="bart"] .fun-menu button{border:1px solid rgba(255,210,30,.30);background:rgba(255,255,255,.03);color:var(--text)}
-html[data-theme="bart"] .modes button.on,html[data-theme="bart"] .fun-btn.on,html[data-theme="bart"] .fun-menu button.on,html[data-theme="bart"] .seg button.on{background:#FFD21E;color:#0B0F17;border-color:#FFD21E;box-shadow:0 0 12px rgba(255,210,30,.65)}
-html[data-theme="bart"] .team{border:1px solid rgba(46,155,230,.28)}
-html[data-theme="bart"] .orb{background:var(--grad);box-shadow:0 0 10px rgba(255,210,30,.75),0 0 22px rgba(46,155,230,.45)}
-html[data-theme="bart"] .brand>div{position:relative}
-html[data-theme="bart"] .brand>div::after{content:"⚡ 1000 V DC · THIRD RAIL · SFBART";display:inline-block;margin-top:4px;font-size:.63rem;font-weight:800;letter-spacing:.14em;color:#FFD21E;background:rgba(255,210,30,.08);border:1px solid rgba(255,210,30,.45);border-left:5px solid #FFD21E;padding:2px 9px;border-radius:3px;text-shadow:0 0 6px rgba(255,210,30,.45)}

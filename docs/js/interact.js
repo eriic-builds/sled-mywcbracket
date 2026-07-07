@@ -6,7 +6,7 @@ export function initInteractions(){
  var root=document.documentElement,LS=window.localStorage;
  var KTHEME='wcb.theme',KFAV='wcb.favs',KFO='wcb.favonly',KSC='wcb.scores.v3';
  function setTheme(t){root.setAttribute('data-theme',t);document.querySelectorAll('.modes button').forEach(function(b){if(b.dataset.mode)b.classList.toggle('on',b.dataset.mode===t)});if(funBtn)funBtn.classList.toggle('on',!!FUN[t]);try{LS.setItem(KTHEME,t)}catch(e){}closeFun();if(window.__drawConn)setTimeout(window.__drawConn,80);}
- var FUN={geocities:1,minecraft:1,winxp:1,doodle:1,hongkong:1,bart:1};
+ var FUN={geocities:1,minecraft:1,winxp:1,doodle:1};
  var funWrap=document.getElementById('funWrap'),funBtn=document.getElementById('funBtn');
  function closeFun(){if(funWrap){funWrap.classList.remove('open');if(funBtn)funBtn.setAttribute('aria-expanded','false');}}
  document.querySelectorAll('.modes button').forEach(function(b){if(b.dataset.mode)b.addEventListener('click',function(){setTheme(b.dataset.mode)})});
