@@ -43,9 +43,10 @@
 #errbox ul{margin:0;padding-left:20px;color:var(--text2);font-size:.9rem;line-height:1.6}
 #errbox .err-f{margin-top:10px;font-size:.88rem;color:var(--muted,#9aa2ad)}
 .linkbtn{background:none;border:none;color:var(--blue);font:inherit;cursor:pointer;text-decoration:underline;padding:0}
-#viewerbar{position:sticky;top:0;z-index:60;display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:center;
+#viewerbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:10px;
   padding:8px 14px;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);font-size:.86rem}
-#viewerbar #vb-home{margin-right:auto}
+#viewerbar #vb-home{flex-shrink:0}
+#viewerbar .vb-center{flex:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px}
 #viewerbar .vb-you{color:var(--muted,#9aa2ad)} #viewerbar .vb-you b{color:var(--text)}
 #viewerbar button{font:inherit;font-size:.82rem;font-weight:600;border-radius:9px;padding:5px 11px;cursor:pointer;
   color:var(--text);background:var(--hover);border:1px solid var(--border2)}
@@ -186,14 +187,16 @@
 <!-- Returning-visitor / viewer control bar (hidden until a bracket is loaded) -->
 <div id="viewerbar" hidden>
   <button id="vb-home" title="Back to the start page — your bracket stays saved">🏠 Home</button>
-  <span class="vb-you">Viewing <b id="vb-name">your bracket</b><span class="vb-saved">✓ saved on this device</span></span>
-  <button id="vb-compare" title="Rank the brackets saved on this device">🏆 Leaderboard</button>
-  <button id="vb-share" title="Copy a link that shows this bracket to anyone you send it to">🔗 Share link</button>
-  <button id="vb-addrival" hidden title="Put this bracket on your local leaderboard">➕ Add to my leaderboard</button>
-  <button id="vb-export" title="Download a backup file — reopen it later or on another device">Save a copy</button>
-  <button id="vb-clear" title="Remove this bracket from this device">Clear</button>
-  <button id="vb-saveshared" hidden title="Keep this shared bracket as yours on this device">Save as mine</button>
-  <button id="vb-back" hidden title="Return to your own saved bracket">← Back to my bracket</button>
+  <div class="vb-center">
+    <span class="vb-you">Viewing <b id="vb-name">your bracket</b><span class="vb-saved">✓ saved on this device</span></span>
+    <button id="vb-compare" title="Rank the brackets saved on this device">🏆 Leaderboard</button>
+    <button id="vb-share" title="Copy a link that shows this bracket to anyone you send it to">🔗 Share link</button>
+    <button id="vb-addrival" hidden title="Put this bracket on your local leaderboard">➕ Add to my leaderboard</button>
+    <button id="vb-export" title="Download a backup file — reopen it later or on another device">Save a copy</button>
+    <button id="vb-clear" title="Remove this bracket from this device">Clear</button>
+    <button id="vb-saveshared" hidden title="Keep this shared bracket as yours on this device">Save as mine</button>
+    <button id="vb-back" hidden title="Return to your own saved bracket">← Back to my bracket</button>
+  </div>
   <div id="sharepop" class="sharepop" hidden>
     <label class="sp-field">Share as
       <input id="share-name" type="text" maxlength="40" autocomplete="off"
