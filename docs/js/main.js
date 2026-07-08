@@ -8,6 +8,8 @@ import { savePicks, loadPicks, clearPicks, exportPicks, resetWhatIfsIfChanged,
 import { parseWorkbook, validateAgainstTopology, ValidationError } from "./parse-excel.js";
 import { openBuilder } from "./builder.js";
 import { encodeShare, decodeShare } from "./share.js";
+import { openCompare, addRival } from "./compare.js";
+import { hashPicks } from "./storage.js";
 
 const $ = (s) => document.querySelector(s);
 let TOPO = null, LIVE = null;
@@ -40,10 +42,11 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   if (savedTag) savedTag.hidden = isDemo || isShared;   // only true for the owner's bracket
   // Viewer-bar mode: own bracket -> manage/share buttons; shared -> save/back only.
   const own = !isDemo && !isShared;
-  for (const id of ["vb-replace", "vb-export", "vb-clear", "vb-share"])
+  for (const id of ["vb-replace", "vb-export", "vb-clear", "vb-share", "vb-compare"])
     { const el = $("#" + id); if (el) el.hidden = !own; }
   $("#vb-saveshared").hidden = !isShared;
   $("#vb-back").hidden = !isShared;
+  $("#vb-addrival").hidden = !isShared;
   $("#sharepop").hidden = true;
   initInteractions();                                  // run the verbatim interaction layer
   if (window.__drawConn) setTimeout(window.__drawConn, 90);  // initial connector draw
@@ -123,6 +126,23 @@ function wireShare() {
 
 // Returns "shown" (shared bracket rendered), "failed" (bad link — error is showing,
 // stay on the landing so the message isn't covered up), or "none" (no share hash).
+// Turn a pasted share link (or bare payload) into a rival on the local leaderboard.
+function addRivalFromLink(text) {
+  try {
+    const m = String(text).match(/#b=([A-Za-z0-9_-]+)/) || String(text).trim().match(/^([A-Za-z0-9_-]{24,})$/);
+    if (!m) return { ok: false, reason: "That doesn’t look like a share link — it should contain #b=…" };
+    const picks = validateAgainstTopology(decodeShare(m[1], TOPO), TOPO);
+    const mine = loadPicks();
+    if (mine && hashPicks(mine) === hashPicks(picks)) return { ok: false, reason: "That’s your own bracket 🙂" };
+    return addRival(picks);
+  } catch (e) {
+    const why = e instanceof ValidationError ? e.problems.join(" ") : (e.message || String(e));
+    return { ok: false, reason: "Couldn’t add that bracket: " + why };
+  }
+}
+
+function openLeaderboard() { if (TOPO && LIVE) openCompare(TOPO, LIVE, { onAddLink: addRivalFromLink }); }
+
 function openSharedFromHash() {
   const m = location.hash.match(/^#b=([A-Za-z0-9_-]+)$/);
   if (!m || !TOPO) return "none";
@@ -165,6 +185,13 @@ function wire() {
     showDashboard(SHOWN);          // re-show as own (restores + resets what-ifs correctly)
   };
   $("#vb-back").onclick = () => { clearHash(); location.reload(); };
+  $("#vb-compare").onclick = openLeaderboard;
+  $("#vb-addrival").onclick = () => {
+    if (!SHOWN || !IS_SHARED) return;
+    const res = addRival(SHOWN);
+    if (!res.ok) { alert(res.reason); return; }
+    openLeaderboard();                 // straight to the standings — the payoff moment
+  };
   wireShare();
   const dab = $("#dab"); if (dab) dab.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
 }
