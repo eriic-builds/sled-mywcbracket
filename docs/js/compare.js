@@ -72,7 +72,7 @@ export function diffPicks(mine, theirs, live, topology) {
 // ── overlay UI ───────────────────────────────────────────────────────────────
 const ROUND_TAG = { r32: "R32", r16: "R16", qf: "QF", sf: "SF", final: "Final" };
 
-export function openCompare(topology, live, { onAddLink } = {}) {
+export function openCompare(topology, live, { onAddLink, onAddDemo } = {}) {
   const host = document.getElementById("compare");
   const inner = host.querySelector(".bld-inner");
   host.hidden = false;
@@ -99,7 +99,8 @@ export function openCompare(topology, live, { onAddLink } = {}) {
         rows.map((r, i) => {
           const champ = `<span class="${r.champAlive ? "" : "cmp-out"}">${esc(r.champ)}</span>${r.champAlive ? "" : " ✕"}`;
           const tools = r.you ? '<span class="cmp-you">you</span>' :
-            `<button class="cmp-btn" data-diff="${r.hash}" title="Where you and they differ">diff</button>` +
+            // "diff" needs a bracket of yours to compare against — hide it until one exists
+            (mine ? `<button class="cmp-btn" data-diff="${r.hash}" title="Where you and they differ">diff</button>` : "") +
             `<button class="cmp-btn" data-rename="${r.hash}" title="Rename on your board (local only)">✎</button>` +
             `<button class="cmp-btn" data-remove="${r.hash}" title="Remove from your board">✕</button>`;
           let diffHtml = "";
@@ -132,7 +133,8 @@ export function openCompare(topology, live, { onAddLink } = {}) {
         <button id="cmp-add">Add</button></div>
         <div id="cmp-msg" class="cmp-msg"></div>
         <div class="sp-note">Ask them to tap <b>🔗 Share link</b> on their dashboard and send you the link.
-        Their bracket is added to your board only — you can rename or remove it anytime.</div>
+        Their bracket is added to your board only — you can rename or remove it anytime.
+        ${onAddDemo ? 'No links yet? <button class="linkbtn" id="cmp-demo">Add the demo bracket to try it</button>' : ""}</div>
       </div>`;
 
     inner.querySelector("#cmp-close").onclick = close;
@@ -155,6 +157,13 @@ export function openCompare(topology, live, { onAddLink } = {}) {
       if (res.ok) { linkIn.value = ""; render(); }
     };
     linkIn.onkeydown = (e) => { if (e.key === "Enter") inner.querySelector("#cmp-add").click(); };
+    const demoBtn = inner.querySelector("#cmp-demo");
+    if (demoBtn) demoBtn.onclick = async () => {
+      const res = await onAddDemo();
+      msg.textContent = res.ok ? (res.dup ? "Already on your board." : "Added the demo ✓") : res.reason;
+      msg.className = "cmp-msg " + (res.ok ? "ok" : "bad");
+      if (res.ok) render();
+    };
   }
 
   render();

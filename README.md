@@ -23,15 +23,32 @@ as JavaScript, so *anyone* can drop in their bracket and see their own board.
 
 ## How to use it
 
-1. Open the site and **drop your bracket Excel** (`.xlsx`) on the page — or click **Try the demo
-   bracket** to see a sample.
+1. Open the site and **drop your bracket Excel** (`.xlsx`) on the page, **build a bracket** by
+   tapping winners, or click **See a demo first**.
 2. It parses your **"My Bracket"** tab entirely in your browser (SheetJS), validates it, and
    renders your dashboard scored against live results.
-3. Your bracket is saved in `localStorage`, so it reopens instantly next time. **Export JSON**,
-   **Import JSON**, **Replace**, and **Clear** are in the top bar.
+3. Your bracket is saved in `localStorage`, so it reopens instantly next time. **Save a copy**,
+   **Open a saved backup**, **New bracket**, and **Clear** are in the top bar.
+
+## The social loop (what this pilot adds)
+
+1. **🔗 Share link** — your whole bracket travels inside the URL (~140 characters: 31 picks +
+   your display name + tiebreaker). Edit the **"share as"** name first if you'd rather appear as
+   initials or a nickname. Send it to whoever you choose — chat, email, carrier pigeon.
+2. **Opening a link** shows the sender's full live-scored dashboard, view-only. Your own saved
+   bracket and what-if edits are never touched.
+3. **➕ Add to my leaderboard** puts their bracket on *your* board — stored in your browser only.
+4. **🏆 Leaderboard** ranks everyone you've added (confirmed points, then attainable), with a
+   per-rival **diff** of the games still to play, sorted by points at stake. Rename or remove
+   anyone anytime (local only).
+
+There is no server and no pool registry — see `SPEC.md` for the wire format, the behavioral
+invariants, and the deliberate decisions (e.g. no "re-share someone else's bracket" feature).
 
 **Privacy:** the only network requests are same-origin fetches of `docs/data/*.json` (the shared
-live results + tournament topology) and the static assets. Your workbook never leaves the browser.
+live results + tournament topology) and the static assets. Your workbook never leaves the browser;
+your picks leave it only inside a share link **you** create. The bracket rides in the URL
+*fragment* (`#b=…`), which browsers never send to any server — not even GitHub's logs see it.
 
 ## How it works
 

@@ -49,6 +49,10 @@
 #viewerbar button{font:inherit;font-size:.82rem;font-weight:600;border-radius:9px;padding:5px 11px;cursor:pointer;
   color:var(--text);background:var(--hover);border:1px solid var(--border2)}
 #viewerbar button:hover{background:var(--border)}
+/* The leaderboard is the headline social feature — make its button unmissable */
+#viewerbar #vb-compare, #viewerbar #vb-addrival{color:#04121a;font-weight:800;border:none;
+  background:linear-gradient(120deg,#F2C14E,#F29B4E);box-shadow:0 0 0 2px rgba(242,193,78,.25)}
+#viewerbar #vb-compare:hover, #viewerbar #vb-addrival:hover{filter:brightness(1.08);background:linear-gradient(120deg,#F2C14E,#F29B4E)}
 .steps{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:26px 0 0;text-align:left}
 .step{flex:1 1 200px;max-width:230px;background:var(--hover);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
 .step b{display:block;color:var(--gold-ink);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
@@ -181,8 +185,8 @@
 <!-- Returning-visitor / viewer control bar (hidden until a bracket is loaded) -->
 <div id="viewerbar" hidden>
   <span class="vb-you">Viewing <b id="vb-name">your bracket</b><span class="vb-saved">✓ saved on this device</span></span>
-  <button id="vb-share" title="Copy a link that shows this bracket to anyone you send it to">🔗 Share link</button>
   <button id="vb-compare" title="Rank the brackets saved on this device">🏆 Leaderboard</button>
+  <button id="vb-share" title="Copy a link that shows this bracket to anyone you send it to">🔗 Share link</button>
   <button id="vb-addrival" hidden title="Put this bracket on your local leaderboard">➕ Add to my leaderboard</button>
   <button id="vb-replace" title="Start over — build or upload a different bracket">New bracket</button>
   <button id="vb-export" title="Download a backup file — reopen it later or on another device">Save a copy</button>
@@ -238,19 +242,28 @@
     </button>
   </div>
 
+  <div id="poolcard" class="choices alt" hidden>
+    <button class="choice" id="poolopen">
+      <span class="ch-ic">🏆</span>
+      <span class="ch-t">Your pool — <span id="poolcount">0</span> saved</span>
+      <span class="ch-s">See the leaderboard of brackets added on this device</span>
+    </button>
+  </div>
+
   <div class="mini-row">
     <button class="linkbtn" id="demo">👀 See a demo first</button>
   </div>
 
-  <p class="privacy">🔒 Everything stays <b>in your browser</b> — your picks are never uploaded. They're
-  saved on this device so your dashboard reopens on its own, and results auto-sync a few times a day.</p>
+  <p class="privacy">🔒 Everything stays <b>in your browser</b> — your picks are saved on this device
+  and never uploaded. Want to compare with friends? You each send a <b>share link</b> you create
+  yourselves; brackets added to your leaderboard live on your device only.</p>
 
   <div id="errbox" hidden></div>
 
   <div class="steps">
     <div class="step"><b>1 · Build or upload</b><span>Pick winners here, or drop your SLED Excel.</span></div>
     <div class="step"><b>2 · Scored live</b><span>Matched to real results, auto-synced a few times a day.</span></div>
-    <div class="step"><b>3 · Saved for you</b><span>Reopens on this device; save a backup anytime.</span></div>
+    <div class="step"><b>3 · Share &amp; compare</b><span>Send your link, add your friends' links, and watch the leaderboard.</span></div>
   </div>
 
   <p class="foothint">A fan project. Same engine as

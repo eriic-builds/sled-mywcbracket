@@ -8,7 +8,7 @@ import { savePicks, loadPicks, clearPicks, exportPicks, resetWhatIfsIfChanged,
 import { parseWorkbook, validateAgainstTopology, ValidationError } from "./parse-excel.js";
 import { openBuilder } from "./builder.js";
 import { encodeShare, decodeShare } from "./share.js";
-import { openCompare, addRival } from "./compare.js";
+import { openCompare, addRival, loadRivals } from "./compare.js";
 import { hashPicks } from "./storage.js";
 
 const $ = (s) => document.querySelector(s);
@@ -47,6 +47,8 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   $("#vb-saveshared").hidden = !isShared;
   $("#vb-back").hidden = !isShared;
   $("#vb-addrival").hidden = !isShared;
+  const nRivals = loadRivals().length;
+  $("#vb-compare").textContent = "🏆 Leaderboard" + (nRivals ? ` (${nRivals + 1})` : "");
   $("#sharepop").hidden = true;
   initInteractions();                                  // run the verbatim interaction layer
   if (window.__drawConn) setTimeout(window.__drawConn, 90);  // initial connector draw
@@ -91,6 +93,7 @@ function toLanding() {
   $("#viewerbar").hidden = true; $("#dab").hidden = true;
   $("#errbox").hidden = true;
   $("#landing").hidden = false;
+  refreshLanding();
   window.scrollTo(0, 0);
 }
 
@@ -141,7 +144,27 @@ function addRivalFromLink(text) {
   }
 }
 
-function openLeaderboard() { if (TOPO && LIVE) openCompare(TOPO, LIVE, { onAddLink: addRivalFromLink }); }
+async function addDemoRival() {
+  try {
+    const picks = validateAgainstTopology(await fetch("data/demo-picks.json").then(r => r.json()), TOPO);
+    const mine = loadPicks();
+    if (mine && hashPicks(mine) === hashPicks(picks)) return { ok: false, reason: "The demo *is* your bracket 🙂" };
+    return addRival(picks);
+  } catch (e) { return { ok: false, reason: "Couldn’t load the demo bracket." }; }
+}
+
+function openLeaderboard() {
+  if (TOPO && LIVE) openCompare(TOPO, LIVE, { onAddLink: addRivalFromLink, onAddDemo: addDemoRival });
+}
+
+// Landing "Your pool" card — visible only when brackets are already on the board.
+function refreshLanding() {
+  const card = $("#poolcard");
+  if (!card) return;
+  const n = loadRivals().length;
+  card.hidden = n === 0;
+  const c = $("#poolcount"); if (c) c.textContent = n;
+}
 
 function openSharedFromHash() {
   const m = location.hash.match(/^#b=([A-Za-z0-9_-]+)$/);
@@ -186,6 +209,7 @@ function wire() {
   };
   $("#vb-back").onclick = () => { clearHash(); location.reload(); };
   $("#vb-compare").onclick = openLeaderboard;
+  const po = $("#poolopen"); if (po) po.onclick = openLeaderboard;
   $("#vb-addrival").onclick = () => {
     if (!SHOWN || !IS_SHARED) return;
     const res = addRival(SHOWN);
@@ -200,6 +224,7 @@ function wire() {
   try { const th = localStorage.getItem("wcb.theme"); if (th) document.documentElement.setAttribute("data-theme", th); } catch (e) {}
   wire();
   try { await loadData(); } catch (e) { console.warn("data load failed", e); }
+  refreshLanding();
   const hash = openSharedFromHash();     // a share link wins over the saved bracket
   if (hash === "shown") return;
   if (hash === "failed") return;         // keep the landing + error visible, don't cover it
