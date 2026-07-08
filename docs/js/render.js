@@ -302,24 +302,29 @@ function pickBox(D, team, picked, short, champ, st) {
   return `<div class="${cls.join(" ")}" data-team="${esc(team)}" data-round="${short}" tabindex="0">` +
     `<span class="fav-bar"></span>${sh}<span class="tname">${esc(team)}</span>${tag}${badge}${chev}</div>`;
 }
-function laterCell(D, team, picked, short, champ = false, actual = null, mode = "actual") {
+// One cell of a later round. In "actual" mode the slot's REAL occupant rules the cell:
+// `actual` is the winner of this side's feeder match (null while the feeder is unplayed),
+// computed per slot in buildBracket \u2014 independent of the user's pick tree, so the actual
+// path flows through every round even when every pick is busted.
+function laterCell(D, team, picked, short, champ = false, actual = null, mode = "actual", feeder = "") {
   if (mode === "picked") return pickBox(D, team, picked, short, champ, D.reach_status(team, short));
   const st = D.reach_status(team, short);
-  if (st !== "won" && D.ELIM.has(team)) {
-    if (actual) {
-      const sd = seedOf(D, actual), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
-      const gone = D.ELIM.has(actual);
-      const cls = "team st-actual" + (gone ? " gone" : "");
-      const rnd = { r16: "Round of 16", qf: "Quarterfinal", sf: "Semifinal", final: "Final" }[short] || "this round";
-      let tip;
-      if (actual === team) tip = `${actual} reached the ${rnd}` + (gone ? ", but is now out" : "");
-      else if (gone) tip = `${actual} advanced in your ${team} pick's place, but is now out`;
-      else tip = `actually advanced \u2014 you picked ${team}`;
-      return `<div class="${cls}" data-team="${esc(actual)}" data-round="${short}" tabindex="0">` +
-        `<span class="fav-bar"></span>${sh}<span class="tname">${esc(actual)}</span>` +
-        `<span class="rb up" title="${esc(tip)}">\u25B2</span></div>`;
-    }
-    return '<div class="team blank"><span class="tname">&nbsp;</span></div>';
+  if (actual && actual !== team) {
+    // the slot is decided and its occupant isn't your pick \u2014 show who actually went through
+    const sd = seedOf(D, actual), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
+    const gone = D.ELIM.has(actual);
+    const cls = "team st-actual" + (gone ? " gone" : "");
+    const tip = gone ? `${actual} advanced in your ${team} pick's place, but is now out`
+                     : `actually advanced \u2014 you picked ${team}`;
+    return `<div class="${cls}" data-team="${esc(actual)}" data-round="${short}" tabindex="0">` +
+      `<span class="fav-bar"></span>${sh}<span class="tname">${esc(actual)}</span>` +
+      `<span class="rb up" title="${esc(tip)}">\u25B2</span></div>`;
+  }
+  if (!actual && st !== "won" && D.ELIM.has(team)) {
+    // your pick is out and the slot isn't decided yet \u2014 keep the path visible with a
+    // placeholder instead of a dead blank (also keeps the column heights stable)
+    const lbl = feeder ? "Winner " + feeder : "TBD";
+    return `<div class="team tbd-actual" data-round="${short}"><span class="tname">${esc(lbl)}</span></div>`;
   }
   return pickBox(D, team, picked, short, champ, st);
 }
@@ -343,22 +348,29 @@ export function buildBracket(D, mode = "actual") {
     ["Semifinals", "sf", "Jul 14\u201315", D.rounds[3][3]], ["Final", "final", "Jul 19", D.rounds[4][3]]];
   const roundCodes = { r16: D._r16codes, qf: D._qfcodes, sf: D._sfcodes, final: D._finalcodes };
   const r16day = {}; for (const [mc, day] of D.R16_FIX) r16day[mc] = day;
+  // Feeder codes per round, in slot order: side a of slot j fed by prev[2j], side b by
+  // prev[2j+1] (same pairing order the pick tree uses, so sides can never swap).
+  const prevCodes = { r16: D._r32codes, qf: D._r16codes, sf: D._qfcodes, final: D._sfcodes };
   for (const [label, short, sub, ms] of meta) {
     const cc = [];
     const codes = roundCodes[short] || [];
     ms.forEach(([a, b, w], j) => {
       const isf = (label === "Final");
-      const aa = D.actual_advancer(short, a), ab = D.actual_advancer(short, b);
+      const pfa = prevCodes[short][2 * j], pfb = prevCodes[short][2 * j + 1];
+      const aa = has(D.RES, pfa) ? D.RES[pfa][2] : null;   // the slot's actual occupants,
+      const ab = has(D.RES, pfb) ? D.RES[pfb][2] : null;   // straight from real results
       const code = j < codes.length ? codes[j] : "";
       const when = r16day[code] || "";
       const lab = code ? (esc(code) + (when ? " \u00b7 " + esc(when) : "")) : "";
       const mlab = lab ? `<div class="mlabel up">${lab}</div>` : "";
-      cc.push('<div class="match">' + mlab + laterCell(D, a, w === a, short, isf && w === a, aa, mode) + laterCell(D, b, w === b, short, isf && w === b, ab, mode) + '</div>');
+      cc.push('<div class="match">' + mlab + laterCell(D, a, w === a, short, isf && w === a, aa, mode, pfa) + laterCell(D, b, w === b, short, isf && w === b, ab, mode, pfb) + '</div>');
     });
     cols.push(`<div class="round"><div class="rhead">${esc(label)}<span>${esc(sub)}</span></div><div class="matches">` + cc.join("") + '</div></div>');
   }
+  const finalCode = D._finalcodes[0];
+  const champActual = has(D.RES, finalCode) ? D.RES[finalCode][2] : null;
   cols.push('<div class="round champcol"><div class="rhead">Champion<span>your pick</span></div><div class="matches">' +
-    '<div class="match">' + laterCell(D, D.CHAMP, true, "champion", true, null, mode) +
+    '<div class="match">' + laterCell(D, D.CHAMP, true, "champion", true, champActual, mode, finalCode) +
     '<div class="champ-note">' + esc(D.CHAMP_NOTE) + '</div></div></div></div>');
   return `<div class="bracket mode-${mode}"><svg class="bksvg" aria-hidden="true"></svg>` + cols.join("") + '</div>';
 }

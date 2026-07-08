@@ -1,11 +1,11 @@
-# wc26-pool-pilot — Bring Your Own Bracket, now social
+# sled-mywcbracket — Bring Your Own Bracket, now social
 
-[![Sync World Cup results](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/sync-results.yml)
-[![Deploy GitHub Pages](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/deploy-pages.yml)
-[![Tests](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/tests.yml/badge.svg)](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/tests.yml)
+[![Sync World Cup results](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/sync-results.yml)
+[![Deploy GitHub Pages](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/deploy-pages.yml)
+[![Tests](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/tests.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/tests.yml)
 
-> **Pilot fork** of [my-wc26-bracket](https://github.com/eriic-builds/my-wc26-bracket)
-> testing the zero-backend social layer: share your bracket as a link, add colleagues'
+> The **social edition** of [my-wc26-bracket](https://github.com/eriic-builds/my-wc26-bracket)
+> (started as a pilot, now the main): share your bracket as a link, add colleagues'
 > links to a local leaderboard, compare picks — still 100% client-side, still free.
 > See `SPEC.md` for the social-loop spec and `PLAN-*.md` for the build plans.
 
@@ -13,7 +13,7 @@
 > live-scored dashboard — bracket map, KPIs, scorecard, round-by-round results, themes — all
 > rendered **in your browser**. Your picks travel only in links **you** choose to send.
 
-**Live site:** https://eriic-builds.github.io/wc26-pool-pilot/
+**Live site:** https://eriic-builds.github.io/sled-mywcbracket/
 
 This is a client-side fork of [**wc26-bracket**](https://github.com/eriic-builds/wc26-bracket)
 (which renders one person's dashboard in Python at build time). Here the same render engine runs

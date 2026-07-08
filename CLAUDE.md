@@ -1,4 +1,4 @@
-# wc26-pool-pilot
+# sled-mywcbracket
 
 Pilot fork of `my-wc26-bracket` testing the **zero-backend social layer**: share a
 bracket as a URL, add received links to a local leaderboard, compare picks. Production

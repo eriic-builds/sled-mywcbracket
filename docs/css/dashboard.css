@@ -187,6 +187,8 @@ body::before{content:"";position:fixed;inset:-20% -10% auto -10%;height:70vh;z-i
 .conn.c-actual{stroke:var(--blue);opacity:.9}
 .conn.gone{opacity:.4}
 .team.blank{visibility:hidden}
+.team.tbd-actual{border-style:dashed;background:transparent;justify-content:center}
+.team.tbd-actual .tname{color:var(--muted);font-style:italic;font-weight:500;font-size:.78rem;flex:none}
 .team.st-actual{border-color:color-mix(in srgb,var(--blue) 55%,var(--border));opacity:.95}
 .team.st-actual .tname{color:var(--muted)}
 .team.st-actual .rb.up,.team.realadv .rb.up{color:var(--blue)}

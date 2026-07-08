@@ -42,8 +42,9 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   if (savedTag) savedTag.hidden = isDemo || isShared;   // only true for the owner's bracket
   // Viewer-bar mode: own bracket -> manage/share buttons; shared -> save/back only.
   const own = !isDemo && !isShared;
-  for (const id of ["vb-replace", "vb-export", "vb-clear", "vb-share", "vb-compare"])
+  for (const id of ["vb-export", "vb-clear", "vb-share", "vb-compare"])
     { const el = $("#" + id); if (el) el.hidden = !own; }
+  // 🏠 Home stays visible in every mode — the escape hatch, and it never deletes anything.
   $("#vb-saveshared").hidden = !isShared;
   $("#vb-back").hidden = !isShared;
   $("#vb-addrival").hidden = !isShared;
@@ -86,15 +87,28 @@ async function onDemo() {
 
 function clearHash() { history.replaceState(null, "", location.pathname + location.search); }
 
-function toLanding() {
-  restoreWhatIfs();               // drop any preview stash before clearing for real
-  clearPicks();
+function showLanding() {
   const app = $("#app"); app.hidden = true; app.innerHTML = "";
   $("#viewerbar").hidden = true; $("#dab").hidden = true;
   $("#errbox").hidden = true;
   $("#landing").hidden = false;
   refreshLanding();
   window.scrollTo(0, 0);
+}
+
+// 🏠 Home — back to the start page. Never deletes anything: the saved bracket and
+// what-if edits stay; a preview (demo/shared) just restores the stashed state first.
+function goHome() {
+  restoreWhatIfs();
+  clearHash();
+  showLanding();
+}
+
+// Clear — the explicitly destructive one (its button says what it removes).
+function toLanding() {
+  restoreWhatIfs();               // drop any preview stash before clearing for real
+  clearPicks();
+  showLanding();
 }
 
 // ── share-link UI ──────────────────────────────────────────────────────────
@@ -157,8 +171,17 @@ function openLeaderboard() {
   if (TOPO && LIVE) openCompare(TOPO, LIVE, { onAddLink: addRivalFromLink, onAddDemo: addDemoRival });
 }
 
-// Landing "Your pool" card — visible only when brackets are already on the board.
+// Landing cards that depend on stored state: "Open my dashboard" when a bracket is
+// saved (you can only reach the landing with one via 🏠 Home), "Your pool" when
+// rivals exist.
 function refreshLanding() {
+  const mine = loadPicks();
+  const row = $("#minerow");
+  if (row) {
+    row.hidden = !mine;
+    const nm = $("#openmine-name");
+    if (nm && mine) nm.textContent = (mine.entrant || "Your") + "’s bracket";
+  }
   const card = $("#poolcard");
   if (!card) return;
   const n = loadRivals().length;
@@ -199,8 +222,9 @@ function wire() {
     try { accept(validateAgainstTopology(JSON.parse(await f.text()), TOPO)); }
     catch (e) { showError(e instanceof ValidationError ? e.problems : ["That JSON wasn’t a valid bracket: " + (e.message || e)]); }
   };
-  $("#vb-replace").onclick = toLanding;
+  $("#vb-home").onclick = goHome;
   $("#vb-clear").onclick = toLanding;
+  const om = $("#openmine"); if (om) om.onclick = () => { const p = loadPicks(); if (p) showDashboard(p); };
   $("#vb-export").onclick = () => { const p = loadPicks(); if (p) exportPicks(p); };
   $("#vb-saveshared").onclick = () => {
     if (!SHOWN || !IS_SHARED) return;

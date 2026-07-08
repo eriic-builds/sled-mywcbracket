@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bring Your Own Bracket — World Cup 2026 Pool Pilot</title>
+<title>Bring Your Own Bracket — World Cup 2026 · SLED</title>
 <meta name="description" content="Upload or build your 2026 FIFA World Cup bracket, share it as a link, and compare with friends on a local leaderboard. 100% in your browser — scored live against real results.">
-<link rel="canonical" href="https://eriic-builds.github.io/wc26-pool-pilot/">
-<meta property="og:title" content="Bring Your Own Bracket — World Cup 2026 Pool Pilot">
+<link rel="canonical" href="https://eriic-builds.github.io/sled-mywcbracket/">
+<meta property="og:title" content="Bring Your Own Bracket — World Cup 2026 · SLED">
 <meta property="og:description" content="Share your bracket as a link and compare with friends — all in your browser, scored live.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://eriic-builds.github.io/wc26-pool-pilot/">
+<meta property="og:url" content="https://eriic-builds.github.io/sled-mywcbracket/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
 <link rel="stylesheet" href="css/dashboard.css">
@@ -188,7 +188,7 @@
   <button id="vb-compare" title="Rank the brackets saved on this device">🏆 Leaderboard</button>
   <button id="vb-share" title="Copy a link that shows this bracket to anyone you send it to">🔗 Share link</button>
   <button id="vb-addrival" hidden title="Put this bracket on your local leaderboard">➕ Add to my leaderboard</button>
-  <button id="vb-replace" title="Start over — build or upload a different bracket">New bracket</button>
+  <button id="vb-home" title="Back to the start page — your bracket stays saved">🏠 Home</button>
   <button id="vb-export" title="Download a backup file — reopen it later or on another device">Save a copy</button>
   <button id="vb-clear" title="Remove this bracket from this device">Clear</button>
   <button id="vb-saveshared" hidden title="Keep this shared bracket as yours on this device">Save as mine</button>
@@ -213,6 +213,14 @@
   <h1>Pick your bracket, watch it score itself</h1>
   <p class="tag">Upload your filled-in <b>SLED World Cup 2026</b> Excel and get your own live dashboard —
   or build a bracket right here in a couple of minutes. No spreadsheet needed.</p>
+
+  <div class="choices" id="minerow" hidden>
+    <button class="choice primary" id="openmine">
+      <span class="ch-ic">📊</span>
+      <span class="ch-t">Open my dashboard</span>
+      <span class="ch-s"><b id="openmine-name">Your bracket</b> is saved on this device</span>
+    </button>
+  </div>
 
   <div class="choices">
     <button class="choice primary" id="pick">

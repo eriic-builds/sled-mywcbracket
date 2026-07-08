@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>wc26-pool-pilot — Build Story, Codebase Analysis & Learning Moments</title>
+<title>sled-mywcbracket — Build Story, Codebase Analysis & Learning Moments</title>
 <style>
 :root{
   --bg:#0e1116;--panel:#161b23;--panel2:#1c232e;--border:#2a3342;--text:#e6ebf2;
@@ -74,7 +74,7 @@ footer{margin-top:40px;color:var(--muted);font-size:.8rem;text-align:center}
 <body>
 <div class="wrap">
 
-<h1>wc26-pool-pilot — the build story</h1>
+<h1>sled-mywcbracket — the build story</h1>
 <p class="sub">How the zero-backend social layer got planned, built, verified, and shipped in five stages — what I did, why, what went wrong along the way, and what each bump teaches. Built July 7–8, 2026, mid-tournament.</p>
 <label class="eli5toggle"><input type="checkbox" id="eli5"> <span>🧒 ELI5 mode — plain-English explanations everywhere</span></label>
 
@@ -119,7 +119,7 @@ footer{margin-top:40px;color:var(--muted);font-size:.8rem;text-align:center}
 </table>
 <div class="eli5">🧒 <b>ELI5:</b> The part of a web address after the <code>#</code> is like a note you keep in your pocket while showing someone your ID — the security guard (the server) never sees the note. Only the web page running on YOUR computer reads it.</div>
 
-<div class="good">✅ <b>Live now:</b> <a href="https://eriic-builds.github.io/wc26-pool-pilot/">eriic-builds.github.io/wc26-pool-pilot</a> · repo: <a href="https://github.com/eriic-builds/wc26-pool-pilot">github.com/eriic-builds/wc26-pool-pilot</a> · production (<a href="https://eriic-builds.github.io/my-wc26-bracket/">my-wc26-bracket</a>) untouched.</div>
+<div class="good">✅ <b>Live now:</b> <a href="https://eriic-builds.github.io/sled-mywcbracket/">eriic-builds.github.io/sled-mywcbracket</a> · repo: <a href="https://github.com/eriic-builds/sled-mywcbracket">github.com/eriic-builds/sled-mywcbracket</a> · production (<a href="https://eriic-builds.github.io/my-wc26-bracket/">my-wc26-bracket</a>) untouched.</div>
 </section>
 
 <!-- ================= TAB: STAGES ================= -->
@@ -280,7 +280,7 @@ footer{margin-top:40px;color:var(--muted);font-size:.8rem;text-align:center}
 <div class="card">
 <b>Solo (one browser):</b>
 <ol>
-<li>Open <a href="https://eriic-builds.github.io/wc26-pool-pilot/">the live pilot</a> → <b>Build my bracket</b> (or upload your Excel).</li>
+<li>Open <a href="https://eriic-builds.github.io/sled-mywcbracket/">the live pilot</a> → <b>Build my bracket</b> (or upload your Excel).</li>
 <li>Tap <b>🏆 Leaderboard</b> → "Add the demo bracket to try it" → you're ranked against the demo.</li>
 <li>Tap <b>diff</b> on the demo row → see exactly which remaining games separate you, biggest points first.</li>
 </ol>
@@ -293,7 +293,7 @@ footer{margin-top:40px;color:var(--muted);font-size:.8rem;text-align:center}
 </div>
 
 <h2>What a share link actually looks like</h2>
-<div class="urlbox">https://eriic-builds.github.io/wc26-pool-pilot/#b=eyJ2IjoxLCJiIjoiMDAxMTAwMDAxMTAwMDAwMDExMTAwMTAxMDAxMDAwMSIsIm4iOiJFcmljIExhbSIsInQiOjR9</div>
+<div class="urlbox">https://eriic-builds.github.io/sled-mywcbracket/#b=eyJ2IjoxLCJiIjoiMDAxMTAwMDAxMTAwMDAwMDExMTAwMTAxMDAxMDAwMSIsIm4iOiJFcmljIExhbSIsInQiOjR9</div>
 <p>Paste the part after <code>#b=</code> into <code>atob('…')</code> in any console and you'll see exactly what it carries: <code>{"v":1,"b":"0011000011…","n":"Eric Lam","t":4}</code> — the 31 coin-flips, a name, a tiebreaker. Nothing else. That transparency is itself a privacy feature.</p>
 
 <h2>Commands (pilot repo)</h2>

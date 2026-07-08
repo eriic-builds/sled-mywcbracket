@@ -86,6 +86,11 @@ export function initInteractions(){
  document.querySelectorAll('.sec-toggle').forEach(function(bt){bt.addEventListener('click',function(){var body=document.getElementById(bt.getAttribute('aria-controls'));if(!body)return;var open=bt.getAttribute('aria-expanded')!=='false';bt.setAttribute('aria-expanded',open?'false':'true');body.classList.toggle('collapsed',open);});});
  var _rt;window.addEventListener('resize',function(){clearTimeout(_rt);_rt=setTimeout(drawConnectors,120);});
  window.addEventListener('load',function(){setTimeout(drawConnectors,60);});
+ // Redraw whenever the bracket's box actually changes size (fonts landing, section
+ // collapse/expand, theme swaps) — catches every "lines don't connect" layout shift
+ // that the resize event alone misses.
+ if(window.ResizeObserver){var _ro=new ResizeObserver(function(){clearTimeout(_rt);_rt=setTimeout(drawConnectors,80);});var _bw=document.querySelector('.brk-wrap');if(_bw)_ro.observe(_bw);}
+ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){setTimeout(drawConnectors,30);});
  // ---- hover: quick World Cup stat card on each team box ----
  var card=document.getElementById('statcard');
  function posCard(ev){var pad=14,w=card.offsetWidth,h=card.offsetHeight,x=ev.clientX+16,y=ev.clientY+16;
