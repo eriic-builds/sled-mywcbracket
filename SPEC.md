@@ -51,6 +51,15 @@ There is no step 5. No server, no pool code, no registry.
   link exchange failing socially.
 - **Base64(JSON), not bit-packing.** ~80 chars fits any chat; debuggable with `atob()`.
 - **Rivals cap = 20.** ~4 KB each; well inside localStorage quotas including Safari.
+- **No share-link revocation.** A link IS the data (like an attachment); with no server
+  there is nothing to revoke against, and even server-based revocation can't reach saved
+  copies or screenshots. Mitigation is prevention: the "share as" alias keeps a real name
+  out of the link entirely. If true revocation ever becomes a requirement, that is the
+  one feature that justifies a tiny backend (links become references, deletable at the
+  source) — deferred deliberately, not forgotten.
+- **Bracket map "actual" view reads slots from results, not from the user's pick tree**
+  (rebuilt Jul 8). Decided slot → real occupant (▲ if not your pick); undecided slot with
+  a busted pick → a "Winner MXX" placeholder, never a blank. Locked by `tests/bracketmap.mjs`.
 
 ## Out of scope for the pilot
 

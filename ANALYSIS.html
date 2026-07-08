@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>sled-mywcbracket — Build Story, Codebase Analysis & Learning Moments</title>
+<!-- Round 2 (Jul 8): repo promoted from pilot to main, renamed; nav fixes; actual-path rebuild -->
 <style>
 :root{
   --bg:#0e1116;--panel:#161b23;--panel2:#1c232e;--border:#2a3342;--text:#e6ebf2;
@@ -75,12 +76,13 @@ footer{margin-top:40px;color:var(--muted);font-size:.8rem;text-align:center}
 <div class="wrap">
 
 <h1>sled-mywcbracket — the build story</h1>
-<p class="sub">How the zero-backend social layer got planned, built, verified, and shipped in five stages — what I did, why, what went wrong along the way, and what each bump teaches. Built July 7–8, 2026, mid-tournament.</p>
+<p class="sub">How the zero-backend social layer got planned, built, verified, and shipped — first as a pilot (5 stages), then promoted to the main repo and hardened in <b>Round 2</b> (rename, navigation, and the actual-path bracket rebuild). What I did, why, what went wrong, and what each bump teaches. Built July 7–8, 2026, mid-tournament.</p>
 <label class="eli5toggle"><input type="checkbox" id="eli5"> <span>🧒 ELI5 mode — plain-English explanations everywhere</span></label>
 
 <nav id="nav">
   <button data-tab="t-what" class="on">🎯 What we built</button>
   <button data-tab="t-stages">📋 Stage by stage</button>
+  <button data-tab="t-round2">🔁 Round 2</button>
   <button data-tab="t-code">🗺️ The codebase now</button>
   <button data-tab="t-council">🧠 Taste Council calls</button>
   <button data-tab="t-learn">🎓 Learning moments</button>
@@ -173,6 +175,70 @@ footer{margin-top:40px;color:var(--muted);font-size:.8rem;text-align:center}
 <tr><td>Compare: leaderboard numbers == dashboard numbers, diff undecided-only + sorted, rank order</td><td>unit (new)</td><td><span class="pill p-green">12/12</span></td></tr>
 <tr><td>Full browser E2E: share → view → add → rank → diff → rename → guards</td><td>manual, real Chrome</td><td><span class="pill p-green">pass</span></td></tr>
 <tr><td>CI on GitHub Actions (every push) + Pages deploy</td><td>pipeline</td><td><span class="pill p-green">green</span></td></tr>
+</table>
+</section>
+
+<!-- ================= TAB: ROUND 2 ================= -->
+<section class="tab" id="t-round2">
+<h2>Round 2 — pilot promoted to main (July 8)</h2>
+<p class="sub">You test-drove the pilot, liked it, and reported four things. Here's what each one was, what the real cause turned out to be, and what got shipped.</p>
+
+<div class="stage"><div class="n">①</div><div style="flex:1">
+<h3>Rename: wc26-pool-pilot → sled-mywcbracket</h3>
+<div class="meta">one <code>gh repo rename</code> + a sweep of every URL in the repo</div>
+<p>GitHub migrated the Pages site to the new address automatically and redirects the old repo URLs. Every reference — README badges, <code>&lt;link rel="canonical"&gt;</code>, og:tags, the deploy workflow's environment URL, CLAUDE.md, this file — was swept in one pass, then the "Pilot" framing was retired: this is now the main social edition.</p>
+<div class="bump"><b>Gotcha for later:</b> any share links or bookmarks made under the OLD Pages URL (<code>…/wc26-pool-pilot/</code>) do <b>not</b> redirect — GitHub redirects repo pages, not github.io sites. Only test links existed, so nothing was lost — but it's why renames should happen early.</div>
+<div class="eli5">🧒 <b>ELI5:</b> We changed the restaurant's name before printing the real menus. The post office forwards mail to the new name, but the old street sign is just gone — good thing only friends had the old address.</div>
+</div></div>
+
+<div class="stage"><div class="n">②③</div><div style="flex:1">
+<h3>Navigation: trapped in the demo + "New bracket" → "🏠 Home"</h3>
+<div class="meta">files: <code>main.js</code>, <code>index.html</code></div>
+<p><b>Your bug report was two symptoms of one design gap:</b> every "go back" button was secretly destructive. "New bracket" and "Clear" both wiped your saved bracket — and the demo view showed <i>no</i> buttons at all, because all the owner buttons hide in demo mode and nothing non-destructive existed to show. So: no way out of the demo, and a scary mislabeled "New bracket".</p>
+<p><b>The fix is a separation of concerns:</b> <b>🏠 Home</b> goes to the start page and <i>never deletes anything</i> (it also restores stashed what-if edits and cleans the URL) — so it's safe to show in every mode: own, demo, and shared. <b>Clear</b> remains the one destructive button, and says so. And since the landing can now be reached <i>while</i> a bracket is saved, it gained an "📊 Open my dashboard — Eric's bracket is saved here" card, closing the loop.</p>
+<div class="eli5">🧒 <b>ELI5:</b> Before, the only doors out of any room were marked "burn the house down." Now there's a normal front door (Home) in every room, and the matches are in a clearly-labeled drawer (Clear).</div>
+</div></div>
+
+<div class="stage"><div class="n">④</div><div style="flex:1">
+<h3>The big one: the actual-path bracket rebuild</h3>
+<div class="meta">files: <code>render.js</code> (the byte-locked engine — intentionally), <code>interact.js</code>, <code>dashboard.css</code> + new <code>tests/bracketmap.mjs</code></div>
+<p><b>Reproduce before you fix:</b> I generated a worst-case bracket (every pick a loser) and rendered it headlessly. Result: the "Actual path" view showed <b>8 dead-blank cells</b> — fine through the QF column, then nothing: 4 blank semifinal cells, 2 blank final cells, blank champion. And since blank boxes carry no team identity, connector lines had nothing to attach to — <i>your "lines don't connect" symptom was the same bug wearing a different hat.</i></p>
+<p><b>Root cause:</b> the old code derived "who actually advanced" by walking <i>your pick tree</i> (asking "what happened in the match where my pick played?"). When your picks bust out early, that chain of questions dead-ends — even though the real tournament data knows exactly who's in each slot.</p>
+<p><b>The rebuild:</b> each bracket slot now reads its occupant <b>directly from real results</b> — "who won this slot's feeder match?" — completely independent of your picks. Decided slot + not your pick → blue ▲ box. Undecided slot + your pick busted → a dashed <i>"Winner M97"</i> placeholder instead of a void, so the path structure stays visible (and column heights stable) all the way to the champion. Your-pick-alive cells are untouched, and the "My picks" view wasn't touched at all — you said it was accurate, and the tests confirm it.</p>
+<p><b>Connectors got a second fix too:</b> a <code>ResizeObserver</code> on the bracket plus a redraw when webfonts finish loading. Lines used to be drawn once at load; any layout shift afterward (font swap, collapsing/expanding a section, theme change) left them pointing at stale coordinates.</p>
+<div class="bump"><b>Testing surprise worth learning from:</b> after the rebuild, the golden snapshot… passed <i>unchanged</i>. Why? The demo bracket is a good bracket — its actual view never had a blank cell, so the snapshot never exercised the broken path. The fixture only protects what its data reaches. That's why a dedicated <code>tests/bracketmap.mjs</code> now locks the worst case: all-losers bracket → zero blanks, every decided slot shows its real occupant, every undecided busted slot shows "Winner MXX", and an all-correct bracket shows no ▲ at all.</div>
+<div class="eli5">🧒 <b>ELI5 (the bug):</b> The old map drew the river by following YOUR paper boat. When your boat sank at the first waterfall, the map just… stopped drawing the river. The new map draws the river from the river itself — your boat is a sticker on top.</div>
+<div class="eli5">🧒 <b>ELI5 (the testing surprise):</b> A smoke detector in the kitchen can't notice a fire in the garage. The golden test watched a good bracket; the bug only lived in terrible brackets — so we installed a detector in the garage too.</div>
+</div></div>
+
+<div class="stage"><div class="n">⑤</div><div style="flex:1">
+<h3>Bonus bump: the robot pushed while we worked</h3>
+<div class="meta"><code>git push</code> rejected mid-round</div>
+<p>The results-sync bot committed fresh World Cup results to the repo while this round was in progress (it's QF week — that's its job). A quick <code>git pull --rebase</code>, all 7 test suites re-run green on top of the <i>new</i> results, push. Note what that proves: the golden test kept passing because its inputs are frozen fixtures — live data changing under us broke nothing.</p>
+<div class="eli5">🧒 <b>ELI5:</b> The mailman delivered while we were painting the hallway. Because the "before" photos we compare against are kept in an album (frozen fixtures), new mail on the table doesn't make the photos wrong.</div>
+</div></div>
+
+<h2>Your question: "can I kill a share link later?"</h2>
+<div class="card">
+<p><b>The honest answer: no — and no design could truly give you that.</b> A share link IS the data (the 31 picks + name travel inside it), like an email attachment or a photocopy. There's no server that recipients "check back with," so there's nothing to revoke against. And even a server-based revocation can't reach the copies people already saved, or a screenshot of the leaderboard.</p>
+<p><b>What you CAN do, today:</b></p>
+<ul>
+<li><b>Control the blast radius up front</b> — the "share as" field exists exactly for this: share as "E.L." or an alias, and the link never contained your full name to begin with. That's prevention, which beats revocation.</li>
+<li><b>Know what's actually at risk</b> — a link contains picks + the display name you typed. Nothing else. Worst case of a leaked link: someone sees World Cup guesses.</li>
+<li><b>Ask recipients to remove you</b> — one ✕ on their leaderboard; brackets live only on devices, so removal there is complete.</li>
+<li><b>Future option, recorded in SPEC.md</b> — if real revocation ever matters, that's the one feature that justifies a tiny backend (links become <i>references</i> to stored brackets, and deleting the stored bracket kills every link). Deferred deliberately, not forgotten.</li>
+</ul>
+<div class="eli5">🧒 <b>ELI5:</b> Once you hand someone a photocopy, no button un-photocopies it — that's true for every app, even ones with servers (screenshots exist!). So instead of a magic eraser, we gave you a pen name: don't write your full name on the copy in the first place.</div>
+</div>
+
+<h2>Round 2 scorecard</h2>
+<table>
+<tr><th>Item</th><th>Shipped as</th><th>Proof</th></tr>
+<tr><td>Repo rename + URL sweep</td><td><code>sled-mywcbracket</code> live on Pages</td><td>badges green, canonical/og updated, zero stale references (grep)</td></tr>
+<tr><td>Demo trap + Home</td><td>🏠 Home in all modes, never destructive; "Open my dashboard" card</td><td>manual walk: demo → Home → dashboard reopens, picks + what-ifs intact</td></tr>
+<tr><td>Actual-path rebuild</td><td>slot-level occupants + "Winner MXX" placeholders</td><td><code>bracketmap.mjs</code> 5/5; worst-case bracket: 0 blanks (was 8); visual: blue path + lines flow R32→Champion</td></tr>
+<tr><td>Connector robustness</td><td>ResizeObserver + fonts.ready redraw</td><td>lines survive section collapse/expand and font load</td></tr>
+<tr><td>Share-link revocation</td><td>answered honestly (above) + SPEC.md decision</td><td>—</td></tr>
 </table>
 </section>
 

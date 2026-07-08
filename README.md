@@ -27,8 +27,13 @@ as JavaScript, so *anyone* can drop in their bracket and see their own board.
    tapping winners, or click **See a demo first**.
 2. It parses your **"My Bracket"** tab entirely in your browser (SheetJS), validates it, and
    renders your dashboard scored against live results.
-3. Your bracket is saved in `localStorage`, so it reopens instantly next time. **Save a copy**,
-   **Open a saved backup**, **New bracket**, and **Clear** are in the top bar.
+3. Your bracket is saved in `localStorage`, so it reopens instantly next time. The top bar has
+   **🏠 Home** (back to the start page — never deletes anything), **Save a copy**, and **Clear**
+   (the one destructive button). The landing shows **Open my dashboard** whenever a bracket is
+   saved on the device.
+4. The **bracket map** has two views: *My picks* (your path) and *Actual path* — the latter reads
+   every slot from real results, so the true tournament flows through all rounds even where your
+   picks busted; not-yet-played slots show a "Winner M97"-style placeholder.
 
 ## The social loop (what this pilot adds)
 
@@ -44,6 +49,12 @@ as JavaScript, so *anyone* can drop in their bracket and see their own board.
 
 There is no server and no pool registry — see `SPEC.md` for the wire format, the behavioral
 invariants, and the deliberate decisions (e.g. no "re-share someone else's bracket" feature).
+
+**Can I revoke a link I already sent?** No — a link *is* the data, like an email attachment,
+so nothing exists to revoke against (and even server-based revocation can't reach saved copies
+or screenshots). Prevention beats revocation: use the **"share as"** field to share under
+initials or an alias, and the link never contained your name in the first place. Recipients can
+always remove your bracket from their board with one ✕.
 
 **Privacy:** the only network requests are same-origin fetches of `docs/data/*.json` (the shared
 live results + tournament topology) and the static assets. Your workbook never leaves the browser;
