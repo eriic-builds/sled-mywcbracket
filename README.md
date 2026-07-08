@@ -7,7 +7,7 @@
 > The **social edition** of [my-wc26-bracket](https://github.com/eriic-builds/my-wc26-bracket)
 > (started as a pilot, now the main): share your bracket as a link, add colleagues'
 > links to a local leaderboard, compare picks — still 100% client-side, still free.
-> See `SPEC.md` for the social-loop spec and `PLAN-*.md` for the build plans.
+> See `dev-docs/SPEC.md` for the social-loop spec and `dev-docs/PLAN-*.md` for the build plans.
 
 > Upload your own filled-in **SLED World Cup 2026** bracket Excel and get your personal,
 > live-scored dashboard — bracket map, KPIs, scorecard, round-by-round results, themes — all
@@ -64,7 +64,7 @@ or screenshots). Prevention beats revocation: use the **"share as"** field to sh
 initials or an alias, and the link never contained your name in the first place. Recipients can
 always remove your bracket from their board with one ✕.
 
-See `SPEC.md` for the wire format, behavioral invariants, and deliberate design decisions (e.g. no "re-share someone else's bracket" feature).
+See `dev-docs/SPEC.md` for the wire format, behavioral invariants, and deliberate design decisions (e.g. no "re-share someone else's bracket" feature).
 
 ## How it works
 

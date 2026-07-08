@@ -1,4 +1,4 @@
-// Leaderboard test: the pure standings/diff core (SPEC.md invariants 4, 5, 6).
+// Leaderboard test: the pure standings/diff core (dev-docs/SPEC.md invariants 4, 5, 6).
 // Crucially, the leaderboard's "confirmed" number is asserted equal to the number the
 // dashboard itself renders for the same bracket — the two can never drift apart.
 // Run: node tests/compare.mjs

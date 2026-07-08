@@ -1,5 +1,5 @@
 // compare.js — the local pool leaderboard. Rivals live ONLY in this browser
-// (localStorage). No network anywhere in this file, by design (SPEC.md invariant 7):
+// (localStorage). No network anywhere in this file, by design (dev-docs/SPEC.md invariant 7):
 // a bracket reaches this device only inside a share link its owner sent.
 import { computeState } from "./render.js";
 import { hashPicks, loadPicks } from "./storage.js";
