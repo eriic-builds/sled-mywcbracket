@@ -15,6 +15,24 @@ const $ = (s) => document.querySelector(s);
 let TOPO = null, LIVE = null;
 let SHOWN = null;          // the picks currently rendered (needed by "Save as mine")
 let IS_SHARED = false;     // viewing someone else's bracket via a share link
+const HINT_KEY = "wcb.hint.compare.v1";   // dismissal flag for the compare-with-friends nudge
+
+function hintDismissed() { try { return localStorage.getItem(HINT_KEY) === "1"; } catch (e) { return false; } }
+// The nudge is the point of this fork, but only makes sense on your OWN saved bracket
+// (you can't share a demo/shared preview) and only until you've dismissed it once.
+function updateShareHint(own) { const h = $("#sharehint"); if (h) h.hidden = !(own && !hintDismissed()); }
+
+// "Filter by team" is a collapsible panel (collapsed by default to avoid overload);
+// remember the user's choice so it stays open/closed across renders.
+const FILTER_KEY = "wcb.filter.open";
+function wireRailFilter() {
+  const rf = $("#railFilter"), btn = $("#rfToggle"); if (!rf || !btn) return;
+  const set = (o) => { rf.classList.toggle("open", o); btn.setAttribute("aria-expanded", o ? "true" : "false");
+    try { localStorage.setItem(FILTER_KEY, o ? "1" : "0"); } catch (e) {} };
+  let open = false; try { open = localStorage.getItem(FILTER_KEY) === "1"; } catch (e) {}
+  set(open);
+  btn.onclick = () => set(!rf.classList.contains("open"));
+}
 
 async function loadData() {
   const [t, l] = await Promise.all([
@@ -51,7 +69,9 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   const nRivals = loadRivals().length;
   $("#vb-compare").textContent = "🏆 Leaderboard" + (nRivals ? ` (${nRivals + 1})` : "");
   $("#sharepop").hidden = true;
+  updateShareHint(own);                                // compare-with-friends nudge (own bracket only)
   initInteractions();                                  // run the verbatim interaction layer
+  wireRailFilter();                                    // collapsible "Filter by team" panel
   if (window.__drawConn) setTimeout(window.__drawConn, 90);  // initial connector draw
   window.scrollTo(0, 0);
 }
@@ -90,6 +110,7 @@ function clearHash() { history.replaceState(null, "", location.pathname + locati
 function showLanding() {
   const app = $("#app"); app.hidden = true; app.innerHTML = "";
   $("#viewerbar").hidden = true; $("#dab").hidden = true;
+  const sh = $("#sharehint"); if (sh) sh.hidden = true;
   $("#errbox").hidden = true;
   $("#landing").hidden = false;
   refreshLanding();
@@ -121,7 +142,9 @@ function shareURL(alias) {
 
 function wireShare() {
   const pop = $("#sharepop"), nameIn = $("#share-name"), urlIn = $("#share-url"), copy = $("#share-copy");
-  $("#vb-share").onclick = () => {
+  const share = $("#vb-share");
+  const closePop = () => { pop.hidden = true; };
+  share.onclick = () => {
     const p = loadPicks(); if (!p || !TOPO) return;
     pop.hidden = !pop.hidden;
     if (!pop.hidden) {
@@ -131,6 +154,14 @@ function wireShare() {
       nameIn.focus();
     }
   };
+  $("#share-close").onclick = closePop;
+  // Close on Escape or a click anywhere outside the popover (the Share button toggles it itself).
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) closePop(); });
+  document.addEventListener("click", (e) => {
+    if (pop.hidden) return;
+    if (pop.contains(e.target) || share.contains(e.target)) return;
+    closePop();
+  });
   nameIn.oninput = () => { urlIn.value = shareURL(nameIn.value) || ""; copy.textContent = "Copy"; };
   copy.onclick = async () => {
     const url = shareURL(nameIn.value); if (!url) return;
@@ -241,6 +272,9 @@ function wire() {
     openLeaderboard();                 // straight to the standings — the payoff moment
   };
   wireShare();
+  $("#sh-share").onclick = (e) => { e.stopPropagation(); $("#vb-share").click(); };   // open the share popover
+  $("#sh-board").onclick = openLeaderboard;
+  $("#sh-dismiss").onclick = () => { try { localStorage.setItem(HINT_KEY, "1"); } catch (e) {} $("#sharehint").hidden = true; };
   const dab = $("#dab"); if (dab) dab.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
 }
 

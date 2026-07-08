@@ -5,21 +5,6 @@
 
 const DASH = "\u2013";
 
-// Format a UTC ISO string into the viewer's own timezone (e.g. "Thu Jul 9 \u00b7 1:00 PM PDT").
-function localKickoff(utcIso) {
-  try {
-    const d = new Date(utcIso);
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const dp = new Intl.DateTimeFormat("en-US", { weekday:"short", month:"short", day:"numeric", timeZone:tz }).formatToParts(d);
-    const wday = dp.find(p => p.type==="weekday").value;
-    const mon  = dp.find(p => p.type==="month").value;
-    const day  = dp.find(p => p.type==="day").value;
-    const time = d.toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit", timeZone:tz });
-    const tzAbbr = new Intl.DateTimeFormat("en-US", { timeZoneName:"short", timeZone:tz }).formatToParts(d).find(p => p.type==="timeZoneName").value;
-    return `${wday} ${mon} ${day} \u00b7 ${time} ${tzAbbr}`;
-  } catch(e) { return utcIso; }
-}
-
 // Format a UTC ISO string into the viewer's timezone for "updated" timestamps
 // (e.g. "July 8, 2026 \u00b7 1:26 AM PDT").
 function localRefreshed(utcIso) {
@@ -326,7 +311,11 @@ function pickBox(D, team, picked, short, champ, st) {
   if (picked && !champ) cls.push("advancer");
   const gone = (st === "won" && D.out_at_round(team, short));
   if (gone) cls.push("gone");
-  const badge = st === "won" ? (gone ? "" : '<span class="rb ok">\u2713</span>') : (st === "lost" ? '<span class="rb no">\u2715</span>' : "");
+  // A pick that reached this round but was then knocked out here reads as "your pick — out":
+  // greyed box (gone) + the red ✕, matching the legend. Alive picks keep the green ✓.
+  const badge = st === "lost" ? '<span class="rb no">\u2715</span>'
+    : st === "won" ? (gone ? '<span class="rb no">\u2715</span>' : '<span class="rb ok">\u2713</span>')
+    : "";
   const tag = champ ? '<span class="tt">\u{1F3C6}</span>' : "";
   const chev = (picked && !champ) ? '<span class="adv-arrow" title="you have this team advancing">\u203A</span>' : "";
   const sd = seedOf(D, team), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
@@ -610,7 +599,7 @@ export function buildRoundResultsPanel(D, label, short, codes) {
       rows.push(`<div class="rr"><div class="rr-m">${esc(mc)}</div><div class="rr-s">${sc}</div><div class="rr-p">${badge}</div></div>`);
     } else {
       let when;
-      if (has(D.KO_FIX, mc)) { when = localKickoff(D.KO_FIX[mc][0]); }
+      if (has(D.KO_FIX, mc)) { const [, day, et, ct, ptz] = D.KO_FIX[mc]; when = `${day} \u00b7 ${ptz} PT \u00b7 ${ct} CT \u00b7 ${et} ET`; }
       else if (short === "r16" && r16day[mc]) { const [day, et, ct, ptz] = r16day[mc]; when = `${day} \u00b7 ${ptz} PT \u00b7 ${ct} CT \u00b7 ${et} ET`; }
       else when = D.KO_DATES[short];
       const ta = a || ("Winner " + fa), tb = b || ("Winner " + fb);
@@ -685,7 +674,7 @@ export function renderDashboard(picks, live, topology) {
     '<button data-mode="winxp" role="menuitem"><span class="fm-em">\u{1FA9F}</span> Windows XP</button>' +
     '<button data-mode="doodle" role="menuitem"><span class="fm-em">\u270F\uFE0F</span> Doodle</button>' +
     '</div></div></div></div>' +
-    '<div class="shell"><nav class="rail glass" id="rail">' +
+    '<div class="shell"><div class="side"><nav class="rail glass" id="rail">' +
     '<button class="navtoggle" id="navToggle" aria-expanded="false" aria-controls="railLinks">\u{1F4D1} Contents \u2630</button>' +
     '<div class="links" id="railLinks"><div class="rt">On this page</div>' +
     '<a href="#intro"><span class="ic">\u{1F50E}</span> Overview</a>' +
@@ -697,7 +686,16 @@ export function renderDashboard(picks, live, topology) {
     '<a href="#sec-finalfour"><span class="ic">\u{1F3C5}</span> Final four</a>' +
     '<a href="#sec-story"><span class="ic">\u2728</span> How it played out</a>' +
     '<a href="#sec-scoring"><span class="ic">\u{1F3AF}</span> Scoring &amp; schedule</a>' +
-    '</div></nav><div class="content">' +
+    '</div>' +
+    '</nav>' +
+    '<div class="railfilter glass" id="railFilter">' +
+    '<button class="rf-toggle" id="rfToggle" type="button" aria-expanded="false" aria-controls="rfBody">' +
+    '<span class="rt">Filter by team</span><span class="rf-car">\u25BE</span></button>' +
+    '<div class="rf-body" id="rfBody">' +
+    '<div class="chips">' + r32_win.map(t => chip(D, t)).join("") + '</div>' +
+    '<div class="rf-foot"><label class="toggle"><input type="checkbox" id="favonly"><span class="tsw"></span>Favorites only</label>' +
+    '<span class="count" id="count"></span></div></div></div>' +
+    '</div><div class="content">' +
     `<section class="hero glass" id="intro"><div class="eyebrow">${esc(D.ENTRANT)} \u00b7 live results vs your picks</div>` +
     `<h1>Backing <span class="g">${esc(D.CHAMP)}</span> ${D.CHAMP_ALIVE ? "\u2014 and still in it" : "\u2014 but knocked out"}</h1>` +
     `<p class="sub">The <b>${esc(D.CUR_LABEL)}</b> is <b>${D.CUR_DONE} of ${D.CUR_TOTAL} final</b> \u2014 you're <b>${D.CUR_CORR} of ${D.CUR_DEC} right</b> this round, ` +
@@ -711,8 +709,6 @@ export function renderDashboard(picks, live, topology) {
     '<div class="composer"><span class="corb"></span><span class="plus">+</span>' +
     '<input id="search" type="text" placeholder="Track a team through the bracket \u2014 try England, Morocco, Paraguay\u2026" autocomplete="off">' +
     '<span class="mic">\u{1F3A4}</span><button class="clr" id="clear">Clear</button></div></section>' +
-    '<div class="filterbar glass"><div class="chips">' + r32_win.map(t => chip(D, t)).join("") +
-    '</div><label class="toggle"><input type="checkbox" id="favonly"><span class="tsw"></span>Favorites only</label><span class="count" id="count"></span></div>' +
     shead("sec-standing", "\u{1F4CA}", "Your live standing", "6 signals") +
     `<div class="kpigrid">${buildKpis(D)}</div>` + '</div>' +
     shead("sec-scorecard", "\u{1F9EE}", "Scorecard \u2014 your path, scored live", `${D.CONF} confirmed \u00b7 ${D.LIVE} live`) +
