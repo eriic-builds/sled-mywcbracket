@@ -1,0 +1,22 @@
+name: Tests
+
+# Every test is hermetic (repo-local data only). parse.mjs self-skips in CI because
+# the real workbook is private and never leaves Eric's machine.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm test

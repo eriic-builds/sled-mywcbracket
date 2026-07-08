@@ -1,13 +1,19 @@
-# my-wc26-bracket — Bring Your Own Bracket
+# wc26-pool-pilot — Bring Your Own Bracket, now social
 
-[![Sync World Cup results](https://github.com/eriic-builds/my-wc26-bracket/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/my-wc26-bracket/actions/workflows/sync-results.yml)
-[![Deploy GitHub Pages](https://github.com/eriic-builds/my-wc26-bracket/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/my-wc26-bracket/actions/workflows/deploy-pages.yml)
+[![Sync World Cup results](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/sync-results.yml)
+[![Deploy GitHub Pages](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/deploy-pages.yml)
+[![Tests](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/tests.yml/badge.svg)](https://github.com/eriic-builds/wc26-pool-pilot/actions/workflows/tests.yml)
+
+> **Pilot fork** of [my-wc26-bracket](https://github.com/eriic-builds/my-wc26-bracket)
+> testing the zero-backend social layer: share your bracket as a link, add colleagues'
+> links to a local leaderboard, compare picks — still 100% client-side, still free.
+> See `SPEC.md` for the social-loop spec and `PLAN-*.md` for the build plans.
 
 > Upload your own filled-in **SLED World Cup 2026** bracket Excel and get your personal,
 > live-scored dashboard — bracket map, KPIs, scorecard, round-by-round results, themes — all
-> rendered **in your browser**. Your file is never uploaded anywhere.
+> rendered **in your browser**. Your picks travel only in links **you** choose to send.
 
-**Live site:** https://eriic-builds.github.io/my-wc26-bracket/
+**Live site:** https://eriic-builds.github.io/wc26-pool-pilot/
 
 This is a client-side fork of [**wc26-bracket**](https://github.com/eriic-builds/wc26-bracket)
 (which renders one person's dashboard in Python at build time). Here the same render engine runs
@@ -65,16 +71,18 @@ No build step. Serve `docs/` and open it:
 cd docs && python3 -m http.server 8000   # then open http://localhost:8000/
 
 # Tests (Node ≥ 18):
-node tests/golden.mjs   # render.js is byte-identical to the Python engine (needs /tmp/py_sections.json)
-node tests/parse.mjs    # parse-excel.js reproduces the demo bracket from the real workbook
+npm test                # scoring + builder + golden snapshot + parse (parse skips without the private workbook)
+node tests/golden.mjs --update   # accept an INTENTIONAL render change (review the fixture diff)
 
 # Sync results locally:
 python3 scripts/fetch_results.py --dry-run    # preview, writes nothing
 python3 scripts/fetch_results.py              # writes docs/data/results.json
 ```
 
-The golden test compares against the Python engine; dump its sections first with a small script
-that imports the source repo's `build_dashboard.py` (see `tests/golden.mjs` header).
+The golden test is a self-contained snapshot: it renders the demo bracket against
+**frozen** inputs (`tests/fixtures/results.frozen.json`) and compares byte-for-byte with
+`tests/fixtures/golden-sections.json`. Python byte-parity was proven once at porting
+time; the snapshot now guards regressions without any outside-the-repo files.
 
 ## Deploy (GitHub Pages)
 

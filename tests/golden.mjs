@@ -1,12 +1,22 @@
-// Golden test: prove the JS render engine matches the Python original section-by-section.
-// Run: node tests/golden.mjs   (expects /tmp/py_sections.json dumped from build_dashboard.py)
+// Golden test: the render engine's output is frozen as a repo-owned snapshot.
+// (Python byte-parity was proven once at porting time; this now guards regressions.)
+//
+//   node tests/golden.mjs            compare against tests/fixtures/golden-sections.json
+//   node tests/golden.mjs --update   regenerate the snapshot (do this ONLY to accept an
+//                                    intentional render change; review the fixture diff)
+//
+// The snapshot's inputs are frozen too: it renders with tests/fixtures/results.frozen.json,
+// NOT the live docs/data/results.json — a bot rewrites the live file several times a day,
+// which would break a snapshot that read it.
 import fs from "fs";
 import * as R from "../docs/js/render.js";
 
 const D0 = new URL("../docs/data/", import.meta.url);
-const load = (n) => JSON.parse(fs.readFileSync(new URL(n, D0)));
-const picks = load("demo-picks.json"), live = load("results.json"), topo = load("topology.json");
-const py = JSON.parse(fs.readFileSync("/tmp/py_sections.json", "utf-8"));
+const FX = new URL("./fixtures/", import.meta.url);
+const load = (u, n) => JSON.parse(fs.readFileSync(new URL(n, u)));
+const picks = load(D0, "demo-picks.json"), topo = load(D0, "topology.json");
+const live = load(FX, "results.frozen.json");
+const FIXTURE = new URL("golden-sections.json", FX);
 
 const D = R.computeState(picks, live, topo);
 const KO = [["Round of 16", "r16", [89,90,91,92,93,94,95,96].map(n => "M" + n)],
@@ -21,16 +31,23 @@ const js = {
 };
 for (const [label, short, codes] of KO) js["round_" + short] = R.buildRoundResultsPanel(D, label, short, codes);
 
+if (process.argv.includes("--update")) {
+  fs.writeFileSync(FIXTURE, JSON.stringify(js, null, 1) + "\n");
+  console.log("updated fixture: tests/fixtures/golden-sections.json (" + Object.keys(js).length + " sections)");
+  process.exit(0);
+}
+
+const snap = JSON.parse(fs.readFileSync(FIXTURE, "utf-8"));
 let fails = 0;
-for (const k of Object.keys(py)) {
-  if (py[k] === js[k]) { console.log("  ok   " + k); continue; }
+for (const k of Object.keys(snap)) {
+  if (snap[k] === js[k]) { console.log("  ok   " + k); continue; }
   fails++;
   // find first divergence
-  const a = py[k], b = js[k] || "";
+  const a = snap[k], b = js[k] || "";
   let i = 0; while (i < a.length && i < b.length && a[i] === b[i]) i++;
   console.log("  DIFF " + k + " at char " + i);
-  console.log("    py: ..." + JSON.stringify(a.slice(Math.max(0, i - 30), i + 60)));
-  console.log("    js: ..." + JSON.stringify(b.slice(Math.max(0, i - 30), i + 60)));
+  console.log("    fixture: ..." + JSON.stringify(a.slice(Math.max(0, i - 30), i + 60)));
+  console.log("    current: ..." + JSON.stringify(b.slice(Math.max(0, i - 30), i + 60)));
 }
-console.log(fails ? `\nFAILED: ${fails} section(s) differ` : `\nGOLDEN OK: all ${Object.keys(py).length} sections byte-identical`);
+console.log(fails ? `\nFAILED: ${fails} section(s) differ (intentional change? rerun with --update and review the fixture diff)` : `\nGOLDEN OK: all ${Object.keys(snap).length} sections match the snapshot`);
 process.exit(fails ? 1 : 0);

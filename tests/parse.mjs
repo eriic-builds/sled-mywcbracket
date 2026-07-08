@@ -14,7 +14,13 @@ if (!globalThis.XLSX || !globalThis.XLSX.read) { console.error("SheetJS failed t
 
 const { parseWorkbook, validateAgainstTopology } = await import("../docs/js/parse-excel.js");
 
-const XLSX_PATH = "/Users/ericlam/Projects/wc26-bracket/input/bracket-picks.xlsx";
+// The real workbook is private (it carries a colleague's name) and lives outside the
+// repo. Skip cleanly when it isn't present (e.g. in CI) — exit 0, not a failure.
+const XLSX_PATH = process.env.WCB_WORKBOOK || "/Users/ericlam/Projects/wc26-bracket/input/bracket-picks.xlsx";
+if (!fs.existsSync(XLSX_PATH)) {
+  console.log("SKIP parse.mjs: private workbook not present (set WCB_WORKBOOK to run)");
+  process.exit(0);
+}
 const demo = JSON.parse(fs.readFileSync(new URL("../docs/data/demo-picks.json", import.meta.url)));
 const topo = JSON.parse(fs.readFileSync(new URL("../docs/data/topology.json", import.meta.url)));
 

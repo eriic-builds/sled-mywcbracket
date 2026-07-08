@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: https://eriic-builds.github.io/my-wc26-bracket/
+      url: https://eriic-builds.github.io/wc26-pool-pilot/
     steps:
       - uses: actions/checkout@v5
       - uses: actions/configure-pages@v6
