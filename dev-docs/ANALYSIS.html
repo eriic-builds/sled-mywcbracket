@@ -130,7 +130,7 @@ footer{margin-top:40px;color:var(--muted);font-size:.8rem;text-align:center}
 
 <div class="stage"><div class="n">0</div><div style="flex:1">
 <h3>Repo setup + safety net</h3>
-<div class="meta">commit <code>003c056</code> · clone-with-history → new public repo, hermetic tests, CI, CLAUDE.md/SPEC.md/TASTE_COUNCIL.md</div>
+<div class="meta">commit <code>003c056</code> · clone-with-history → new public repo, hermetic tests, CI, CLAUDE.md/SPEC.md/TECHNICAL_TASTE_COUNCIL.md</div>
 <p><b>Why first:</b> we were about to modify the glue code hard, mid-tournament. The golden snapshot (render output frozen against <b>frozen inputs</b>) + CI meant every later stage had a tripwire. The results.json inputs had to be frozen too, because a bot rewrites the live file 3×/day — a snapshot reading it would break daily.</p>
 <div class="bump"><b>Bump 1:</b> GitHub can't fork a repo into the same account — so it's a clone-with-full-history pushed to a fresh repo. Also, the PLAN-*.md files were <i>untracked</i> in the source repo, so <code>git clone</code> silently didn't bring them; they were copied by hand. <i>Lesson: clone copies commits, not your desk.</i></div>
 <div class="bump"><b>Bump 2:</b> The permission system refused to create a <i>public</i> repo without your explicit OK — correct behavior, given the whole conversation was about privacy. You confirmed; only then did it publish. <i>Lesson: irreversible/outward-facing actions deserve a human gate even when a plan mentioned them.</i></div>

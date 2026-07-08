@@ -151,22 +151,22 @@ periodically, since these evolve):
 
 **The rule to follow, any time one of these files is created or regenerated
 in this repo** (via `/init` or equivalent):
-1. Check whether `TASTE_COUNCIL.md` exists at the repo root. If not, check
-   one sensible fallback: `~/.claude/TASTE_COUNCIL.md` (a personal, cross-
+1. Check whether `TECHNICAL_TASTE_COUNCIL.md` exists at the repo root. If not, check
+   one sensible fallback: `~/.claude/TECHNICAL_TASTE_COUNCIL.md` (a personal, cross-
    project copy). If it's there, copy it into this repo root rather than
    just linking to it — repo-local means it travels with the repo and
    survives elsewhere.
    If it's genuinely not found in either place, stop and say so plainly,
    Hanselman-style — name the problem and the fix, don't just note that
    something's off:
-   `TASTE_COUNCIL.md not found at ./ or ~/.claude/. Paste it and I'll add it
+   `TECHNICAL_TASTE_COUNCIL.md not found at ./ or ~/.claude/. Paste it and I'll add it
    to this repo, or tell me where it lives and I'll point to that instead.`
    Do not fabricate a version of it, and do not add a pointer line to a file
    that doesn't exist — a link to nothing is worse than no link.
 2. Check whether the generated/updated file already contains a pointer line
-   to `TASTE_COUNCIL.md`. If it does, leave it alone — don't duplicate.
+   to `TECHNICAL_TASTE_COUNCIL.md`. If it does, leave it alone — don't duplicate.
 3. If it doesn't, append one line at the end of that file:
-   `Also read TASTE_COUNCIL.md for build philosophy and decision-making
+   `Also read TECHNICAL_TASTE_COUNCIL.md for build philosophy and decision-making
    judgment before making non-trivial changes.`
 4. Do this for every instruction file this tool touches in the repo (e.g. if
    both `AGENTS.md` and `CLAUDE.md` exist because multiple tools are in use,

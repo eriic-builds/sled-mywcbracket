@@ -41,4 +41,4 @@ python3 scripts/fetch_results.py --dry-run # preview a results sync
 - Viewing a shared/demo bracket must never mutate the visitor's saved bracket or
   what-if overrides.
 
-Also read TASTE_COUNCIL.md for build philosophy and decision-making judgment before making non-trivial changes.
+Also read TECHNICAL_TASTE_COUNCIL.md for build philosophy and decision-making judgment before making non-trivial changes.
