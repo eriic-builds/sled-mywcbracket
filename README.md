@@ -47,8 +47,16 @@ as JavaScript, so *anyone* can drop in their bracket and see their own board.
    per-rival **diff** of the games still to play, sorted by points at stake. Rename or remove
    anyone anytime (local only).
 
-There is no server and no pool registry — see `SPEC.md` for the wire format, the behavioral
-invariants, and the deliberate decisions (e.g. no "re-share someone else's bracket" feature).
+**Where does everything live?**
+
+| Thing | Where it lives |
+|---|---|
+| Your bracket | Your browser's storage — on your device, not ours |
+| Brackets you've added | Your browser's storage — same deal |
+| A share link | Entirely inside the URL you send — nothing is written anywhere when you generate it |
+| Live match results | A JSON file on GitHub, updated 3× a day by a bot |
+
+When you hit "Share link", your 31 picks + display name get packed into the URL itself (the part after `#`). The recipient's browser unpacks it directly — no round-trip to any server, no account, no database row created. If they click "Add to my leaderboard", it saves to *their* browser. That's the whole chain.
 
 **Can I revoke a link I already sent?** No — a link *is* the data, like an email attachment,
 so nothing exists to revoke against (and even server-based revocation can't reach saved copies
@@ -56,10 +64,7 @@ or screenshots). Prevention beats revocation: use the **"share as"** field to sh
 initials or an alias, and the link never contained your name in the first place. Recipients can
 always remove your bracket from their board with one ✕.
 
-**Privacy:** the only network requests are same-origin fetches of `docs/data/*.json` (the shared
-live results + tournament topology) and the static assets. Your workbook never leaves the browser;
-your picks leave it only inside a share link **you** create. The bracket rides in the URL
-*fragment* (`#b=…`), which browsers never send to any server — not even GitHub's logs see it.
+See `SPEC.md` for the wire format, behavioral invariants, and deliberate design decisions (e.g. no "re-share someone else's bracket" feature).
 
 ## How it works
 
