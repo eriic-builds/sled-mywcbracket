@@ -10,7 +10,8 @@
 > See `dev-docs/SPEC.md` for the social-loop spec and `dev-docs/PLAN-*.md` for the build plans.
 
 > Upload your own filled-in **SLED World Cup 2026** bracket Excel and get your personal,
-> live-scored dashboard — bracket map, KPIs, scorecard, round-by-round results, themes — all
+> live-scored dashboard — bracket map, KPIs, scorecard, round-by-round results (with kickoff
+> times in PT/CT/ET and host city), themes — all
 > rendered **in your browser**. Your picks travel only in links **you** choose to send.
 
 **Live site:** https://eriic-builds.github.io/sled-mywcbracket/
@@ -43,9 +44,9 @@ as JavaScript, so *anyone* can drop in their bracket and see their own board.
 2. **Opening a link** shows the sender's full live-scored dashboard, view-only. Your own saved
    bracket and what-if edits are never touched.
 3. **➕ Add to my leaderboard** puts their bracket on *your* board — stored in your browser only.
-4. **🏆 Leaderboard** ranks everyone you've added (confirmed points, then attainable), with a
-   per-rival **diff** of the games still to play, sorted by points at stake. Rename or remove
-   anyone anytime (local only).
+4. **🏆 Leaderboard** ranks everyone you've added — up to 20 brackets — by confirmed points, then
+   attainable, with a per-rival **diff** of the games still to play, sorted by points at stake.
+   Rename or remove anyone anytime (local only).
 
 **Where does everything live?**
 
@@ -70,19 +71,32 @@ See `dev-docs/SPEC.md` for the wire format, behavioral invariants, and deliberat
 
 ```
 your bracket.xlsx ──(browser, SheetJS)──► parse-excel.js ──┐
+click-to-pick builder ───────────────────► builder.js ─────┤
                                                            ├─► render.js ──► your dashboard (DOM)
-docs/data/topology.json  (fixed bracket) ──────────────────┤        + interact.js (themes, search…)
-docs/data/results.json   (live, synced)  ──────────────────┘
+docs/data/topology.json  (fixed bracket) ──────────────────┤     + interact.js (themes, search, connectors)
+docs/data/results.json   (live, synced)  ──────────────────┘     + main.js (uploads, share, leaderboard)
+
+share link   ⇄  share.js    (packs/unpacks your picks in the URL — no network)
+leaderboard  ⇄  compare.js  (ranks + diffs brackets you've added — localStorage only)
 ```
 
-- **`docs/js/render.js`** — the render engine, ported 1:1 from the Python generator. A pure
-  function `renderDashboard(picks, live, topology)` → HTML string. A **golden test** proves it is
-  byte-identical to the Python original for the demo bracket.
+- **`docs/js/render.js`** — the render engine. `computeState(picks, live, topology)` builds the
+  scored state, then pure section builders (`buildBracket`, `buildScorecard`, `buildRoundResultsPanel`,
+  …) each return an HTML string, and `renderDashboard()` assembles them. A **golden test** byte-locks
+  every section builder's output against a frozen snapshot; byte-parity with the original Python
+  generator was proven once at porting time and is now guarded against regressions.
 - **`docs/js/parse-excel.js`** — workbook → picks object, with validation (reject with specific
   messages, never render garbage). Verified to reproduce the demo bracket from the real workbook.
+- **`docs/js/builder.js`** — the pure pick core (`deriveStructure`, `teamsFor`, `repair`,
+  `buildPicks`) plus the click-to-pick overlay, so you can build a bracket by tapping winners
+  without a spreadsheet. The same core encodes and decodes share links.
+- **`docs/js/share.js` / `docs/js/compare.js`** — the social layer. `share.js` encodes/decodes a
+  whole bracket into the URL hash; `compare.js` keeps the local leaderboard (rank + per-rival diff).
+  Neither touches the network — a bracket only leaves the browser inside a link you send.
+- **`docs/js/main.js`** — wires the page together: uploads and build flow, the viewer bar, the share
+  popover, the leaderboard overlay, and the collapsible "filter by team" rail.
 - **`docs/js/interact.js`** — the interaction layer (themes, favorites, team search, connector
-  drawing, hover stat cards, scrollspy), extracted verbatim and run *after* the dashboard is
-  injected via `initInteractions()`.
+  drawing, hover stat cards, scrollspy), run *after* the dashboard is injected via `initInteractions()`.
 - **`docs/js/storage.js`** — save / load / export / import; namespaces what-if score overrides per
   bracket so two uploads on one device don't leak into each other.
 - **`scripts/fetch_results.py`** — the same sync engine as the source repo, trimmed to write
@@ -92,7 +106,7 @@ docs/data/results.json   (live, synced)  ─────────────
 
 | File | What it is |
 | --- | --- |
-| `docs/data/topology.json` | The fixed bracket: `r32` fixtures, `ko_feed`, seeds, kickoff-time tables. Same for everyone. |
+| `docs/data/topology.json` | The fixed bracket: `r32` fixtures, `ko_feed`, seeds, and the static knockout schedule (`r16_fix`, `ko_when` kickoff times, `ko_city` host cities). Same for everyone. |
 | `docs/data/results.json` | Live results the sync writes: `res`, `ko_fix`, `auto_hl`, `refreshed`. |
 | `docs/data/demo-picks.json` | A sample bracket (Eric's) used by **Try the demo**. |
 
@@ -104,7 +118,8 @@ No build step. Serve `docs/` and open it:
 cd docs && python3 -m http.server 8000   # then open http://localhost:8000/
 
 # Tests (Node ≥ 18):
-npm test                # scoring + builder + golden snapshot + parse (parse skips without the private workbook)
+npm test                # scoring, builder, share, compare, bracketmap, golden snapshot, parse
+                        # (parse skips without the private workbook)
 node tests/golden.mjs --update   # accept an INTENTIONAL render change (review the fixture diff)
 
 # Sync results locally:
