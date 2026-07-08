@@ -5,6 +5,37 @@
 
 const DASH = "\u2013";
 
+// Format a UTC ISO string into the viewer's own timezone (e.g. "Thu Jul 9 \u00b7 1:00 PM PDT").
+function localKickoff(utcIso) {
+  try {
+    const d = new Date(utcIso);
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const dp = new Intl.DateTimeFormat("en-US", { weekday:"short", month:"short", day:"numeric", timeZone:tz }).formatToParts(d);
+    const wday = dp.find(p => p.type==="weekday").value;
+    const mon  = dp.find(p => p.type==="month").value;
+    const day  = dp.find(p => p.type==="day").value;
+    const time = d.toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit", timeZone:tz });
+    const tzAbbr = new Intl.DateTimeFormat("en-US", { timeZoneName:"short", timeZone:tz }).formatToParts(d).find(p => p.type==="timeZoneName").value;
+    return `${wday} ${mon} ${day} \u00b7 ${time} ${tzAbbr}`;
+  } catch(e) { return utcIso; }
+}
+
+// Format a UTC ISO string into the viewer's timezone for "updated" timestamps
+// (e.g. "July 8, 2026 \u00b7 1:26 AM PDT").
+function localRefreshed(utcIso) {
+  try {
+    const d = new Date(utcIso);
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const dp = new Intl.DateTimeFormat("en-US", { month:"long", day:"numeric", year:"numeric", timeZone:tz }).formatToParts(d);
+    const mon = dp.find(p => p.type==="month").value;
+    const day = dp.find(p => p.type==="day").value;
+    const yr  = dp.find(p => p.type==="year").value;
+    const time = d.toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit", timeZone:tz });
+    const tzAbbr = new Intl.DateTimeFormat("en-US", { timeZoneName:"short", timeZone:tz }).formatToParts(d).find(p => p.type==="timeZoneName").value;
+    return `${mon} ${day}, ${yr} \u00b7 ${time} ${tzAbbr}`;
+  } catch(e) { return utcIso; }
+}
+
 export function esc(s) {
   return String(s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -579,7 +610,7 @@ export function buildRoundResultsPanel(D, label, short, codes) {
       rows.push(`<div class="rr"><div class="rr-m">${esc(mc)}</div><div class="rr-s">${sc}</div><div class="rr-p">${badge}</div></div>`);
     } else {
       let when;
-      if (has(D.KO_FIX, mc)) { const [day, et, ct, ptz] = D.KO_FIX[mc]; when = `${day} \u00b7 ${ptz} PT \u00b7 ${ct} CT \u00b7 ${et} ET`; }
+      if (has(D.KO_FIX, mc)) { when = localKickoff(D.KO_FIX[mc][0]); }
       else if (short === "r16" && r16day[mc]) { const [day, et, ct, ptz] = r16day[mc]; when = `${day} \u00b7 ${ptz} PT \u00b7 ${ct} CT \u00b7 ${et} ET`; }
       else when = D.KO_DATES[short];
       const ta = a || ("Winner " + fa), tb = b || ("Winner " + fb);
@@ -639,7 +670,7 @@ export function renderDashboard(picks, live, topology) {
   const syncBtn = D.SYNC_URL ? `<a class="synbtn glass" id="syncBtn" href="${esc(D.SYNC_URL)}" target="_blank" rel="noopener" title="Pull the latest results"><span class="syn-ic">\u{1F504}</span><span class="syn-tx">Sync now</span></a>` : "";
   return '<div class="topbar"><div class="brand"><span class="orb"></span><div>2026 FIFA World Cup - Bracket Dashboard - MSFT SLED<small>Live results vs your picks</small></div></div>' +
     '<div class="upd-group">' +
-    `<div class="refreshed glass" id="topRefreshed" title="Results auto-sync from FIFA\u2019s live feed a few times a day \u2014 no manual refresh needed"><span class="rf-dot"></span>Live \u00b7 updated ${D.REFRESHED}</div>` +
+    `<div class="refreshed glass" id="topRefreshed" title="Results auto-sync from FIFA\u2019s live feed a few times a day \u2014 no manual refresh needed"><span class="rf-dot"></span>Live \u00b7 updated ${localRefreshed(D.REFRESHED)}</div>` +
     syncBtn + '</div>' +
     '<div class="modes glass">' +
     '<div class="theme-toggle" role="group" aria-label="Light or dark theme">' +
@@ -723,14 +754,14 @@ export function renderDashboard(picks, live, topology) {
     '</div><div style="font-size:.8rem;color:var(--muted);margin-top:12px;line-height:1.5"><b>Earned</b> is the points you\u2019ve confirmed so far in each round \u2014 they add up to your <b>' + `${D.CONF} of 80` + '</b> confirmed. Each pick scored on its own; Champion is worth a full 16. ' +
     `Tiebreaker: total goals in the Final at the end of extra time \u2014 penalties don\u2019t count. Your tiebreaker: <b>${esc(D.TIEBREAKER)}</b>.</div></div>` +
     '<div class="glass" style="padding:20px"><div style="font-weight:700;margin-bottom:4px">Where the tournament stands</div>' +
-    `<div style="font-size:.8rem;color:var(--muted);margin-bottom:8px">Live results as of ${D.REFRESHED} \u00b7 auto-syncs a few times a day</div>` +
+    `<div style="font-size:.8rem;color:var(--muted);margin-bottom:8px">Live results as of ${localRefreshed(D.REFRESHED)} \u00b7 auto-syncs a few times a day</div>` +
     `<div class="stages" style="grid-template-columns:1fr;padding:0;gap:8px">${buildStages(D)}</div></div></div>` + '</div>' +
     '<div class="glass foot"><b>Sources.</b> Your picks, scoring, tiebreaker and any host bonus rule from your <b>SLED World Cup 2026 bracket workbook</b> and the challenge instructions. ' +
     'Match results, scores and kickoff times from <b>FIFA official match records</b> (fifa.com), corroborated by NBC Sports, CBS Sports, ESPN and Sporting News, for the 2026 FIFA World Cup. Kickoff times anchored to ET, converted to CT/PT. Hover-card country pedigree (titles, best finish) from public FIFA World Cup historical records.' +
     `<div class="src"><b>Status.</b> ${esc(D.LIVE_STATUS)} ` +
     `You have <b>${D.CONF} points</b> confirmed, <b>${D.LIVE}</b> live, max attainable <b>${D.ATTAIN}</b>. ` +
     `This is your personal, <b>unofficial</b> tally for Rob to review \u2014 his scoring is authoritative. Champion ${esc(D.CHAMP)} \u00b7 runner-up ${esc(D.RUNNER)}.</div>` +
-    `<div class="src">Live results as of <b>${D.REFRESHED}</b> \u00b7 reading mode, favorites and any manual score edits are saved on this device.</div>` +
+    `<div class="src">Live results as of <b>${localRefreshed(D.REFRESHED)}</b> \u00b7 reading mode, favorites and any manual score edits are saved on this device.</div>` +
     '<div class="src">\u{1F3C6} Thank you to <b>Rob Brautigam</b> for hosting the 2026 FIFA World Cup bracket challenge for SLED.</div>' +
     (D.CREDIT ? `<div class="src credit">${esc(D.CREDIT)}</div>` : "") + '</div>' +
     '</div></div>';   // close .content, .shell

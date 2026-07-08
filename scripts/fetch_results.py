@@ -521,7 +521,8 @@ def build_ko_fix(ko_feed, res, upcoming_feed):
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=timezone.utc)
         day = re.sub(r"\b0(\d)", r"\1", dt.astimezone(et_z).strftime("%a %b %d"))
-        out[code] = (day, _fmt(dt, et_z), _fmt(dt, ct_z), _fmt(dt, pt_z))
+        utc_iso = dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        out[code] = (utc_iso, day, _fmt(dt, et_z), _fmt(dt, ct_z), _fmt(dt, pt_z))
     return out
 
 
@@ -893,12 +894,9 @@ def build_auto_hl(feed, limit=6):
     return entries
 
 
-def now_pt_stamp() -> str:
-    now = datetime.now(ZoneInfo("America/Los_Angeles"))  # DST-safe (PT year-round)
-    # Trim leading zeros on day and hour, but keep the minute zero-padded ("10:06").
-    day = str(now.day)
-    hour = str(int(now.strftime("%I")))
-    return now.strftime(f"%B {day}, %Y \u00b7 {hour}:%M %p PT")
+def now_utc_stamp() -> str:
+    """UTC ISO-8601 string; the browser formats it into the viewer's local timezone."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _write_results(results: dict) -> None:
@@ -992,7 +990,7 @@ def main() -> int:
             print(f"Source: {src}. No new finished games to apply \u2014 results already current (dry-run).")
             return 0
         # Nothing to apply, but record that we checked so "last synced" stays honest.
-        stamp = now_pt_stamp()
+        stamp = now_utc_stamp()
         if results.get("refreshed") != stamp:
             results["refreshed"] = stamp
             _write_results(results)
@@ -1010,7 +1008,7 @@ def main() -> int:
         print(f"  {c} [{ko_label(c, ko_feed)}]: {gA}\u2013{gB} \u2192 {w}{tail}")
     if ko_fix_changed:
         for c in sorted(new_ko_fix, key=lambda c: int(c[1:])):
-            day, et, ct, pt = new_ko_fix[c]
+            utc_iso, day, et, ct, pt = new_ko_fix[c]
             print(f"  {c} [{ko_label(c, ko_feed)}] kickoff: {day} \u00b7 {pt} PT \u00b7 {ct} CT \u00b7 {et} ET")
 
     if args.dry_run:
@@ -1023,7 +1021,7 @@ def main() -> int:
     results["res"] = {c: list(new_res[c]) for c in sorted(new_res, key=lambda c: int(c[1:]))}
     results["ko_fix"] = {c: list(new_ko_fix[c]) for c in sorted(new_ko_fix, key=lambda c: int(c[1:]))}
     results["auto_hl"] = [list(e) for e in auto_entries]
-    results["refreshed"] = now_pt_stamp()
+    results["refreshed"] = now_utc_stamp()
     _write_results(results)
     print("Updated docs/data/results.json (res / ko_fix / auto_hl / refreshed).")
     return 0
