@@ -1,4 +1,4 @@
-# Taste Council
+# Technical Taste Council
 
 Purpose: I'm not a developer by trade. I know what outcome I want but I lack the
 built-in instinct for *when something is quietly going wrong* — over-engineering,
