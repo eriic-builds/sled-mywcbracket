@@ -1,6 +1,6 @@
 {
  "type": "module",
  "scripts": {
-  "test": "node tests/scoring.mjs && node tests/builder.mjs && node tests/golden.mjs && node tests/parse.mjs"
+  "test": "node tests/scoring.mjs && node tests/builder.mjs && node tests/share.mjs && node tests/golden.mjs && node tests/parse.mjs"
  }
 }

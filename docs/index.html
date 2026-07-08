@@ -72,6 +72,18 @@
 .mini-row{display:flex;gap:10px;align-items:center;justify-content:center;margin:12px 0 4px}
 .mini-row .dotsep{color:var(--muted,#9aa2ad)}
 .vb-saved{margin-left:8px;font-size:.76rem;color:var(--win-ink)}
+
+/* Share-link popover (lives under the viewer bar) */
+.sharepop{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:70;
+  width:min(480px,92vw);background:var(--panel,#1c1b21);border:1px solid var(--border2);border-radius:14px;
+  padding:14px 16px;box-shadow:0 18px 50px rgba(0,0,0,.45);text-align:left}
+.sp-field{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted,#9aa2ad)}
+.sp-field input{font:inherit;font-size:.95rem;color:var(--text);background:var(--hover);border:1px solid var(--border2);border-radius:9px;padding:8px 10px}
+.sp-field input:focus{outline:none;border-color:#0097F4}
+.sp-row{display:flex;gap:8px;margin-top:10px}
+.sp-row input{flex:1;font:inherit;font-size:.78rem;color:var(--muted);background:var(--hover);border:1px solid var(--border2);border-radius:9px;padding:8px 10px;min-width:0}
+.sp-row button{font:inherit;font-weight:700;font-size:.85rem;border-radius:9px;padding:8px 14px;cursor:pointer;border:1px solid transparent;color:#04121a;background:linear-gradient(120deg,#0097F4,#00B291);white-space:nowrap}
+.sp-note{margin-top:10px;font-size:.78rem;line-height:1.5;color:var(--muted,#9aa2ad)}
 .alt-head{margin:24px 0 2px;font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .choices.alt{margin:8px 0 4px}
 .choices.alt .choice{flex:1 1 220px;max-width:300px}
@@ -138,9 +150,24 @@
 <!-- Returning-visitor / viewer control bar (hidden until a bracket is loaded) -->
 <div id="viewerbar" hidden>
   <span class="vb-you">Viewing <b id="vb-name">your bracket</b><span class="vb-saved">✓ saved on this device</span></span>
+  <button id="vb-share" title="Copy a link that shows this bracket to anyone you send it to">🔗 Share link</button>
   <button id="vb-replace" title="Start over — build or upload a different bracket">New bracket</button>
   <button id="vb-export" title="Download a backup file — reopen it later or on another device">Save a copy</button>
   <button id="vb-clear" title="Remove this bracket from this device">Clear</button>
+  <button id="vb-saveshared" hidden title="Keep this shared bracket as yours on this device">Save as mine</button>
+  <button id="vb-back" hidden title="Return to your own saved bracket">← Back to my bracket</button>
+  <div id="sharepop" class="sharepop" hidden>
+    <label class="sp-field">Share as
+      <input id="share-name" type="text" maxlength="40" autocomplete="off"
+             placeholder="the name people will see">
+    </label>
+    <div class="sp-row">
+      <input id="share-url" type="text" readonly aria-label="Your share link">
+      <button id="share-copy">Copy</button>
+    </div>
+    <div class="sp-note">🔒 This link contains your picks and the name above — nothing else.
+    Send it only to people you want to see it. Prefer initials or a nickname? Just edit the name.</div>
+  </div>
 </div>
 
 <!-- Landing -->

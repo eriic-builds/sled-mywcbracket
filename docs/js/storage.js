@@ -25,6 +25,27 @@ export function hashPicks(picks) {
   return h.toString(36);
 }
 
+// Preview renders (demo / shared link) must not destroy the owner's what-if edits:
+// stash the real state before the preview, restore it when the owner's bracket
+// returns. stash is only written when absent, so back-to-back previews (demo then a
+// shared link) can't overwrite the real state with a preview's.
+const KEY_STASH = "wcb.scores.stash";
+export function stashWhatIfs() {
+  if (safeGet(KEY_STASH) != null) return;
+  const h = safeGet(KEY_HASH), s = safeGet(KEY_SCORES);
+  if (h != null || s != null) safeSet(KEY_STASH, JSON.stringify({ h, s }));
+}
+export function restoreWhatIfs() {
+  const raw = safeGet(KEY_STASH);
+  if (!raw) return;
+  try {
+    const { h, s } = JSON.parse(raw);
+    if (h != null) safeSet(KEY_HASH, h); else safeDel(KEY_HASH);
+    if (s != null) safeSet(KEY_SCORES, s); else safeDel(KEY_SCORES);
+  } catch (e) {}
+  safeDel(KEY_STASH);
+}
+
 // Clear per-pick what-if overrides when a DIFFERENT bracket is loaded (their IDs like
 // "r32-M74" are entrant-relative and would otherwise haunt the next upload).
 export function resetWhatIfsIfChanged(picks) {
