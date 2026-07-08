@@ -310,5 +310,39 @@
    "3:00 PM",
    "1:00 PM"
   ]
- ]
+ ],
+ "ko_city": {
+ "M89": "Philadelphia",
+ "M90": "Houston",
+ "M91": "New York / New Jersey",
+ "M92": "Mexico City",
+ "M93": "Dallas",
+ "M94": "Seattle",
+ "M95": "Atlanta",
+ "M96": "Vancouver",
+ "M97": "Boston",
+ "M98": "Los Angeles",
+ "M99": "Miami",
+ "M100": "Kansas City",
+ "M101": "Dallas",
+ "M102": "Atlanta",
+ "M104": "New York / New Jersey"
+ },
+ "ko_when": {
+ "M89": ["Sat Jul 4", "5:00 PM", "4:00 PM", "2:00 PM"],
+ "M90": ["Sat Jul 4", "1:00 PM", "12:00 PM", "10:00 AM"],
+ "M91": ["Sun Jul 5", "4:00 PM", "3:00 PM", "1:00 PM"],
+ "M92": ["Sun Jul 5", "8:00 PM", "7:00 PM", "5:00 PM"],
+ "M93": ["Mon Jul 6", "3:00 PM", "2:00 PM", "12:00 PM"],
+ "M94": ["Mon Jul 6", "8:00 PM", "7:00 PM", "5:00 PM"],
+ "M95": ["Tue Jul 7", "12:00 PM", "11:00 AM", "9:00 AM"],
+ "M96": ["Tue Jul 7", "4:00 PM", "3:00 PM", "1:00 PM"],
+ "M97": ["Thu Jul 9", "4:00 PM", "3:00 PM", "1:00 PM"],
+ "M98": ["Fri Jul 10", "3:00 PM", "2:00 PM", "12:00 PM"],
+ "M99": ["Sat Jul 11", "5:00 PM", "4:00 PM", "2:00 PM"],
+ "M100": ["Sat Jul 11", "9:00 PM", "8:00 PM", "6:00 PM"],
+ "M101": ["Tue Jul 14", "3:00 PM", "2:00 PM", "12:00 PM"],
+ "M102": ["Wed Jul 15", "3:00 PM", "2:00 PM", "12:00 PM"],
+ "M104": ["Sun Jul 19", "3:00 PM", "2:00 PM", "12:00 PM"]
+ }
 }

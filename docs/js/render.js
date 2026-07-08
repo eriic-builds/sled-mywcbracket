@@ -86,6 +86,8 @@ export function computeState(picks, live, topology) {
   D.KO_DATES = topology.ko_dates;
   D.R32_TIMES = topology.r32_times || {};
   D.R16_FIX = (topology.r16_fix || []).map(r => r.slice());
+  D.KO_CITY = topology.ko_city || {};
+  D.KO_WHEN = topology.ko_when || {};
   D.POINTS_MAX = 80;
   D.KO_ROUND_ORDER = [
     ["Round of 16", "r16", [89,90,91,92,93,94,95,96].map(n => "M" + n)],
@@ -599,9 +601,11 @@ export function buildRoundResultsPanel(D, label, short, codes) {
       rows.push(`<div class="rr"><div class="rr-m">${esc(mc)}</div><div class="rr-s">${sc}</div><div class="rr-p">${badge}</div></div>`);
     } else {
       let when;
-      if (has(D.KO_FIX, mc)) { const [, day, et, ct, ptz] = D.KO_FIX[mc]; when = `${day} \u00b7 ${ptz} PT \u00b7 ${ct} CT \u00b7 ${et} ET`; }
+      if (has(D.KO_FIX, mc)) { const v = D.KO_FIX[mc]; const day = v[v.length - 4], et = v[v.length - 3], ct = v[v.length - 2], ptz = v[v.length - 1]; when = `${day} \u00b7 ${ptz} PT \u00b7 ${ct} CT \u00b7 ${et} ET`; }
       else if (short === "r16" && r16day[mc]) { const [day, et, ct, ptz] = r16day[mc]; when = `${day} \u00b7 ${ptz} PT \u00b7 ${ct} CT \u00b7 ${et} ET`; }
+      else if (has(D.KO_WHEN, mc)) { const [day, et, ct, ptz] = D.KO_WHEN[mc]; when = `${day} \u00b7 ${ptz} PT \u00b7 ${ct} CT \u00b7 ${et} ET`; }
       else when = D.KO_DATES[short];
+      if (has(D.KO_CITY, mc)) when += ` \u00b7 ${D.KO_CITY[mc]}`;
       const ta = a || ("Winner " + fa), tb = b || ("Winner " + fb);
       let pkt;
       if (pk && D.ELIM.has(pk)) pkt = `<span class="res-no">pick ${esc(pk)} out</span>`;
