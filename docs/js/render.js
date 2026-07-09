@@ -522,14 +522,16 @@ function collectBusts(D) {
 export function storyCards(D) {
   const cards = [];
   const played = D.ROUND_SEQ.map(s => [s, D.round_tally(s)]);
-  const bits = played.filter(([s, [c, d, l]]) => d).map(([s, [c, d, l]]) => `${c} of ${d} in the ${D.ROUND_FULL[s]}`);
+  const decided = played.filter(([s, [c, d, l]]) => d);
   const tot_c = played.reduce((a, [s, [c]]) => a + c, 0);
   const tot_d = played.reduce((a, [s, [c, d]]) => a + d, 0);
-  if (!bits.length) cards.push(["\u26BD", "The story so far", "Kicking off", "No games are final yet \u2014 your first results will land here as they finish."]);
+  if (!decided.length) cards.push(["\u26BD", "The story so far", "Kicking off", "No games are final yet. Your first results land here as they finish."]);
   else {
+    // Lead with the most recent completed round so the story tracks the tournament, then fold in the running total.
+    const [ls, lt] = decided[decided.length - 1];
     const head = tot_c === tot_d ? "Perfect run" : (tot_c * 2 >= tot_d ? "Holding strong" : "Bumpy road");
-    const body = bits.join(" \u00b7 ") + `. ${D.CONF} points banked, ${D.LIVE} still live.`;
-    cards.push([tot_c === tot_d ? "\u2705" : "\u{1F4CA}", `${tot_c} of ${tot_d} picks right so far`, head, body]);
+    const body = `You went ${lt[0]} of ${lt[1]} in the ${D.ROUND_FULL[ls]}. That puts you at ${tot_c} of ${tot_d} right so far, ${D.CONF} points banked and ${D.LIVE} still live.`;
+    cards.push([tot_c === tot_d ? "\u2705" : "\u{1F4CA}", `Through the ${D.ROUND_FULL[ls]}`, head, body]);
   }
   const busts = collectBusts(D);
   if (busts.length) {
@@ -537,9 +539,9 @@ export function storyCards(D) {
     const [lvl, _n, pk, w, a, b, gA, gB, note] = busts[0];
     const sc = `${a} ${gA}${DASH}${gB} ${b}` + (note ? ` (${note})` : "");
     const forfeit = forfeited(D, pk, lvl), n = busts.length;
-    const lead = lvl === 0 ? `${w} knocked out your ${pk} pick \u2014 ${sc}.` : `${w} ended your ${pk} run in the ${STORY_ROUND_NAME[lvl]} \u2014 ${sc}.`;
-    const tail = n > 1 ? ` It's the costliest of ${n} branches that have busted, ${D.OUT} points gone in all.` : ` That's ${forfeit} point${forfeit !== 1 ? "s" : ""} off your board.`;
-    cards.push([teamEmoji(w), "Biggest swing", `${w} over ${pk}`, lead + tail]);
+    const lead = lvl === 0 ? `${w} knocked out your ${pk} pick, ${sc}.` : `${w} ended your ${pk} run in the ${STORY_ROUND_NAME[lvl]}, ${sc}.`;
+    const tail = n > 1 ? ` This is your costliest miss so far, one of ${n} busted branches, ${D.OUT} points gone in all.` : ` That is ${forfeit} point${forfeit !== 1 ? "s" : ""} off your board.`;
+    cards.push([teamEmoji(w), "Costliest so far", `${w} over ${pk}`, lead + tail]);
   } else cards.push(["\u{1F3AF}", "Clean sheet", "No busted branches yet", "Every team you've backed so far is still standing \u2014 nothing off your board."]);
   const ce = teamEmoji(D.CHAMP);
   if (D.ELIM.has(D.CHAMP)) cards.push([ce, "What's at stake", `${D.CHAMP} is out`, `Your title pick is gone, so the Champion\u2019s 16 points are off the board \u2014 ${D.ATTAIN} still attainable.`]);
