@@ -4,6 +4,8 @@
 // the output matches an uploaded workbook exactly.
 
 // ── pure core (unit-testable) ────────────────────────────────────────────────
+import { flagImg } from "./flags.js";
+
 export function deriveStructure(topology) {
   const r32 = topology.r32.map(m => ({ code: m[0], date: m[1], a: m[2], b: m[3] }));
   const feedToCode = {};
@@ -93,7 +95,7 @@ export function openBuilder(topology, onDone, onCancel, resume = true) {
       if (!t) return `<div class="bld-team tbd">Winner of ${esc(feeder)}</div>`;
       const cls = w === t ? " picked" : (w ? " dim" : "");
       return `<button class="bld-team${cls}" data-code="${esc(code)}" data-team="${esc(t)}">` +
-        `${seedTag(t)}<span class="tname">${esc(t)}</span><span class="bld-adv">through \u2713</span></button>`;
+        `${flagImg(t)}${seedTag(t)}<span class="tname">${esc(t)}</span><span class="bld-adv">through \u2713</span></button>`;
     };
     // friendly context instead of the internal match code: the date for R32, nothing later
     const tag = m ? `<div class="bld-mc">${esc(m.date)}</div>` : "";
