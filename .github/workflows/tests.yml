@@ -22,3 +22,5 @@ jobs:
       - run: npm test
         env:
           TZ: America/Los_Angeles
+      - name: Validate committed results.json
+        run: python3 scripts/validate_results.py

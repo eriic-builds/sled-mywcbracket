@@ -34,6 +34,9 @@ jobs:
       - name: Fetch results into docs/data/results.json
         run: python scripts/fetch_results.py
 
+      - name: Validate results before committing
+        run: python scripts/validate_results.py
+
       - name: Commit and push if results changed
         id: commit
         run: |

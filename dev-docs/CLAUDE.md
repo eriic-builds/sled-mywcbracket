@@ -30,6 +30,10 @@ python3 scripts/fetch_results.py --dry-run # preview a results sync
   test or fixture depend on its live contents.
 - `scripts/fetch_results.py` — results sync (FIFA feed + fallback), runs via
   `.github/workflows/sync-results.yml`.
+- `scripts/validate_results.py` — schema + sanity gate for `results.json` (stdlib only).
+  The sync workflow runs it between fetch and commit, and `tests.yml` runs it on push, so
+  a malformed feed never ships. Run it locally after a manual data edit:
+  `python3 scripts/validate_results.py`.
 
 ## Social-layer rules (the point of this pilot)
 
