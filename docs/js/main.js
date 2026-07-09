@@ -140,34 +140,54 @@ function shareURL(alias) {
   return location.origin + location.pathname + "#b=" + encodeShare({ ...p, entrant: name }, TOPO);
 }
 
+function possessive(name) {
+  const n = String(name || "").trim();
+  if (!n) return "your";
+  return n + (/s$/i.test(n) ? "\u2019" : "\u2019s");
+}
+
 function wireShare() {
   const pop = $("#sharepop"), nameIn = $("#share-name"), urlIn = $("#share-url"), copy = $("#share-copy");
+  const native = $("#share-native"), prev = $("#share-preview");
   const share = $("#vb-share");
-  const closePop = () => { pop.hidden = true; };
+  const shareName = () => (nameIn.value.trim() || (loadPicks() || {}).entrant || "");
+  const refresh = () => {
+    urlIn.value = shareURL(nameIn.value) || "";
+    if (prev) prev.textContent = possessive(shareName());
+    copy.textContent = "Copy link";
+  };
+  const closePop = () => { if (!pop.hidden) { pop.hidden = true; share.focus(); } };
   share.onclick = () => {
     const p = loadPicks(); if (!p || !TOPO) return;
     pop.hidden = !pop.hidden;
     if (!pop.hidden) {
       nameIn.value = p.entrant || "";
-      urlIn.value = shareURL(nameIn.value) || "";
-      copy.textContent = "Copy";
+      if (native) native.hidden = !navigator.share;
+      refresh();
       nameIn.focus();
     }
   };
   $("#share-close").onclick = closePop;
-  // Close on Escape or a click anywhere outside the popover (the Share button toggles it itself).
+  // Close on Escape (return focus to the trigger) or a click outside (leave focus where it landed).
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) closePop(); });
   document.addEventListener("click", (e) => {
     if (pop.hidden) return;
     if (pop.contains(e.target) || share.contains(e.target)) return;
-    closePop();
+    pop.hidden = true;
   });
-  nameIn.oninput = () => { urlIn.value = shareURL(nameIn.value) || ""; copy.textContent = "Copy"; };
+  nameIn.oninput = refresh;
   copy.onclick = async () => {
     const url = shareURL(nameIn.value); if (!url) return;
     urlIn.value = url;
     try { await navigator.clipboard.writeText(url); copy.textContent = "✓ Copied"; }
     catch (e) { urlIn.select(); copy.textContent = "Select + copy"; }  // clipboard denied -> manual
+  };
+  if (native) native.onclick = async () => {
+    const url = shareURL(nameIn.value); if (!url) return;
+    const nm = shareName();
+    const label = nm ? `${possessive(nm)} World Cup 2026 bracket` : "my World Cup 2026 bracket";
+    try { await navigator.share({ title: label, text: `See ${label} \uD83C\uDFC6`, url }); }
+    catch (e) { if (e && e.name === "AbortError") return; }
   };
   urlIn.onclick = () => urlIn.select();
 }
