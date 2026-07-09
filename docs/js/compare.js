@@ -75,10 +75,17 @@ const ROUND_TAG = { r32: "R32", r16: "R16", qf: "QF", sf: "SF", final: "Final" }
 export function openCompare(topology, live, { onAddLink, onAddDemo } = {}) {
   const host = document.getElementById("compare");
   const inner = host.querySelector(".bld-inner");
+  const prevFocus = document.activeElement;             // a11y: return focus here on close
+  host.setAttribute("role", "dialog");
+  host.setAttribute("aria-modal", "true");
+  host.setAttribute("aria-label", "Pool leaderboard");
   host.hidden = false;
   let openDiff = null;                                   // hash of the row whose diff is expanded
 
-  function close() { host.hidden = true; inner.innerHTML = ""; document.removeEventListener("keydown", onKey); }
+  function close() {
+    host.hidden = true; inner.innerHTML = ""; document.removeEventListener("keydown", onKey);
+    if (prevFocus && prevFocus.focus) prevFocus.focus();   // a11y: restore focus to the trigger
+  }
   function onKey(e) { if (e.key === "Escape") close(); }
   document.addEventListener("keydown", onKey);
 
@@ -124,7 +131,7 @@ export function openCompare(topology, live, { onAddLink, onAddDemo } = {}) {
       <div class="bld-head">
         <div><div class="bld-title">🏆 Pool leaderboard</div>
         <div class="bld-sub">Everyone on this board lives on <b>this device only</b> — nothing is uploaded.</div></div>
-        <button class="bld-x" id="cmp-close" title="Close">✕</button>
+        <button class="bld-x" id="cmp-close" title="Close" aria-label="Close leaderboard">✕</button>
       </div>
       <div class="cmp-table">${body}</div>
       <div class="cmp-addbox">
@@ -167,4 +174,5 @@ export function openCompare(topology, live, { onAddLink, onAddDemo } = {}) {
   }
 
   render();
+  const closeBtn = inner.querySelector("#cmp-close"); if (closeBtn) closeBtn.focus();   // a11y: move focus into the dialog
 }

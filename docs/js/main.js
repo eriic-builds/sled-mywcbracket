@@ -87,6 +87,25 @@ function showError(problems) {
   $("#err-demo").onclick = onDemo;
 }
 
+// Live data (topology + results) failed to load. Show a readable, retryable banner
+// instead of a silent blank state. The landing itself works without live data.
+function showDataError() {
+  const box = $("#errbox");
+  box.innerHTML = '<div class="err-h">Live results did not load</div>' +
+    '<ul><li>Your connection or the results file did not respond.</li></ul>' +
+    '<div class="err-f">Check your connection, then <button id="err-retry" class="linkbtn">retry</button>.</div>';
+  box.hidden = false;
+  $("#err-retry").onclick = async () => {
+    try { await loadData(); } catch (e) { return; }   // still down: leave the banner up
+    box.hidden = true;
+    refreshLanding();
+    const hash = openSharedFromHash();
+    if (hash === "shown" || hash === "failed") return;
+    const saved = loadPicks();
+    if (saved) { try { showDashboard(saved); } catch (e) { console.warn(e); } }
+  };
+}
+
 async function handleFile(file) {
   $("#errbox").hidden = true;
   try {
@@ -281,6 +300,7 @@ function wire() {
   fileInput.onchange = () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); };
   const dz = $("#drop");
   dz.addEventListener("click", () => fileInput.click());
+  dz.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); } });
   ["dragover", "dragenter"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("over"); }));
   ["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("over"); }));
   dz.addEventListener("drop", e => { const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) handleFile(f); });
@@ -319,13 +339,29 @@ function wire() {
   $("#sh-board").onclick = openLeaderboard;
   $("#sh-dismiss").onclick = () => { try { localStorage.setItem(HINT_KEY, "1"); } catch (e) {} $("#sharehint").hidden = true; };
   const dab = $("#dab"); if (dab) dab.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  // One-time notice if the browser blocks local saving (private mode / quota), so a
+  // silent save failure does not surprise you later.
+  window.addEventListener("wcb:storage-blocked", () => {
+    if ($("#storagenote")) return;
+    const n = document.createElement("div");
+    n.id = "storagenote"; n.setAttribute("role", "status");
+    n.textContent = "Your browser blocked local saving. Changes will not persist on this device.";
+    n.style.cssText = "position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:200;max-width:92%;background:var(--panel,#1c1b21);color:var(--text,#fff);border:1px solid var(--border2,rgba(255,255,255,.16));border-radius:12px;padding:11px 14px;font-size:.86rem;box-shadow:0 10px 30px rgba(0,0,0,.45)";
+    const x = document.createElement("button");
+    x.textContent = "\u2715"; x.setAttribute("aria-label", "Dismiss");
+    x.style.cssText = "margin-left:12px;background:none;border:0;color:inherit;cursor:pointer;font:inherit";
+    x.onclick = () => n.remove();
+    n.appendChild(x); document.body.appendChild(n);
+  }, { once: true });
 }
 
 (async function () {
   try { const th = localStorage.getItem("wcb.theme") || "dark"; document.documentElement.setAttribute("data-theme", th); localStorage.setItem("wcb.theme", th); } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   wire();
-  try { await loadData(); } catch (e) { console.warn("data load failed", e); }
+  let dataOk = true;
+  try { await loadData(); } catch (e) { console.warn("data load failed", e); dataOk = false; }
   refreshLanding();
+  if (!dataOk) { showDataError(); return; }   // landing stays visible; the banner explains and offers retry
   const hash = openSharedFromHash();     // a share link wins over the saved bracket
   if (hash === "shown") return;
   if (hash === "failed") return;         // keep the landing + error visible, don't cover it

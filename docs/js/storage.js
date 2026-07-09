@@ -6,7 +6,13 @@ const KEY_HASH = "wcb.fan.hash";
 const KEY_SCORES = "wcb.scores.v3";   // the interaction layer's manual overrides
 
 function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* Safari private mode */ } }
+let _storageWarned = false;
+function safeSet(k, v) {
+  try { localStorage.setItem(k, v); }
+  catch (e) {   // Safari private mode / quota: tell the app once so it can notify the user
+    if (!_storageWarned) { _storageWarned = true; try { window.dispatchEvent(new CustomEvent("wcb:storage-blocked")); } catch (_) {} }
+  }
+}
 function safeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
 export function savePicks(picks) { safeSet(KEY, JSON.stringify(picks)); }
