@@ -98,12 +98,38 @@ function showDataError() {
   $("#err-retry").onclick = async () => {
     try { await loadData(); } catch (e) { return; }   // still down: leave the banner up
     box.hidden = true;
+    maybeShowStaleNotice(LIVE);
     refreshLanding();
     const hash = openSharedFromHash();
     if (hash === "shown" || hash === "failed") return;
     const saved = loadPicks();
     if (saved) { try { showDashboard(saved); } catch (e) { console.warn(e); } }
   };
+}
+
+// Live results sync a few times a day. When the data is well behind, say so plainly
+// instead of showing old scores as if they were current.
+const STALE_MIN = 180;   // 3 hours -> "may be behind"
+const STALL_MIN = 360;   // 6 hours -> the sync is likely delayed
+function maybeShowStaleNotice(live) {
+  const old = document.getElementById("stalenote"); if (old) old.remove();
+  if (!live || !live.refreshed) return;
+  const ageMin = (Date.now() - Date.parse(live.refreshed)) / 60000;
+  if (!(ageMin > STALE_MIN)) return;
+  const hrs = Math.floor(ageMin / 60);
+  const when = hrs >= 1 ? `${hrs} hour${hrs > 1 ? "s" : ""} ago` : `${Math.round(ageMin)} minutes ago`;
+  const msg = ageMin > STALL_MIN
+    ? `Live results have not updated in ${when}. The sync may be delayed.`
+    : `Live results may be behind. Last update ${when}.`;
+  const n = document.createElement("div");
+  n.id = "stalenote"; n.setAttribute("role", "status");
+  n.style.cssText = "position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:200;max-width:92%;background:var(--panel,#1c1b21);color:var(--text,#fff);border:1px solid var(--gold,#FFCE20);border-radius:12px;padding:9px 14px;font-size:.85rem;box-shadow:0 10px 30px rgba(0,0,0,.45);display:flex;align-items:center;gap:10px";
+  const span = document.createElement("span"); span.textContent = msg; n.appendChild(span);
+  const x = document.createElement("button");
+  x.textContent = "\u2715"; x.setAttribute("aria-label", "Dismiss");
+  x.style.cssText = "background:none;border:0;color:inherit;cursor:pointer;font:inherit";
+  x.onclick = () => n.remove();
+  n.appendChild(x); document.body.appendChild(n);
 }
 
 async function handleFile(file) {
@@ -362,6 +388,7 @@ function wire() {
   try { await loadData(); } catch (e) { console.warn("data load failed", e); dataOk = false; }
   refreshLanding();
   if (!dataOk) { showDataError(); return; }   // landing stays visible; the banner explains and offers retry
+  maybeShowStaleNotice(LIVE);
   const hash = openSharedFromHash();     // a share link wins over the saved bracket
   if (hash === "shown") return;
   if (hash === "failed") return;         // keep the landing + error visible, don't cover it
