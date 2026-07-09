@@ -1,182 +1,71 @@
-# PLAN: CI safety net — hermetic tests + gated data pipeline
+# PLAN: CI safety net — validate the live data before it ships
 
-**Rank: 1 of 5 — do this first.**
-Every other plan touches `render.js`, `main.js`, or the sync pipeline. Right now nothing
-runs the tests automatically, and the one shared artifact every visitor depends on
-(`docs/data/results.json`) is committed by a bot with zero validation. The tournament is
-live (QFs start Jul 9); this plan is the seatbelt for everything else.
+**Rank: 4 of 6.** The render engine is already golden-tested and `npm test` runs in CI. The
+gap is the live data path: the sync bot commits `results.json` blindly after the fetch
+script exits 0, with no schema or sanity check. A malformed feed during the final could push
+a broken board straight to the deployed site. Close that hole.
 
 ## Goal
+No `results.json` reaches `main` unless it passes a schema and sanity check. A bad sync fails
+loudly (the existing issue-on-failure fires) instead of publishing garbage.
 
-1. Make all four tests runnable with **no files outside this repo** (today `golden.mjs`
-   needs `/tmp/py_sections.json` and `parse.mjs` needs another repo's `.xlsx`).
-2. Run them in GitHub Actions on every push/PR.
-3. Validate `results.json` against the topology **before** the sync bot commits it, so a
-   bad feed can never publish a corrupt scoreboard.
+## Exact files to touch
+- `scripts/validate_results.py` — new, stdlib-only validator (Python 3.12).
+- `.github/workflows/sync-results.yml` — run the validator after fetch, before commit.
+- `.github/workflows/tests.yml` — optional: run the validator on a committed sample so a
+  bad hand-edit is caught on push too.
+- `dev-docs/CLAUDE.md` — note the new guard so the next reader knows it exists.
 
-## Files to touch
-
-| File | Change |
-| --- | --- |
-| `tests/golden.mjs` | Read fixture from `tests/fixtures/` instead of `/tmp`; add `--update` mode |
-| `tests/fixtures/golden-sections.json` | NEW — committed snapshot of the render output |
-| `tests/fixtures/results.frozen.json` | NEW — frozen copy of `results.json` used by the snapshot |
-| `tests/parse.mjs` | Skip (exit 0) with a clear message when the private workbook is absent |
-| `scripts/validate_results.py` | NEW — stdlib-only schema/consistency validator |
-| `.github/workflows/tests.yml` | NEW — run tests + validator on push/PR |
-| `.github/workflows/sync-results.yml` | Add a "Validate" step between fetch and commit |
-| `package.json` | Add `"scripts": {"test": "..."}` |
-
-Do **not** touch `docs/js/render.js` in this plan.
+## Current state (verified)
+- `.github/workflows/tests.yml` runs `npm test` on Node 22 for push, PR, and dispatch.
+- `.github/workflows/sync-results.yml` runs `python scripts/fetch_results.py`, then commits
+  `docs/data/results.json` only if it changed, dispatches `deploy-pages.yml`, and opens an
+  issue on failure. There is no validation between fetch and commit.
+- `results.json` keys: `res`, `ko_fix`, `auto_hl`, `refreshed`.
+- Tests use frozen fixtures `tests/fixtures/golden-sections.json` and
+  `tests/fixtures/results.frozen.json`, so CI never touches the live feed.
 
 ## Step-by-step
+1. **Write `scripts/validate_results.py`** (stdlib only). It loads `docs/data/results.json`
+   and asserts:
+   - top-level keys `res`, `ko_fix`, `auto_hl`, `refreshed` all present.
+   - `refreshed` parses as `%Y-%m-%dT%H:%M:%SZ` and is not in the future by more than a few
+     minutes and not older than, say, 48 hours.
+   - `res` is a non-empty object; each entry has the expected shape
+     `[goalsA, goalsB, winner, note]`, goals are ints, winner is a non-empty string.
+   - every `winner` in `res` is one of the two teams in that match (cross-check against
+     `topology.json` pairings where available).
+   - `auto_hl` is a list; each row has the expected arity used by `buildHighlights`.
+   - counts are sane: decided games do not exceed the tournament total (80 scoring units,
+     31 matches). Fail on absurd values.
+   It exits non-zero with a clear message on the first failure, zero on success.
+2. **Gate the sync.** In `sync-results.yml`, after `fetch_results.py` and before the commit
+   step, run `python scripts/validate_results.py`. If it fails, the job fails, the existing
+   failure-issue step fires, and nothing is committed or deployed.
+3. **Guard hand-edits.** In `tests.yml`, add a step
+   `python scripts/validate_results.py` so a broken committed `results.json` also fails on
+   push and PR, not only on the scheduled sync.
+4. **Document it.** Add one line to `dev-docs/CLAUDE.md`: the sync is gated by
+   `validate_results.py`; run it locally with `python3 scripts/validate_results.py` after a
+   manual data edit.
 
-### Step 1 — freeze the golden test's inputs
-
-The current golden test compares JS output against a Python dump. Python parity was
-proven once; the ongoing need is *regression* protection for the JS engine. Convert it to
-a self-contained snapshot test.
-
-**Critical trap:** the golden test renders using `docs/data/results.json`, which a bot
-rewrites up to 3×/day. If the snapshot reads the live file, it breaks on every sync.
-The snapshot must use a **frozen copy** of results.json committed under `tests/fixtures/`.
-
-1. `cp docs/data/results.json tests/fixtures/results.frozen.json` (one time; never
-   auto-updated by the sync).
-2. Rewrite `tests/golden.mjs`:
-   - Load `picks` from `docs/data/demo-picks.json`, `topo` from `docs/data/topology.json`,
-     but `live` from `tests/fixtures/results.frozen.json`.
-   - Build the same `js` object of sections it builds today (keep that code).
-   - If `process.argv.includes("--update")`: write
-     `tests/fixtures/golden-sections.json` = `JSON.stringify(js, null, 1)` and exit 0
-     printing `updated fixture`.
-   - Otherwise: read the fixture and diff each key exactly as the current code does
-     (keep the first-divergence printout — it is genuinely useful).
-3. Run `node tests/golden.mjs --update` once, commit the fixture, then run
-   `node tests/golden.mjs` and confirm `GOLDEN OK`.
-4. Update the README's golden-test paragraph (it currently tells you to dump
-   `/tmp/py_sections.json` from the Python repo).
-
-### Step 2 — make parse.mjs skippable
-
-`tests/parse.mjs` line 17 hardcodes `/Users/ericlam/Projects/wc26-bracket/input/bracket-picks.xlsx`
-(the real workbook contains a colleague's name — it should NOT be committed).
-
-- Read the path from `process.env.WCB_WORKBOOK` with the current absolute path as the
-  default.
-- Before parsing: `if (!fs.existsSync(XLSX_PATH)) { console.log("SKIP parse.mjs: private workbook not present (set WCB_WORKBOOK to run)"); process.exit(0); }`
-- Exit **0**, not 1 — CI must stay green without the workbook.
-
-### Step 3 — package.json test script
-
-```json
-{
-  "type": "module",
-  "scripts": {
-    "test": "node tests/scoring.mjs && node tests/builder.mjs && node tests/golden.mjs && node tests/parse.mjs"
-  }
-}
-```
-
-Order matters: put the always-run tests first so a SKIP at the end is obvious in logs.
-
-### Step 4 — scripts/validate_results.py
-
-Stdlib only (`json`, `sys`, `os`). Loads `docs/data/topology.json` and
-`docs/data/results.json` (or a path passed as `sys.argv[1]`). Checks, collecting ALL
-violations before exiting:
-
-1. Top-level keys: `refreshed` (non-empty str), `res` (dict), `ko_fix` (dict),
-   `auto_hl` (list). Extra keys are allowed (forward-compat — plan 2 adds one).
-2. Known codes = the 16 R32 codes from `topology.r32` ∪ keys of `topology.ko_feed`.
-   Every key of `res` and `ko_fix` must be a known code. **This catches M103** (the
-   third-place playoff): it is deliberately absent from `ko_feed`, and the render engine
-   would misbehave on it; the feed does carry it, so an unknown-code guard is load-bearing,
-   not theoretical.
-3. Each `res[code]` is `[int>=0, int>=0, str winner, str note]` (JSON list, len 4).
-4. For each R32 code in `res`: winner must be one of that fixture's two teams from
-   `topology.r32`.
-5. For each KO code in `res`: let `fa, fb = ko_feed[code]`. Both feeders must
-   themselves be in `res` (a KO result without decided feeders is corrupt), and winner
-   must be `res[fa][2]` or `res[fb][2]`.
-6. Each `ko_fix[code]`: code NOT in `res`, value is a list of 4 non-empty strings.
-7. Each `auto_hl` entry: list of exactly 5 strings.
-8. Exit 1 with one line per violation; exit 0 printing `results.json OK (<n> results)`.
-
-### Step 5 — wire the validator into the sync workflow
-
-In `.github/workflows/sync-results.yml`, between the "Fetch results" step and the
-"Commit and push" step, add:
-
-```yaml
-      - name: Validate results.json before publishing
-        run: python scripts/validate_results.py
-```
-
-If it fails, the job fails **before committing**, and the existing
-"Open an issue if the sync failed" step (`if: failure()`) fires automatically — you get
-paged, visitors keep the last good data. No other change needed in that file.
-
-### Step 6 — .github/workflows/tests.yml
-
-```yaml
-name: Tests
-on:
-  push:
-    branches: [main]
-  pull_request:
-  workflow_dispatch: {}
-permissions:
-  contents: read
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - run: npm test
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-      - run: python scripts/validate_results.py
-```
-
-No `npm install` — there are no dependencies; do not add a lockfile step.
-
-## Edge cases a weaker model would miss
-
-- **The snapshot must not read live `results.json`** (rewritten 3×/day by the bot) —
-  freeze inputs in `tests/fixtures/results.frozen.json` or CI turns red on every sync.
-- **`scoring.mjs` intentionally keeps using live results.json.** Its reference scorer is
-  computed from the same live data, so it is churn-proof, and running it against fresh
-  data is a feature (it re-verifies every new synced result). Don't "fix" it.
-- **`scoring.mjs` is randomized** (3000 random brackets, `Math.random`). That's fine —
-  the invariants it checks must hold for *every* bracket. Do not seed it; a flake here
-  means a real bug.
-- **parse.mjs must SKIP with exit 0, not fail**, when the workbook is missing — the
-  workbook is private and will never exist in CI.
-- **`--update` discipline:** regenerating `golden-sections.json` is how you *accept* a
-  render change. Any PR that touches `render.js` should show a fixture diff; a fixture
-  diff with no render.js change is a red flag.
-- **Validator must allow unknown top-level keys** in results.json — plan 2
-  (match-day-freshness) adds `refreshed_iso`. Strict top-level key rejection would make
-  the two plans conflict.
-- **KO winner check needs both feeders decided** (rule 5). The sync's `match_all` only
-  resolves a KO match when both feeder winners are known, so a violation here means real
-  corruption, not an in-progress state.
+## Edge cases a weaker model will miss
+- Do not validate against the live network. Validate the written `results.json` only, so the
+  check is deterministic and hermetic like the rest of the suite.
+- Penalty shootouts inflate `score.fullTime` in some feeds. The validator should accept a
+  `note` such as a shootout marker and must not reject a legitimate high score outright.
+  Reject only impossible values (negative goals, winner not in the match).
+- The 3x-daily sync rewrites `refreshed` even with no game change, so a "changed file" is
+  normal. The validator runs regardless of whether the file changed.
+- Keep it stdlib-only (`json`, `datetime`, `sys`). This repo pins Python 3.12 stdlib for the
+  sync path; do not add a dependency.
+- Do not fail on an empty `auto_hl` early in a round (valid). Fail only on missing keys or
+  malformed rows.
 
 ## Acceptance criteria
-
-1. Fresh clone + `npm test` passes with only Node ≥ 20 installed; output contains
-   `SCORING OK`, `BUILDER OK`, `GOLDEN OK`, and `SKIP parse.mjs`.
-2. `rm /tmp/py_sections.json` (if present) — `npm test` still passes.
-3. `python scripts/validate_results.py` prints `results.json OK (23 results)` (count
-   matches current data).
-4. Corrupt a copy: change `res.M74[2]` to `"Narnia"` → validator exits 1 naming M74.
-   Add key `"M103": [1,0,"France",""]` → validator exits 1 naming M103.
-5. Push to a branch → the `Tests` workflow runs and is green.
-6. `sync-results.yml` diff shows exactly one new step, placed before "Commit and push".
-7. Edit `render.js` (add a space to a template) → `node tests/golden.mjs` FAILS showing
-   the divergence; revert → passes.
+- `python scripts/validate_results.py` exits 0 on the current committed `results.json` and
+  exits non-zero with a clear message on a deliberately corrupted copy (missing key, future
+  timestamp, winner not in match).
+- `sync-results.yml` runs the validator between fetch and commit; a failing validation blocks
+  the commit and opens the failure issue.
+- `tests.yml` runs the validator; `npm test` still passes.
