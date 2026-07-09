@@ -3,6 +3,8 @@
 // bracket + live results + the fixed topology, it returns the dashboard HTML string.
 // Kept faithful to the Python so the golden test (tests/) can prove parity.
 
+import { flagImg } from "./flags.js";
+
 const DASH = "\u2013";
 
 // Format a UTC ISO string into the viewer's timezone for "updated" timestamps
@@ -305,7 +307,7 @@ function r32_cell(D, team, picked, decided, real_winner, freebie) {
   const sd = seedOf(D, team), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
   const ftag = freebie ? '<span class="tt" title="Freebie \u2014 Canada 1\u20130 South Africa, auto-credited">\u{1F381}</span>' : "";
   return `<div class="${cls.join(" ")}" data-team="${esc(team)}" data-round="r32" tabindex="0">` +
-    `<span class="fav-bar"></span>${sh}<span class="tname">${esc(team)}</span>${ftag}${badge}</div>`;
+    `<span class="fav-bar"></span>${sh}${flagImg(team, "bk-flag")}<span class="tname">${esc(team)}</span>${ftag}${badge}</div>`;
 }
 function pickBox(D, team, picked, short, champ, st) {
   const cls = ["team", "st-" + st];
@@ -322,7 +324,7 @@ function pickBox(D, team, picked, short, champ, st) {
   const chev = (picked && !champ) ? '<span class="adv-arrow" title="you have this team advancing">\u203A</span>' : "";
   const sd = seedOf(D, team), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
   return `<div class="${cls.join(" ")}" data-team="${esc(team)}" data-round="${short}" tabindex="0">` +
-    `<span class="fav-bar"></span>${sh}<span class="tname">${esc(team)}</span>${tag}${badge}${chev}</div>`;
+    `<span class="fav-bar"></span>${sh}${flagImg(team, "bk-flag")}<span class="tname">${esc(team)}</span>${tag}${badge}${chev}</div>`;
 }
 // One cell of a later round. In "actual" mode the slot's REAL occupant rules the cell:
 // `actual` is the winner of this side's feeder match (null while the feeder is unplayed),
@@ -339,7 +341,7 @@ function laterCell(D, team, picked, short, champ = false, actual = null, mode = 
     const tip = gone ? `${actual} advanced in your ${team} pick's place, but is now out`
                      : `actually advanced \u2014 you picked ${team}`;
     return `<div class="${cls}" data-team="${esc(actual)}" data-round="${short}" tabindex="0">` +
-      `<span class="fav-bar"></span>${sh}<span class="tname">${esc(actual)}</span>` +
+      `<span class="fav-bar"></span>${sh}${flagImg(actual, "bk-flag")}<span class="tname">${esc(actual)}</span>` +
       `<span class="rb up" title="${esc(tip)}">\u25B2</span></div>`;
   }
   if (!actual && st !== "won" && D.ELIM.has(team)) {

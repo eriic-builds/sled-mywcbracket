@@ -256,6 +256,7 @@ body::before{content:"";position:fixed;inset:-20% -10% auto -10%;height:70vh;z-i
 .round:not(:first-child) .team::before{content:"";position:absolute;left:-7px;top:50%;width:7px;height:1px;background:var(--border2)}
 .team .seed{font-size:.6rem;font-weight:700;color:var(--muted);background:var(--hover);border-radius:5px;padding:2px 5px;flex:0 0 auto}
 .team .tname{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.team .bk-flag{width:20px;height:14px;border-radius:2px;flex:0 0 auto;object-fit:cover;box-shadow:0 0 0 1px var(--border)}
 .team .tt{font-size:.9rem}
 .team .rb{font-size:.72rem;font-weight:800;flex:0 0 auto}
 .team .rb.ok{color:var(--win-ink)}.team .rb.no{color:var(--lose-ink)}.team .rb.up{color:var(--muted);opacity:.85}
