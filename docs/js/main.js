@@ -202,6 +202,23 @@ function openLeaderboard() {
   if (TOPO && LIVE) openCompare(TOPO, LIVE, { onAddLink: addRivalFromLink, onAddDemo: addDemoRival });
 }
 
+// Landing theme switcher (light/dark). Persists to the same key the dashboard
+// uses (wcb.theme) so the choice carries straight into the dashboard, and reads
+// data-theme back so it stays in sync when you return Home after changing themes.
+function setLandingTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  try { localStorage.setItem("wcb.theme", t); } catch (e) {}
+  syncLandingThemeButtons();
+}
+function syncLandingThemeButtons() {
+  const t = document.documentElement.getAttribute("data-theme");
+  document.querySelectorAll("[data-theme-btn]").forEach(b => {
+    const on = b.getAttribute("data-theme-btn") === t;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+
 // Landing cards that depend on stored state: "Open my dashboard" when a bracket is
 // saved (you can only reach the landing with one via 🏠 Home), "Your pool" when
 // rivals exist.
@@ -218,6 +235,7 @@ function refreshLanding() {
   const n = loadRivals().length;
   card.hidden = n === 0;
   const c = $("#poolcount"); if (c) c.textContent = n;
+  syncLandingThemeButtons();   // keep the landing light/dark switcher in sync
 }
 
 function openSharedFromHash() {
@@ -248,6 +266,11 @@ function wire() {
   dz.addEventListener("drop", e => { const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) handleFile(f); });
   $("#demo").onclick = onDemo;
   $("#import").onclick = () => $("#importfile").click();
+  // Landing nav: brand → back-to-top, and the light/dark theme switcher.
+  const lhome = $("#lhome");
+  if (lhome) lhome.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  document.querySelectorAll("[data-theme-btn]").forEach(b =>
+    b.addEventListener("click", () => setLandingTheme(b.getAttribute("data-theme-btn"))));
   $("#importfile").onchange = async () => {
     const f = $("#importfile").files[0]; if (!f) return;
     try { accept(validateAgainstTopology(JSON.parse(await f.text()), TOPO)); }
@@ -279,7 +302,7 @@ function wire() {
 }
 
 (async function () {
-  try { const th = localStorage.getItem("wcb.theme"); if (th) document.documentElement.setAttribute("data-theme", th); } catch (e) {}
+  try { const th = localStorage.getItem("wcb.theme") || "dark"; document.documentElement.setAttribute("data-theme", th); localStorage.setItem("wcb.theme", th); } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   wire();
   try { await loadData(); } catch (e) { console.warn("data load failed", e); }
   refreshLanding();
