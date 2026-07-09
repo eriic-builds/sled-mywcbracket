@@ -335,6 +335,8 @@ function wire() {
   // Landing nav: brand → back-to-top, and the light/dark theme switcher.
   const lhome = $("#lhome");
   if (lhome) lhome.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  const lhometab = $("#lhometab");
+  if (lhometab) lhometab.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
   document.querySelectorAll("[data-theme-btn]").forEach(b =>
     b.addEventListener("click", () => setLandingTheme(b.getAttribute("data-theme-btn"))));
   $("#importfile").onchange = async () => {
