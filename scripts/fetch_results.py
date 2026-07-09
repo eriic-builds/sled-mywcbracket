@@ -690,7 +690,7 @@ def _recap_win(home, away, w, loser, gh, ga, wg, lg, margin, label, note,
             f"Ice-cold from twelve yards, {w} saw off {loser} on penalties ({note}) after {gh}\u2013{ga} in the {label}.",
         ]
     elif comeback:
-        tl = f" \u2014 {wphrase} turning it around" if wphrase else ""
+        tl = f", {wphrase} turning it around" if wphrase else ""
         opts = [
             f"Down at the break, {w} roared back to beat {loser} {score} in the {label}{tl}.",
             f"{w} flipped the script after falling behind, completing a {score} comeback against {loser} in the {label}{tl}.",
@@ -699,7 +699,7 @@ def _recap_win(home, away, w, loser, gh, ga, wg, lg, margin, label, note,
     elif n >= 3:
         hero = starcl or f"{star} grabbed a hat-trick"
         opts = [
-            f"Match ball secured \u2014 {hero} to fire {w} past {loser} {score} in the {label}{otail}.",
+            f"Match ball secured, {hero} to fire {w} past {loser} {score} in the {label}{otail}.",
             f"The {star} show: {hero} powering {w} to a {score} win over {loser} in the {label}{otail}.",
         ]
     elif n >= 2:
@@ -709,13 +709,13 @@ def _recap_win(home, away, w, loser, gh, ga, wg, lg, margin, label, note,
             f"{hero} to settle {w}'s {score} win over {loser} in the {label}{otail}.",
         ]
     elif note == "AET":
-        tl = f" \u2014 {wphrase} decisive" if wphrase else ""
+        tl = f", {wphrase} decisive" if wphrase else ""
         opts = [
             f"It took extra time, but {w} got there, beating {loser} {score} in the {label}{tl}.",
             f"{w} needed the extra 30, edging {loser} {score} after extra time in the {label}{tl}.",
         ]
     elif margin >= 3:
-        tl = f" \u2014 {wphrase} on the scoresheet" if wphrase else ""
+        tl = f", {wphrase} on the scoresheet" if wphrase else ""
         opts = [
             f"{w} ran riot, sweeping {loser} aside {score} in the {label}{tl}.",
             f"No contest: {w} cruised past {loser} {score} in the {label}{tl}.",
@@ -724,7 +724,7 @@ def _recap_win(home, away, w, loser, gh, ga, wg, lg, margin, label, note,
     elif late:
         opts = [
             f"{w} left it late, snatching a {score} {label} squeaker past {loser}" + (f" ({wphrase})" if wphrase else "") + ".",
-            f"Heartbreak for {loser} \u2014 {w} nicked it {score} late in the {label}" + (f", {wphrase} on target" if wphrase else "") + ".",
+            f"Heartbreak for {loser}, {w} nicked it {score} late in the {label}" + (f", {wphrase} on target" if wphrase else "") + ".",
         ]
     elif margin == 1:
         opts = [
@@ -734,7 +734,7 @@ def _recap_win(home, away, w, loser, gh, ga, wg, lg, margin, label, note,
     else:
         opts = [
             (f"{wphrase} on target as " if wphrase else "") + f"{w} saw off {loser} {score} in the {label}.",
-            f"{w} had too much for {loser}, running out {score} winners in the {label}" + (f" \u2014 {wphrase} scoring" if wphrase else "") + ".",
+            f"{w} had too much for {loser}, running out {score} winners in the {label}" + (f", {wphrase} scoring" if wphrase else "") + ".",
             f"Job done for {w}, a composed {score} win over {loser} in the {label}" + (f" with {wphrase}" if wphrase else "") + ".",
         ]
     return opts[_stable_idx(seed, len(opts))]
@@ -747,7 +747,7 @@ def _recap_draw(home, away, gh, ga, label, goals, seed) -> str:
     as_ = _scorer_phrase(goals, "away")
     if hs and as_:
         opts = [
-            f"{home} and {away} couldn't be separated in a {score} {label} draw \u2014 {hs} for {home}, {as_} for {away}.",
+            f"{home} and {away} couldn't be separated in a {score} {label} draw, {hs} for {home}, {as_} for {away}.",
             f"Honours even: {home} {score} {away} in the {label}, {hs} and {as_} trading goals.",
             f"End to end but level, {home} and {away} shared a {score} {label} draw ({hs}; {as_}).",
         ]
@@ -937,7 +937,7 @@ def main() -> int:
         feed, upcoming_feed = results_from_footballdata(tmap)
         src = "football-data.org"
         if feed is None:
-            print("No FOOTBALL_DATA_TOKEN set and no --input given \u2014 nothing to do.")
+            print("No FOOTBALL_DATA_TOKEN set and no --input given, nothing to do.")
             return 0
     elif args.source == "fifa":
         feed, upcoming_feed = results_from_fifa(tmap)
@@ -949,7 +949,7 @@ def main() -> int:
         try:
             feed, upcoming_feed, src, is_fifa = results_auto(tmap)
         except RuntimeError as exc:
-            print(f"All result sources failed \u2014 nothing to do this run. ({exc})")
+            print(f"All result sources failed, nothing to do this run. ({exc})")
             return 0
         # Scorer/half/comeback enrichment is FIFA-only (needs FIFA match IDs);
         # skip it when the fallback source supplied the feed.
@@ -987,14 +987,14 @@ def main() -> int:
 
     if not changed and not hl_changed and not ko_fix_changed:
         if args.dry_run:
-            print(f"Source: {src}. No new finished games to apply \u2014 results already current (dry-run).")
+            print(f"Source: {src}. No new finished games to apply, results already current (dry-run).")
             return 0
         # Nothing to apply, but record that we checked so "last synced" stays honest.
         stamp = now_utc_stamp()
         if results.get("refreshed") != stamp:
             results["refreshed"] = stamp
             _write_results(results)
-        print(f"Source: {src}. No new finished games \u2014 refreshed sync time to {stamp}.")
+        print(f"Source: {src}. No new finished games, refreshed sync time to {stamp}.")
         return 0
 
     print(f"Source: {src}. Applying {len(changed)} result update(s)"
