@@ -1,7 +1,7 @@
 
 :root{--blue:#0097F4;--purple:#CB85FF;--pink:#FF32A3;--orange:#FFA200;--yellow:#FFCE20;--green:#9BC72A;--teal:#00B291;--red:#E5484D;
  --grad:linear-gradient(120deg,#0097F4,#00B291);
- --radius:18px;--radius-sm:12px;--fs:16px;--lh:1.5;--ls:0em;--gap:16px;--fstack:"Segoe UI","Segoe Sans Display",system-ui,-apple-system,sans-serif;}
+ --radius:18px;--radius-sm:12px;--fs:16px;--lh:1.5;--ls:0em;--gap:16px;--fstack:"Poppins","Segoe UI","Segoe Sans Display",system-ui,-apple-system,sans-serif;--fserif:"Source Serif 4",Georgia,"Times New Roman",serif;}
 html[data-theme="dark"]{color-scheme:dark;--bg:#141317;--panel:#1c1b21;--text:#FFF;--text2:#F4F7EE;--muted:#9aa2ad;--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.16);
  --glass:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.028));--shadow:0 10px 30px rgba(0,0,0,.45);--hover:rgba(255,255,255,.05);
  --gold:#FFCE20;--gold-ink:#FFCE20;--win:#00B291;--win-ink:#4fd8bf;--out:#7c828d;--lose-ink:#f2757a;--g1:rgba(0,151,244,.22);--g2:rgba(0,178,145,.16);--g3:rgba(0,178,145,.16);}
@@ -40,6 +40,9 @@ html[data-theme="doodle"]{--bg:#F4EFE1;--panel:#FBF7EC;--text:#333029;--text2:#4
 *{box-sizing:border-box}html,body{margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:24px}
 body{font-family:var(--fstack);font-size:var(--fs);line-height:var(--lh);letter-spacing:var(--ls);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
+/* Heading accents render in Source Serif 4 italic (em / i / .italic) — mirrors mywcbracket-glass. */
+h1 :is(em,i,.italic), h2 :is(em,i,.italic), h3 :is(em,i,.italic),
+.hero-title :is(em,i,.italic){ font-family:var(--fserif); font-style:italic; font-weight:400; }
 body::before{content:"";position:fixed;inset:-20% -10% auto -10%;height:70vh;z-index:0;pointer-events:none;background:radial-gradient(closest-side,var(--g1),transparent) -8% -12%/55% 90% no-repeat,radial-gradient(closest-side,var(--g2),transparent) 108% -8%/55% 85% no-repeat,radial-gradient(closest-side,var(--g3),transparent) 60% 120%/60% 80% no-repeat;filter:blur(6px)}
 .wrap{max-width:1280px;margin:0 auto;padding:26px 22px 90px;position:relative;z-index:1}
 .glass{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
