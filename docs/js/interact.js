@@ -2,17 +2,23 @@
 // Wrapped in initInteractions() so it runs AFTER render.js injects the dashboard DOM.
 export function initInteractions(){
 
-(function(){
+return (function(){
+ var lifecycle=new AbortController(),signal=lifecycle.signal,timers=new Set(),frames=new Set();
+ function later(fn,delay){var id=setTimeout(function(){timers.delete(id);if(!signal.aborted)fn();},delay);timers.add(id);return id;}
+ function cancelLater(id){clearTimeout(id);timers.delete(id);}
+ function nextFrame(fn){var id=requestAnimationFrame(function(){frames.delete(id);if(!signal.aborted)fn();});frames.add(id);return id;}
  var root=document.documentElement,LS=window.localStorage;
- var KTHEME='wcb.theme',KFAV='wcb.favs',KFO='wcb.favonly',KSC='wcb.scores.v3';
- function setTheme(t){root.setAttribute('data-theme',t);document.querySelectorAll('.modes button').forEach(function(b){if(b.dataset.mode)b.classList.toggle('on',b.dataset.mode===t)});if(funBtn)funBtn.classList.toggle('on',!!FUN[t]);try{LS.setItem(KTHEME,t)}catch(e){}closeFun();if(window.__drawConn)setTimeout(window.__drawConn,80);}
+ document.body.classList.remove('map-expanded','map-fit-screen','map-fit-mirror','map-fit-sideways');
+ root.classList.remove('map-fit-screen-root');
+ var KTHEME='wcb.theme',KFAV='wcb.favs',KFO='wcb.favonly',KSC='wcb.scores.v3',KLAYOUT='wcb.bracket-layout';
+ function setTheme(t){root.setAttribute('data-theme',t);document.querySelectorAll('.modes button').forEach(function(b){if(b.dataset.mode)b.classList.toggle('on',b.dataset.mode===t)});if(funBtn)funBtn.classList.toggle('on',!!FUN[t]);try{LS.setItem(KTHEME,t)}catch(e){}closeFun();if(window.__drawConn)later(window.__drawConn,80);}
  var FUN={geocities:1,minecraft:1,winxp:1,doodle:1,sticker:1};
  var funWrap=document.getElementById('funWrap'),funBtn=document.getElementById('funBtn');
  function closeFun(){if(funWrap){funWrap.classList.remove('open');if(funBtn)funBtn.setAttribute('aria-expanded','false');}}
  document.querySelectorAll('.modes button').forEach(function(b){if(b.dataset.mode)b.addEventListener('click',function(){setTheme(b.dataset.mode)})});
  if(funBtn){funBtn.addEventListener('click',function(e){e.stopPropagation();var open=funWrap.classList.toggle('open');funBtn.setAttribute('aria-expanded',open?'true':'false');});}
- document.addEventListener('click',function(e){if(funWrap&&!funWrap.contains(e.target))closeFun();});
- document.addEventListener('keydown',function(e){if(e.key==='Escape')closeFun();});
+ document.addEventListener('click',function(e){if(funWrap&&!funWrap.contains(e.target))closeFun();},{signal:signal});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeFun();},{signal:signal});
  var t0;try{t0=LS.getItem(KTHEME)}catch(e){}setTheme(t0||'dark');
  var favs={};try{favs=JSON.parse(LS.getItem(KFAV)||'{}')||{}}catch(e){favs={}}
  function saveFav(){try{LS.setItem(KFAV,JSON.stringify(favs))}catch(e){}}
@@ -54,43 +60,125 @@ export function initInteractions(){
  rows.forEach(function(r){r.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){var id=r.dataset.pick,s=b.dataset.set;if(s===r.dataset.default)delete scores[id];else scores[id]=s;saveScores();recalc();});});});
  var rst=document.getElementById('scReset');if(rst)rst.addEventListener('click',function(){scores={};saveScores();recalc();});
  // ---- bracket connector lines (elbow paths, coloured by whether each pick came true) ----
- function activeBracket(){var w=document.querySelector('.brk-wrap');if(!w)return document.querySelector('.bracket');return w.querySelector('.bracket.mode-'+(w.getAttribute('data-view')||'actual'));}
+ function activeBracket(){var w=document.querySelector('.brk-wrap');if(!w)return document.querySelector('.bracket');return w.querySelector('.bracket.layout-'+(w.getAttribute('data-layout')||'mirror')+'.mode-'+(w.getAttribute('data-view')||'actual'));}
  function drawConnectors(){
+   if(signal.aborted)return;
    var bracket=activeBracket();if(!bracket)return;
    var svg=bracket.querySelector('.bksvg');
    if(!bracket||!svg) return;
+   if(bracket.clientWidth===0)return;
+   while(svg.firstChild)svg.removeChild(svg.firstChild);
+   svg.setAttribute('width','0');svg.setAttribute('height','0');svg.removeAttribute('viewBox');
    var brect=bracket.getBoundingClientRect(),W=bracket.scrollWidth,Hh=bracket.scrollHeight;
    svg.setAttribute('width',W);svg.setAttribute('height',Hh);svg.setAttribute('viewBox','0 0 '+W+' '+Hh);
-   while(svg.firstChild)svg.removeChild(svg.firstChild);
    function P(el){var r=el.getBoundingClientRect();return{r:r.right-brect.left+bracket.scrollLeft,l:r.left-brect.left+bracket.scrollLeft,y:(r.top+r.bottom)/2-brect.top+bracket.scrollTop};}
-   var rounds=[].slice.call(bracket.querySelectorAll('.round'));
-   // Link each still-advancing team's box to the same team's box in the previous round.
-   for(var ri=1;ri<rounds.length;ri++){
-     var targets=[].slice.call(rounds[ri].querySelectorAll('.team[data-team]'));
-     targets.forEach(function(tb){
-       var team=tb.getAttribute('data-team');
-       var src=rounds[ri-1].querySelector('.team[data-team="'+team+'"]');
-       if(!src) return;
-       var a=P(src),b=P(tb),x1=a.r+1,x2=b.l-1,xm=Math.round((x1+x2)/2);
+   function addChampionPath(d,coreClass){
+     var glow=document.createElementNS('http://www.w3.org/2000/svg','path');
+     glow.setAttribute('d',d);glow.setAttribute('class','champion-link glow');svg.appendChild(glow);
+     var core=document.createElementNS('http://www.w3.org/2000/svg','path');
+     core.setAttribute('d',d);core.setAttribute('class',coreClass);svg.appendChild(core);
+   }
+   if(bracket.classList.contains('layout-sideways')){
+     var rounds=[].slice.call(bracket.querySelectorAll('.round'));
+     for(var ri=1;ri<rounds.length;ri++){
+       var targets=[].slice.call(rounds[ri].querySelectorAll('.team[data-team]'));
+       targets.forEach(function(tb){
+         var team=tb.getAttribute('data-team');
+         var src=rounds[ri-1].querySelector('.team[data-team="'+team+'"]');
+         if(!src)return;
+         var a=P(src),b=P(tb),x1=a.r+1,x2=b.l-1,curve=Math.max(8,Math.round((x2-x1)*.42));
+         var d='M'+Math.round(x1)+' '+Math.round(a.y)+' C'+Math.round(x1+curve)+' '+Math.round(a.y)+' '+Math.round(x2-curve)+' '+Math.round(b.y)+' '+Math.round(x2)+' '+Math.round(b.y);
+         var champion=!!tb.closest('.champcol');
+         var st=tb.classList.contains('st-won')?'won':tb.classList.contains('st-lost')?'lost':tb.classList.contains('st-actual')?'actual':'pending';
+         var gone=tb.classList.contains('gone');
+         if(champion){addChampionPath(d,'conn c-champion');return;}
+         var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+         p.setAttribute('d',d);p.setAttribute('class','conn c-'+st+(gone?' gone':''));svg.appendChild(p);
+       });
+     }
+     return;
+   }
+   var rows=[].slice.call(bracket.querySelectorAll('.team[data-feeder]'));
+   rows.forEach(function(row){
+       var parentCard=row.closest('.mcard');
+       var fromCard=bracket.querySelector('.mcard[data-match-code="'+row.dataset.feeder+'"]');
+       if(!parentCard||!fromCard)return;
+       var side=parentCard.closest('.bkcol').dataset.side;
+       if(side==='C')side=fromCard.closest('.bkcol').dataset.side;
+       var source=row.dataset.team?[].slice.call(fromCard.querySelectorAll('.team[data-team]')).find(function(candidate){return candidate.dataset.team===row.dataset.team;}):null;
+       var a=P(source||fromCard),b=P(row);
+       var x1=side==='R'?a.l:a.r,x2=side==='R'?b.r:b.l,xm=Math.round((x1+x2)/2);
        var d='M'+Math.round(x1)+' '+Math.round(a.y)+' H'+xm+' V'+Math.round(b.y)+' H'+Math.round(x2);
-       var st=tb.classList.contains('st-won')?'won':tb.classList.contains('st-lost')?'lost':tb.classList.contains('st-actual')?'actual':'pending';
-       var gone=tb.classList.contains('gone');
+       var st=row.classList.contains('st-won')||row.classList.contains('adv')?'won':
+         row.classList.contains('st-lost')||row.classList.contains('busted')?'lost':
+         row.classList.contains('st-actual')||row.classList.contains('realadv')?'actual':'pending';
+       var gone=row.classList.contains('gone');
        var p=document.createElementNS('http://www.w3.org/2000/svg','path');
        p.setAttribute('d',d);p.setAttribute('class','conn c-'+st+(gone?' gone':''));svg.appendChild(p);
-     });
+   });
+   var championTarget=bracket.querySelector('.champ-state .team.champ[data-team]');
+   var finalCard=bracket.querySelector('.mcard[data-match-code="M104"]');
+   if(championTarget&&finalCard){
+     var championTeam=championTarget.dataset.team;
+     var finalSource=[].slice.call(finalCard.querySelectorAll('.team[data-team]')).find(function(candidate){return candidate.dataset.team===championTeam;});
+     var from=P(finalSource||finalCard),to=P(championTarget);
+     var centerX=Math.round((from.l+from.r)/2);
+     var championD='M'+centerX+' '+Math.round(from.y)+' V'+Math.round(to.y);
+     addChampionPath(championD,'champion-link');
    }
  }
  window.__drawConn=drawConnectors;
- document.querySelectorAll('.brk-toggle button').forEach(function(bt){bt.addEventListener('click',function(){var w=document.querySelector('.brk-wrap');w.setAttribute('data-view',bt.dataset.view);document.querySelectorAll('.brk-toggle button').forEach(function(x){x.classList.toggle('on',x===bt);});setTimeout(drawConnectors,60);});});
+ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){if(!signal.aborted&&window.__drawConn===drawConnectors)drawConnectors();});
+ document.querySelectorAll('.brk-toggle button').forEach(function(bt){bt.addEventListener('click',function(){var w=document.querySelector('.brk-wrap');w.setAttribute('data-view',bt.dataset.view);document.querySelectorAll('.brk-toggle button').forEach(function(x){x.classList.toggle('on',x===bt);});later(drawConnectors,60);});});
+ var layoutWrap=document.querySelector('.brk-wrap'),layoutButtons=[].slice.call(document.querySelectorAll('.layout-toggle button'));
+ function setLayout(layout,persist){
+   if(!layoutWrap)return;
+   if(layout==='sideways'&&window.innerWidth<=860)layout='mirror';
+   layoutWrap.setAttribute('data-layout',layout);
+   syncExpandedLayout();
+   layoutButtons.forEach(function(button){var on=button.dataset.layout===layout;button.classList.toggle('on',on);button.setAttribute('aria-pressed',on?'true':'false');});
+   if(persist)try{LS.setItem(KLAYOUT,layout)}catch(e){}
+   later(drawConnectors,60);
+ }
+ layoutButtons.forEach(function(button){button.addEventListener('click',function(){setLayout(button.dataset.layout,true);});});
+ var savedLayout='mirror';try{savedLayout=LS.getItem(KLAYOUT)||'mirror'}catch(e){}
+ setLayout(savedLayout,false);
+ var mapExpandButton=document.getElementById('mapExpandToggle');
+ function jumpWithoutMotion(target){
+   var previous=root.style.scrollBehavior;
+   root.style.scrollBehavior='auto';
+   if(target)target.scrollIntoView({block:'start',behavior:'auto'});else window.scrollTo(0,0);
+   nextFrame(function(){root.style.scrollBehavior=previous;});
+ }
+ function syncExpandedLayout(){
+   var fit=document.body.classList.contains('map-expanded')&&!!layoutWrap;
+   document.body.classList.toggle('map-fit-screen',fit);
+   document.body.classList.toggle('map-fit-mirror',fit&&layoutWrap.dataset.layout==='mirror');
+   document.body.classList.toggle('map-fit-sideways',fit&&layoutWrap.dataset.layout==='sideways');
+   root.classList.toggle('map-fit-screen-root',fit);
+   if(fit)nextFrame(function(){jumpWithoutMotion(null);});
+ }
+ function setMapExpanded(expanded,returnFocus){
+   if(!mapExpandButton)return;
+   if(expanded&&window.innerWidth<=860)return;
+   document.body.classList.toggle('map-expanded',expanded);
+   syncExpandedLayout();
+   mapExpandButton.classList.toggle('on',expanded);
+   mapExpandButton.setAttribute('aria-expanded',expanded?'true':'false');
+   mapExpandButton.textContent=expanded?'Collapse table':'Expand table';
+   nextFrame(function(){
+     var target=document.getElementById(expanded?'sec-bracket-body':'sec-bracket');
+    if(target)jumpWithoutMotion(target);
+     if(returnFocus)mapExpandButton.focus();
+     later(drawConnectors,60);
+   });
+ }
+ if(mapExpandButton)mapExpandButton.addEventListener('click',function(){setMapExpanded(!document.body.classList.contains('map-expanded'),false);});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.body.classList.contains('map-expanded')){e.preventDefault();setMapExpanded(false,true);}},{signal:signal});
  document.querySelectorAll('.res-toggle button').forEach(function(bt){bt.addEventListener('click',function(){var w=document.querySelector('.res-wrap');w.setAttribute('data-view',bt.dataset.view);document.querySelectorAll('.res-toggle button').forEach(function(x){x.classList.toggle('on',x===bt);});});});
- document.querySelectorAll('.sec-toggle').forEach(function(bt){bt.addEventListener('click',function(){var body=document.getElementById(bt.getAttribute('aria-controls'));if(!body)return;var open=bt.getAttribute('aria-expanded')!=='false';bt.setAttribute('aria-expanded',open?'false':'true');body.classList.toggle('collapsed',open);});});
- var _rt;window.addEventListener('resize',function(){clearTimeout(_rt);_rt=setTimeout(drawConnectors,120);});
- window.addEventListener('load',function(){setTimeout(drawConnectors,60);});
- // Redraw whenever the bracket's box actually changes size (fonts landing, section
- // collapse/expand, theme swaps) — catches every "lines don't connect" layout shift
- // that the resize event alone misses.
- if(window.ResizeObserver){var _ro=new ResizeObserver(function(){clearTimeout(_rt);_rt=setTimeout(drawConnectors,80);});var _bw=document.querySelector('.brk-wrap');if(_bw)_ro.observe(_bw);}
- if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){setTimeout(drawConnectors,30);});
+ document.querySelectorAll('.sec-toggle').forEach(function(bt){bt.addEventListener('click',function(){var body=document.getElementById(bt.getAttribute('aria-controls'));if(!body)return;var open=bt.getAttribute('aria-expanded')!=='false';bt.setAttribute('aria-expanded',open?'false':'true');body.classList.toggle('collapsed',open);if(!body.classList.contains('collapsed')&&body.querySelector('.bracket')&&window.__drawConn)later(window.__drawConn,60);});});
+ var _rt;window.addEventListener('resize',function(){cancelLater(_rt);_rt=later(function(){if(window.innerWidth<=860&&document.body.classList.contains('map-expanded'))setMapExpanded(false,false);if(layoutWrap&&layoutWrap.dataset.layout==='sideways'&&window.innerWidth<=860)setLayout('mirror',true);else drawConnectors();},120);},{signal:signal});
+ window.addEventListener('load',function(){later(drawConnectors,60);},{signal:signal});
  // ---- hover: quick World Cup stat card on each team box ----
  var card=document.getElementById('statcard');
  function posCard(ev){var pad=14,w=card.offsetWidth,h=card.offsetHeight,x=ev.clientX+16,y=ev.clientY+16;
@@ -100,8 +188,7 @@ export function initInteractions(){
  function showCard(el,ev){var t=el.getAttribute('data-team'),s=window.WCSTATS&&window.WCSTATS[t]; if(!s||!card)return;
    card.innerHTML='<div class="sc-name"><span class="seed">'+(s.s||'')+'</span>'+t+'</div>'
      +'<div class="sc-row"><span class="k">World Cup titles</span><span class="v gold">'+(s.t?('🏆 '+s.t):'—')+'</span></div>'
-     +'<div class="sc-row"><span class="k">Best finish</span><span class="v">'+s.b+'</span></div>'
-     +'<div class="sc-row"><span class="k">This World Cup</span><span class="v">'+s.y+'</span></div>';
+     +'<div class="sc-row"><span class="k">Best finish</span><span class="v">'+s.b+'</span></div>';
    posCard(ev); card.classList.add('show');}
  document.querySelectorAll('.team[data-team]').forEach(function(el){
    el.addEventListener('mouseenter',function(ev){showCard(el,ev)});
@@ -119,6 +206,15 @@ export function initInteractions(){
    var spy=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){railLinks.forEach(function(l){l.classList.remove('active');});var a=linkFor[e.target.id];if(a)a.classList.add('active');}});},{rootMargin:'-45% 0px -50% 0px',threshold:0});
    secs.forEach(function(s){spy.observe(s);});
  }
+ return function(){
+   lifecycle.abort();
+   timers.forEach(function(id){clearTimeout(id);});timers.clear();
+   frames.forEach(function(id){cancelAnimationFrame(id);});frames.clear();
+   if(spy)spy.disconnect();
+   if(window.__drawConn===drawConnectors)delete window.__drawConn;
+   document.body.classList.remove('map-expanded','map-fit-screen','map-fit-mirror','map-fit-sideways');
+   root.classList.remove('map-fit-screen-root');
+ };
 })();
 
 }

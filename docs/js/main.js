@@ -10,12 +10,36 @@ import { openBuilder } from "./builder.js";
 import { encodeShare, decodeShare } from "./share.js";
 import { openCompare, addRival, loadRivals } from "./compare.js";
 import { hashPicks } from "./storage.js";
+import { initMatchDetails } from "./match-details.js";
 
 const $ = (s) => document.querySelector(s);
 let TOPO = null, LIVE = null;
+let DETAILS_STATE = { ok: false, data: null, error: new Error("Not loaded") };
+let PORTRAIT_STATE = { ok: false, data: null, error: new Error("Not loaded") };
 let SHOWN = null;          // the picks currently rendered (needed by "Save as mine")
 let IS_SHARED = false;     // viewing someone else's bracket via a share link
 const HINT_KEY = "wcb.hint.compare.v1";   // dismissal flag for the compare-with-friends nudge
+
+function teardownTrophies() {
+  (window.__trophyTeardowns || []).forEach(teardown => teardown());
+  window.__trophyTeardowns = [];
+  window.__trophyGeneration = (window.__trophyGeneration || 0) + 1;
+  return window.__trophyGeneration;
+}
+
+function teardownMatchDetails() {
+  if (typeof window.__matchDetailsCleanup === "function") {
+    window.__matchDetailsCleanup();
+  }
+  window.__matchDetailsCleanup = null;
+}
+
+function teardownInteractions() {
+  if (typeof window.__interactionCleanup === "function") {
+    window.__interactionCleanup();
+  }
+  window.__interactionCleanup = null;
+}
 
 function hintDismissed() { try { return localStorage.getItem(HINT_KEY) === "1"; } catch (e) { return false; } }
 // The nudge is the point of this fork, but only makes sense on your OWN saved bracket
@@ -35,11 +59,24 @@ function wireRailFilter() {
 }
 
 async function loadData() {
-  const [t, l] = await Promise.all([
+  const optionalJson = async (url) => {
+    try {
+      const response = await fetch(url, { cache: "no-cache" });
+      if (!response.ok) throw new Error(`${url} returned ${response.status}`);
+      return { ok: true, data: await response.json(), error: null };
+    } catch (error) {
+      return { ok: false, data: null, error };
+    }
+  };
+  const [t, l, details, portraits] = await Promise.all([
     fetch("data/topology.json").then(r => r.json()),
     fetch("data/results.json", { cache: "no-cache" }).then(r => r.json()),
+    optionalJson("data/match-details.json"),
+    optionalJson("data/match-portraits.json"),
   ]);
   TOPO = t; LIVE = l;
+  DETAILS_STATE = details;
+  PORTRAIT_STATE = portraits;
 }
 
 function showDashboard(picks, isDemo = false, isShared = false) {
@@ -48,6 +85,9 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   // destroying the real edits (they come back via the stash).
   if (isDemo || isShared) stashWhatIfs(); else restoreWhatIfs();
   resetWhatIfsIfChanged(picks);
+  teardownMatchDetails();
+  teardownInteractions();
+  const trophyGeneration = teardownTrophies();
   SHOWN = picks; IS_SHARED = isShared;
   const app = $("#app");
   app.innerHTML = renderDashboard(picks, LIVE, TOPO);
@@ -70,8 +110,31 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   $("#vb-compare").textContent = "🏆 Leaderboard" + (nRivals ? ` (${nRivals + 1})` : "");
   $("#sharepop").hidden = true;
   updateShareHint(own);                                // compare-with-friends nudge (own bracket only)
-  initInteractions();                                  // run the verbatim interaction layer
+  window.__interactionCleanup = initInteractions();    // bind one dashboard lifecycle
   wireRailFilter();                                    // collapsible "Filter by team" panel
+  window.__matchDetailsCleanup = initMatchDetails(
+    app,
+    DETAILS_STATE,
+    PORTRAIT_STATE,
+  );
+  const trophySlots = [...document.querySelectorAll("[data-trophy]")];
+  if (trophySlots.length) {
+    import("./trophy.js").then(module => {
+      if (window.__trophyGeneration !== trophyGeneration) return;
+      window.__trophyTeardowns = trophySlots
+        .filter(slot => slot.isConnected)
+        .map(slot => module.initTrophy(slot));
+    }).catch(() => {
+      if (window.__trophyGeneration !== trophyGeneration) return;
+      trophySlots.filter(slot => slot.isConnected).forEach(slot => {
+        const fallback = document.createElement("img");
+        fallback.className = "trophy-fallback";
+        fallback.src = "assets/trophy-fallback.svg";
+        fallback.alt = "";
+        slot.replaceChildren(fallback);
+      });
+    });
+  }
   if (window.__drawConn) setTimeout(window.__drawConn, 90);  // initial connector draw
   window.scrollTo(0, 0);
 }
@@ -153,6 +216,9 @@ async function onDemo() {
 function clearHash() { history.replaceState(null, "", location.pathname + location.search); }
 
 function showLanding() {
+  teardownMatchDetails();
+  teardownInteractions();
+  teardownTrophies();
   const app = $("#app"); app.hidden = true; app.innerHTML = "";
   $("#viewerbar").hidden = true; $("#dab").hidden = true;
   const sh = $("#sharehint"); if (sh) sh.hidden = true;

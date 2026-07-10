@@ -1,0 +1,1586 @@
+{
+  "version": 1,
+  "refreshed": "2026-07-10T08:53:16Z",
+  "matches": {
+    "M73": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021518"
+      },
+      "state": "complete",
+      "home": "South Africa",
+      "away": "Canada",
+      "score": {
+        "home": 0,
+        "away": 1,
+        "note": ""
+      },
+      "winner": "Canada",
+      "round": "Round of 32",
+      "kickoff": "2026-06-28T19:00:00Z",
+      "venue": {
+        "stadium": "Los Angeles Stadium",
+        "city": "Los Angeles"
+      },
+      "attendance": 69237,
+      "referee": "João Pedro Silva Pinheiro",
+      "goals": [
+        {
+          "team": "Canada",
+          "player": "Eustaquio",
+          "minute": "90'+2'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Canada",
+          "player": "Saliba",
+          "minute": "54'",
+          "card": "yellow"
+        },
+        {
+          "team": "Canada",
+          "player": "Sigur",
+          "minute": "67'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M74": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021513"
+      },
+      "state": "complete",
+      "home": "Germany",
+      "away": "Paraguay",
+      "score": {
+        "home": 1,
+        "away": 1,
+        "note": "4–3 pens"
+      },
+      "winner": "Paraguay",
+      "round": "Round of 32",
+      "kickoff": "2026-06-29T20:30:00Z",
+      "venue": {
+        "stadium": "Boston Stadium",
+        "city": "Boston"
+      },
+      "attendance": 63945,
+      "referee": "Jalal Jayed",
+      "goals": [
+        {
+          "team": "Germany",
+          "player": "Havertz",
+          "minute": "54'",
+          "kind": "goal"
+        },
+        {
+          "team": "Paraguay",
+          "player": "Enciso",
+          "minute": "42'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Germany",
+          "player": "Havertz",
+          "minute": "106'",
+          "card": "yellow"
+        },
+        {
+          "team": "Germany",
+          "player": "Musiala",
+          "minute": "115'",
+          "card": "yellow"
+        },
+        {
+          "team": "Paraguay",
+          "player": "Cubas",
+          "minute": "65'",
+          "card": "yellow"
+        },
+        {
+          "team": "Paraguay",
+          "player": "Galarza",
+          "minute": "117'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M75": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021522"
+      },
+      "state": "complete",
+      "home": "Netherlands",
+      "away": "Morocco",
+      "score": {
+        "home": 1,
+        "away": 1,
+        "note": "3–2 pens"
+      },
+      "winner": "Morocco",
+      "round": "Round of 32",
+      "kickoff": "2026-06-30T01:00:00Z",
+      "venue": {
+        "stadium": "Monterrey Stadium",
+        "city": "Monterrey"
+      },
+      "attendance": 51243,
+      "referee": "Wilton Sampaio",
+      "goals": [
+        {
+          "team": "Netherlands",
+          "player": "Gakpo",
+          "minute": "72'",
+          "kind": "goal"
+        },
+        {
+          "team": "Morocco",
+          "player": "Diop",
+          "minute": "90'+1'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Morocco",
+          "player": "Diop",
+          "minute": "47'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M76": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021516"
+      },
+      "state": "complete",
+      "home": "Brazil",
+      "away": "Japan",
+      "score": {
+        "home": 2,
+        "away": 1,
+        "note": ""
+      },
+      "winner": "Brazil",
+      "round": "Round of 32",
+      "kickoff": "2026-06-29T17:00:00Z",
+      "venue": {
+        "stadium": "Houston Stadium",
+        "city": "Houston"
+      },
+      "attendance": 68777,
+      "referee": "Maurizio Mariani",
+      "goals": [
+        {
+          "team": "Brazil",
+          "player": "Casemiro",
+          "minute": "56'",
+          "kind": "goal"
+        },
+        {
+          "team": "Brazil",
+          "player": "Martinelli",
+          "minute": "90'+5'",
+          "kind": "goal"
+        },
+        {
+          "team": "Japan",
+          "player": "Sano",
+          "minute": "29'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Brazil",
+          "player": "Casemiro",
+          "minute": "14'",
+          "card": "yellow"
+        },
+        {
+          "team": "Brazil",
+          "player": "Danilo",
+          "minute": "48'",
+          "card": "yellow"
+        },
+        {
+          "team": "Japan",
+          "player": "Sano",
+          "minute": "12'",
+          "card": "yellow"
+        },
+        {
+          "team": "Japan",
+          "player": "Kamada",
+          "minute": "45'",
+          "card": "yellow"
+        },
+        {
+          "team": "Japan",
+          "player": "Suzuki",
+          "minute": "84'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M77": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021523"
+      },
+      "state": "complete",
+      "home": "France",
+      "away": "Sweden",
+      "score": {
+        "home": 3,
+        "away": 0,
+        "note": ""
+      },
+      "winner": "France",
+      "round": "Round of 32",
+      "kickoff": "2026-06-30T21:00:00Z",
+      "venue": {
+        "stadium": "New York/New Jersey Stadium",
+        "city": "New Jersey"
+      },
+      "attendance": 80663,
+      "referee": "Danny Desmond Makkelie",
+      "goals": [
+        {
+          "team": "France",
+          "player": "Mbappe",
+          "minute": "45'",
+          "kind": "goal"
+        },
+        {
+          "team": "France",
+          "player": "Barcola",
+          "minute": "53'",
+          "kind": "goal"
+        },
+        {
+          "team": "France",
+          "player": "Mbappe",
+          "minute": "74'",
+          "kind": "goal"
+        }
+      ]
+    },
+    "M78": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021514"
+      },
+      "state": "complete",
+      "home": "Ivory Coast",
+      "away": "Norway",
+      "score": {
+        "home": 1,
+        "away": 2,
+        "note": ""
+      },
+      "winner": "Norway",
+      "round": "Round of 32",
+      "kickoff": "2026-06-30T17:00:00Z",
+      "venue": {
+        "stadium": "Dallas Stadium",
+        "city": "Dallas"
+      },
+      "attendance": 69665,
+      "referee": "Jesús Valenzuela Sáez",
+      "goals": [
+        {
+          "team": "Ivory Coast",
+          "player": "Diallo",
+          "minute": "74'",
+          "kind": "goal"
+        },
+        {
+          "team": "Norway",
+          "player": "Nusa",
+          "minute": "39'",
+          "kind": "goal"
+        },
+        {
+          "team": "Norway",
+          "player": "Haaland",
+          "minute": "86'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Norway",
+          "player": "Nusa",
+          "minute": "45'+1'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M79": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021520"
+      },
+      "state": "complete",
+      "home": "Mexico",
+      "away": "Ecuador",
+      "score": {
+        "home": 2,
+        "away": 0,
+        "note": ""
+      },
+      "winner": "Mexico",
+      "round": "Round of 32",
+      "kickoff": "2026-07-01T02:00:00Z",
+      "venue": {
+        "stadium": "Mexico City Stadium",
+        "city": "Mexico City"
+      },
+      "attendance": 80824,
+      "referee": "Slavko Vincic",
+      "goals": [
+        {
+          "team": "Mexico",
+          "player": "Quinones",
+          "minute": "22'",
+          "kind": "goal"
+        },
+        {
+          "team": "Mexico",
+          "player": "Jimenez",
+          "minute": "31'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Ecuador",
+          "player": "Franco",
+          "minute": "45'+1'",
+          "card": "yellow"
+        },
+        {
+          "team": "Ecuador",
+          "player": "Paez",
+          "minute": "90'+3'",
+          "card": "yellow"
+        },
+        {
+          "team": "Ecuador",
+          "player": "Hincapie",
+          "minute": "90'+5'",
+          "card": "second-yellow"
+        },
+        {
+          "team": "Ecuador",
+          "player": "Caicedo",
+          "minute": "90'+9'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M80": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021512"
+      },
+      "state": "complete",
+      "home": "England",
+      "away": "DR Congo",
+      "score": {
+        "home": 2,
+        "away": 1,
+        "note": ""
+      },
+      "winner": "England",
+      "round": "Round of 32",
+      "kickoff": "2026-07-01T16:00:00Z",
+      "venue": {
+        "stadium": "Atlanta Stadium",
+        "city": "Atlanta"
+      },
+      "attendance": 68239,
+      "referee": "Adham Mohammad Tumah Makhadmeh",
+      "goals": [
+        {
+          "team": "England",
+          "player": "Kane",
+          "minute": "75'",
+          "kind": "goal"
+        },
+        {
+          "team": "England",
+          "player": "Kane",
+          "minute": "86'",
+          "kind": "goal"
+        },
+        {
+          "team": "DR Congo",
+          "player": "Cipenga",
+          "minute": "7'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "England",
+          "player": "Bellingham",
+          "minute": "19'",
+          "card": "yellow"
+        },
+        {
+          "team": "DR Congo",
+          "player": "Sadiki",
+          "minute": "27'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M81": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021524"
+      },
+      "state": "complete",
+      "home": "United States",
+      "away": "Bosnia & Herz.",
+      "score": {
+        "home": 2,
+        "away": 0,
+        "note": ""
+      },
+      "winner": "United States",
+      "round": "Round of 32",
+      "kickoff": "2026-07-02T00:00:00Z",
+      "venue": {
+        "stadium": "San Francisco Bay Area Stadium",
+        "city": "San Francisco Bay Area"
+      },
+      "attendance": 68827,
+      "referee": "Raphael Claus",
+      "goals": [
+        {
+          "team": "United States",
+          "player": "Balogun",
+          "minute": "45'",
+          "kind": "goal"
+        },
+        {
+          "team": "United States",
+          "player": "Tillman",
+          "minute": "82'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "United States",
+          "player": "Balogun",
+          "minute": "64'",
+          "card": "second-yellow"
+        },
+        {
+          "team": "Bosnia & Herz.",
+          "player": "Radeljic",
+          "minute": "80'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M82": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021525"
+      },
+      "state": "complete",
+      "home": "Belgium",
+      "away": "Senegal",
+      "score": {
+        "home": 3,
+        "away": 2,
+        "note": ""
+      },
+      "winner": "Belgium",
+      "round": "Round of 32",
+      "kickoff": "2026-07-01T20:00:00Z",
+      "venue": {
+        "stadium": "Seattle Stadium",
+        "city": "Seattle"
+      },
+      "attendance": 66925,
+      "referee": "Said Martinez",
+      "goals": [
+        {
+          "team": "Belgium",
+          "player": "Lukaku",
+          "minute": "86'",
+          "kind": "goal"
+        },
+        {
+          "team": "Belgium",
+          "player": "Tielemans",
+          "minute": "89'",
+          "kind": "goal"
+        },
+        {
+          "team": "Belgium",
+          "player": "Tielemans",
+          "minute": "120'+5'",
+          "kind": "penalty"
+        },
+        {
+          "team": "Senegal",
+          "player": "Diarra",
+          "minute": "24'",
+          "kind": "goal"
+        },
+        {
+          "team": "Senegal",
+          "player": "Sarr",
+          "minute": "51'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Belgium",
+          "player": "Mechele",
+          "minute": "64'",
+          "card": "yellow"
+        },
+        {
+          "team": "Senegal",
+          "player": "Camara",
+          "minute": "67'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M83": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021526"
+      },
+      "state": "complete",
+      "home": "Portugal",
+      "away": "Croatia",
+      "score": {
+        "home": 2,
+        "away": 1,
+        "note": ""
+      },
+      "winner": "Portugal",
+      "round": "Round of 32",
+      "kickoff": "2026-07-02T23:00:00Z",
+      "venue": {
+        "stadium": "Toronto Stadium",
+        "city": "Toronto"
+      },
+      "attendance": 43036,
+      "referee": "Espen Eskås",
+      "goals": [
+        {
+          "team": "Portugal",
+          "player": "Ronaldo",
+          "minute": "68'",
+          "kind": "penalty"
+        },
+        {
+          "team": "Portugal",
+          "player": "Ramos",
+          "minute": "90'+4'",
+          "kind": "goal"
+        },
+        {
+          "team": "Croatia",
+          "player": "Perisic",
+          "minute": "53'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Portugal",
+          "player": "Dias",
+          "minute": "17'",
+          "card": "yellow"
+        },
+        {
+          "team": "Croatia",
+          "player": "Modric",
+          "minute": "59'",
+          "card": "yellow"
+        },
+        {
+          "team": "Croatia",
+          "player": "Perisic",
+          "minute": "90'+8'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M84": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021519"
+      },
+      "state": "complete",
+      "home": "Spain",
+      "away": "Austria",
+      "score": {
+        "home": 3,
+        "away": 0,
+        "note": ""
+      },
+      "winner": "Spain",
+      "round": "Round of 32",
+      "kickoff": "2026-07-02T19:00:00Z",
+      "venue": {
+        "stadium": "Los Angeles Stadium",
+        "city": "Los Angeles"
+      },
+      "attendance": 70492,
+      "referee": "Glenn Nyberg",
+      "goals": [
+        {
+          "team": "Spain",
+          "player": "Oyarzabal",
+          "minute": "36'",
+          "kind": "goal"
+        },
+        {
+          "team": "Spain",
+          "player": "Porro",
+          "minute": "66'",
+          "kind": "goal"
+        },
+        {
+          "team": "Spain",
+          "player": "Oyarzabal",
+          "minute": "89'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Austria",
+          "player": "Posch",
+          "minute": "83'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M85": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021527"
+      },
+      "state": "complete",
+      "home": "Switzerland",
+      "away": "Algeria",
+      "score": {
+        "home": 2,
+        "away": 0,
+        "note": ""
+      },
+      "winner": "Switzerland",
+      "round": "Round of 32",
+      "kickoff": "2026-07-03T03:00:00Z",
+      "venue": {
+        "stadium": "BC Place Vancouver",
+        "city": "Vancouver"
+      },
+      "attendance": 52497,
+      "referee": "Yael Falcón Pérez",
+      "goals": [
+        {
+          "team": "Switzerland",
+          "player": "Embolo",
+          "minute": "10'",
+          "kind": "goal"
+        },
+        {
+          "team": "Switzerland",
+          "player": "Ndoye",
+          "minute": "46'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Algeria",
+          "player": "Chaibi",
+          "minute": "36'",
+          "card": "yellow"
+        },
+        {
+          "team": "Algeria",
+          "player": "Boudaoui",
+          "minute": "72'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M86": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021521"
+      },
+      "state": "complete",
+      "home": "Argentina",
+      "away": "Cape Verde",
+      "score": {
+        "home": 3,
+        "away": 2,
+        "note": ""
+      },
+      "winner": "Argentina",
+      "round": "Round of 32",
+      "kickoff": "2026-07-03T22:00:00Z",
+      "venue": {
+        "stadium": "Miami Stadium",
+        "city": "Miami"
+      },
+      "attendance": 64478,
+      "referee": "Drew Fischer",
+      "goals": [
+        {
+          "team": "Argentina",
+          "player": "Messi",
+          "minute": "29'",
+          "kind": "goal"
+        },
+        {
+          "team": "Argentina",
+          "player": "Martinez",
+          "minute": "92'",
+          "kind": "goal"
+        },
+        {
+          "team": "Argentina",
+          "player": "Borges",
+          "minute": "111'",
+          "kind": "own-goal"
+        },
+        {
+          "team": "Cape Verde",
+          "player": "Duarte",
+          "minute": "59'",
+          "kind": "goal"
+        },
+        {
+          "team": "Cape Verde",
+          "player": "Cabral",
+          "minute": "103'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Argentina",
+          "player": "Montiel",
+          "minute": "115'",
+          "card": "yellow"
+        },
+        {
+          "team": "Cape Verde",
+          "player": "Pina",
+          "minute": "68'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M87": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021517"
+      },
+      "state": "complete",
+      "home": "Colombia",
+      "away": "Ghana",
+      "score": {
+        "home": 1,
+        "away": 0,
+        "note": ""
+      },
+      "winner": "Colombia",
+      "round": "Round of 32",
+      "kickoff": "2026-07-04T01:30:00Z",
+      "venue": {
+        "stadium": "Kansas City Stadium",
+        "city": "Kansas City"
+      },
+      "attendance": 69045,
+      "referee": "Clément Turpin",
+      "goals": [
+        {
+          "team": "Colombia",
+          "player": "Arias",
+          "minute": "14'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Colombia",
+          "player": "Arias",
+          "minute": "12'",
+          "card": "yellow"
+        },
+        {
+          "team": "Colombia",
+          "player": "Rios",
+          "minute": "78'",
+          "card": "yellow"
+        },
+        {
+          "team": "Ghana",
+          "player": "Yirenkyi",
+          "minute": "49'",
+          "card": "yellow"
+        },
+        {
+          "team": "Ghana",
+          "player": "Fatawu",
+          "minute": "66'",
+          "card": "yellow"
+        },
+        {
+          "team": "Ghana",
+          "player": "Seidu",
+          "minute": "76'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M88": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289287",
+        "matchId": "400021515"
+      },
+      "state": "complete",
+      "home": "Australia",
+      "away": "Egypt",
+      "score": {
+        "home": 1,
+        "away": 1,
+        "note": "4–2 pens"
+      },
+      "winner": "Egypt",
+      "round": "Round of 32",
+      "kickoff": "2026-07-03T18:00:00Z",
+      "venue": {
+        "stadium": "Dallas Stadium",
+        "city": "Dallas"
+      },
+      "attendance": 70244,
+      "referee": "Gustavo Tejera",
+      "goals": [
+        {
+          "team": "Australia",
+          "player": "Hany",
+          "minute": "55'",
+          "kind": "own-goal"
+        },
+        {
+          "team": "Egypt",
+          "player": "Ashour",
+          "minute": "13'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Egypt",
+          "player": "Hassan",
+          "minute": "104'",
+          "card": "yellow"
+        },
+        {
+          "team": "Egypt",
+          "player": "Ibrahim",
+          "minute": "120'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M89": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289288",
+        "matchId": "400021533"
+      },
+      "state": "complete",
+      "home": "Paraguay",
+      "away": "France",
+      "score": {
+        "home": 0,
+        "away": 1,
+        "note": ""
+      },
+      "winner": "France",
+      "round": "Round of 16",
+      "kickoff": "2026-07-04T21:00:00Z",
+      "venue": {
+        "stadium": "Philadelphia Stadium",
+        "city": "Philadelphia"
+      },
+      "attendance": 68324,
+      "referee": "Ilgiz Tantashev",
+      "goals": [
+        {
+          "team": "France",
+          "player": "Mbappe",
+          "minute": "70'",
+          "kind": "penalty"
+        }
+      ],
+      "cards": [
+        {
+          "team": "France",
+          "player": "Barcola",
+          "minute": "19'",
+          "card": "yellow"
+        },
+        {
+          "team": "France",
+          "player": "Kone",
+          "minute": "81'",
+          "card": "yellow"
+        },
+        {
+          "team": "France",
+          "player": "Olise",
+          "minute": "90'+7'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M90": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289288",
+        "matchId": "400021530"
+      },
+      "state": "complete",
+      "home": "Canada",
+      "away": "Morocco",
+      "score": {
+        "home": 0,
+        "away": 3,
+        "note": ""
+      },
+      "winner": "Morocco",
+      "round": "Round of 16",
+      "kickoff": "2026-07-04T17:00:00Z",
+      "venue": {
+        "stadium": "Houston Stadium",
+        "city": "Houston"
+      },
+      "attendance": 68777,
+      "referee": "Michael Oliver",
+      "goals": [
+        {
+          "team": "Morocco",
+          "player": "Ounahi",
+          "minute": "50'",
+          "kind": "goal"
+        },
+        {
+          "team": "Morocco",
+          "player": "Ounahi",
+          "minute": "82'",
+          "kind": "goal"
+        },
+        {
+          "team": "Morocco",
+          "player": "Rahimi",
+          "minute": "90'+8'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Canada",
+          "player": "Laryea",
+          "minute": "40'",
+          "card": "yellow"
+        },
+        {
+          "team": "Canada",
+          "player": "David",
+          "minute": "43'",
+          "card": "yellow"
+        },
+        {
+          "team": "Canada",
+          "player": "Fougerolles",
+          "minute": "49'",
+          "card": "yellow"
+        },
+        {
+          "team": "Canada",
+          "player": "Larin",
+          "minute": "67'",
+          "card": "yellow"
+        },
+        {
+          "team": "Morocco",
+          "player": "Halhal",
+          "minute": "20'",
+          "card": "yellow"
+        },
+        {
+          "team": "Morocco",
+          "player": "Hakimi",
+          "minute": "40'",
+          "card": "yellow"
+        },
+        {
+          "team": "Morocco",
+          "player": "Ounahi",
+          "minute": "45'",
+          "card": "yellow"
+        },
+        {
+          "team": "Morocco",
+          "player": "Khannouss",
+          "minute": "45'+6'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M91": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289288",
+        "matchId": "400021532"
+      },
+      "state": "complete",
+      "home": "Brazil",
+      "away": "Norway",
+      "score": {
+        "home": 1,
+        "away": 2,
+        "note": ""
+      },
+      "winner": "Norway",
+      "round": "Round of 16",
+      "kickoff": "2026-07-05T20:00:00Z",
+      "venue": {
+        "stadium": "New York/New Jersey Stadium",
+        "city": "New Jersey"
+      },
+      "attendance": 80663,
+      "referee": "Ismail Elfath",
+      "goals": [
+        {
+          "team": "Brazil",
+          "player": "Jr",
+          "minute": "90'+10'",
+          "kind": "penalty"
+        },
+        {
+          "team": "Norway",
+          "player": "Haaland",
+          "minute": "79'",
+          "kind": "goal"
+        },
+        {
+          "team": "Norway",
+          "player": "Haaland",
+          "minute": "90'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Brazil",
+          "player": "Jr",
+          "minute": "90'+6'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M92": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289288",
+        "matchId": "400021531"
+      },
+      "state": "complete",
+      "home": "Mexico",
+      "away": "England",
+      "score": {
+        "home": 2,
+        "away": 3,
+        "note": ""
+      },
+      "winner": "England",
+      "round": "Round of 16",
+      "kickoff": "2026-07-06T01:00:00Z",
+      "venue": {
+        "stadium": "Mexico City Stadium",
+        "city": "Mexico City"
+      },
+      "attendance": 80824,
+      "referee": "Alireza Faghani",
+      "goals": [
+        {
+          "team": "Mexico",
+          "player": "Quinones",
+          "minute": "42'",
+          "kind": "goal"
+        },
+        {
+          "team": "Mexico",
+          "player": "Jimenez",
+          "minute": "69'",
+          "kind": "penalty"
+        },
+        {
+          "team": "England",
+          "player": "Bellingham",
+          "minute": "36'",
+          "kind": "goal"
+        },
+        {
+          "team": "England",
+          "player": "Bellingham",
+          "minute": "38'",
+          "kind": "goal"
+        },
+        {
+          "team": "England",
+          "player": "Kane",
+          "minute": "60'",
+          "kind": "penalty"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Mexico",
+          "player": "Sanchez",
+          "minute": "71'",
+          "card": "yellow"
+        },
+        {
+          "team": "Mexico",
+          "player": "Vasquez",
+          "minute": "90'+8'",
+          "card": "yellow"
+        },
+        {
+          "team": "England",
+          "player": "Rice",
+          "minute": "1'",
+          "card": "yellow"
+        },
+        {
+          "team": "England",
+          "player": "Quansah",
+          "minute": "54'",
+          "card": "second-yellow"
+        },
+        {
+          "team": "England",
+          "player": "Guehi",
+          "minute": "68'",
+          "card": "yellow"
+        },
+        {
+          "team": "England",
+          "player": "Oreilly",
+          "minute": "72'",
+          "card": "yellow"
+        },
+        {
+          "team": "England",
+          "player": "Henderson",
+          "minute": "90'+8'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M93": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289288",
+        "matchId": "400021529"
+      },
+      "state": "complete",
+      "home": "Portugal",
+      "away": "Spain",
+      "score": {
+        "home": 0,
+        "away": 1,
+        "note": ""
+      },
+      "winner": "Spain",
+      "round": "Round of 16",
+      "kickoff": "2026-07-06T19:00:00Z",
+      "venue": {
+        "stadium": "Dallas Stadium",
+        "city": "Dallas"
+      },
+      "attendance": 70649,
+      "referee": "Anthony Taylor",
+      "goals": [
+        {
+          "team": "Spain",
+          "player": "Merino",
+          "minute": "90'+1'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Portugal",
+          "player": "Silva",
+          "minute": "89'",
+          "card": "yellow"
+        },
+        {
+          "team": "Portugal",
+          "player": "Veiga",
+          "minute": "90'+3'",
+          "card": "yellow"
+        },
+        {
+          "team": "Spain",
+          "player": "Torres",
+          "minute": "90'+8'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M94": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289288",
+        "matchId": "400021534"
+      },
+      "state": "complete",
+      "home": "United States",
+      "away": "Belgium",
+      "score": {
+        "home": 1,
+        "away": 4,
+        "note": ""
+      },
+      "winner": "Belgium",
+      "round": "Round of 16",
+      "kickoff": "2026-07-07T00:00:00Z",
+      "venue": {
+        "stadium": "Seattle Stadium",
+        "city": "Seattle"
+      },
+      "attendance": 66925,
+      "referee": "Adham Mohammad Tumah Makhadmeh",
+      "goals": [
+        {
+          "team": "United States",
+          "player": "Tillman",
+          "minute": "31'",
+          "kind": "goal"
+        },
+        {
+          "team": "Belgium",
+          "player": "Ketelaere",
+          "minute": "0'",
+          "kind": "goal"
+        },
+        {
+          "team": "Belgium",
+          "player": "Ketelaere",
+          "minute": "33'",
+          "kind": "goal"
+        },
+        {
+          "team": "Belgium",
+          "player": "Vanaken",
+          "minute": "57'",
+          "kind": "goal"
+        },
+        {
+          "team": "Belgium",
+          "player": "Lukaku",
+          "minute": "90'+3'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "United States",
+          "player": "McKENNIE",
+          "minute": "35'",
+          "card": "yellow"
+        },
+        {
+          "team": "United States",
+          "player": "Tillman",
+          "minute": "69'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M95": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289288",
+        "matchId": "400021528"
+      },
+      "state": "complete",
+      "home": "Argentina",
+      "away": "Egypt",
+      "score": {
+        "home": 3,
+        "away": 2,
+        "note": ""
+      },
+      "winner": "Argentina",
+      "round": "Round of 16",
+      "kickoff": "2026-07-07T16:00:00Z",
+      "venue": {
+        "stadium": "Atlanta Stadium",
+        "city": "Atlanta"
+      },
+      "attendance": 68239,
+      "referee": "François Letexier",
+      "goals": [
+        {
+          "team": "Argentina",
+          "player": "Romero",
+          "minute": "79'",
+          "kind": "goal"
+        },
+        {
+          "team": "Argentina",
+          "player": "Messi",
+          "minute": "83'",
+          "kind": "goal"
+        },
+        {
+          "team": "Argentina",
+          "player": "Fernandez",
+          "minute": "90'+2'",
+          "kind": "goal"
+        },
+        {
+          "team": "Egypt",
+          "player": "Ibrahim",
+          "minute": "15'",
+          "kind": "goal"
+        },
+        {
+          "team": "Egypt",
+          "player": "Zico",
+          "minute": "67'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Egypt",
+          "player": "Shoubir",
+          "minute": "90'+3'",
+          "card": "yellow"
+        },
+        {
+          "team": "Egypt",
+          "player": "Fathy",
+          "minute": "90'+4'",
+          "card": "yellow"
+        },
+        {
+          "team": "Egypt",
+          "player": "Attia",
+          "minute": "90'+8'",
+          "card": "yellow"
+        },
+        {
+          "team": "Egypt",
+          "player": "Hassan",
+          "minute": "90'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M96": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289288",
+        "matchId": "400021535"
+      },
+      "state": "complete",
+      "home": "Switzerland",
+      "away": "Colombia",
+      "score": {
+        "home": 0,
+        "away": 0,
+        "note": "4–3 pens"
+      },
+      "winner": "Switzerland",
+      "round": "Round of 16",
+      "kickoff": "2026-07-07T20:00:00Z",
+      "venue": {
+        "stadium": "BC Place Vancouver",
+        "city": "Vancouver"
+      },
+      "attendance": 52497,
+      "referee": "Ivan Arcides Barton Cisneros",
+      "cards": [
+        {
+          "team": "Switzerland",
+          "player": "Xhaka",
+          "minute": "51'",
+          "card": "yellow"
+        },
+        {
+          "team": "Switzerland",
+          "player": "Zakaria",
+          "minute": "59'",
+          "card": "yellow"
+        },
+        {
+          "team": "Switzerland",
+          "player": "Muheim",
+          "minute": "105'",
+          "card": "yellow"
+        },
+        {
+          "team": "Colombia",
+          "player": "Suarez",
+          "minute": "60'",
+          "card": "yellow"
+        },
+        {
+          "team": "Colombia",
+          "player": "Sanchez",
+          "minute": "94'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M97": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289289",
+        "matchId": "400021536"
+      },
+      "state": "complete",
+      "home": "France",
+      "away": "Morocco",
+      "score": {
+        "home": 2,
+        "away": 0,
+        "note": ""
+      },
+      "winner": "France",
+      "round": "Quarterfinal",
+      "kickoff": "2026-07-09T20:00:00Z",
+      "venue": {
+        "stadium": "Boston Stadium",
+        "city": "Boston"
+      },
+      "attendance": 63811,
+      "referee": "Facundo Tello",
+      "goals": [
+        {
+          "team": "France",
+          "player": "Mbappe",
+          "minute": "60'",
+          "kind": "goal"
+        },
+        {
+          "team": "France",
+          "player": "Dembele",
+          "minute": "66'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Morocco",
+          "player": "Diop",
+          "minute": "63'",
+          "card": "yellow"
+        }
+      ]
+    }
+  }
+}

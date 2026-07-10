@@ -113,6 +113,7 @@
 #sharehint{position:relative;z-index:55;display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;
   padding:11px 16px;background:linear-gradient(120deg,rgba(0,151,244,.14),rgba(0,178,145,.14));
   border-bottom:1px solid var(--border);font-size:.9rem;color:var(--text)}
+#sharehint[hidden]{display:none}
 #sharehint .sh-ic{font-size:1.15rem;flex:0 0 auto}
 #sharehint .sh-tx{flex:1 1 240px;min-width:0;color:var(--text2)} #sharehint .sh-tx b{color:var(--text)}
 #sharehint .sh-cta{font:inherit;font-size:.84rem;font-weight:800;border-radius:9px;padding:7px 13px;cursor:pointer;
@@ -408,9 +409,27 @@
 
 <!-- The rendered dashboard is injected here (inner HTML of .wrap) -->
 <div class="wrap" id="app" hidden></div>
+<div id="portrait-disclosure" class="portrait-disclosure" hidden></div>
 
 <button class="dab" id="dab" title="Back to top" aria-label="Back to top" hidden>↑</button>
 <div class="statcard" id="statcard" aria-hidden="true"></div>
+<div class="factcard" id="factcard" aria-hidden="true"></div>
+
+<!-- Completed-match facts. External portrait content starts empty and loads on intent. -->
+<dialog id="matchdlg" aria-labelledby="matchdlg-title">
+  <div class="mdlg-card">
+    <div class="mdlg-head">
+      <h3 id="matchdlg-title">Match details</h3>
+      <div class="mdlg-actions">
+        <button type="button" class="mdlg-expand" id="portrait-expand" aria-expanded="false" aria-label="Expand data portrait" title="Expand data portrait" hidden></button>
+        <button type="button" class="mdlg-close" id="matchdlg-close" aria-label="Close match details">✕</button>
+      </div>
+    </div>
+    <div class="mdlg-content" id="matchdlg-content"></div>
+    <div class="mdlg-portrait" hidden></div>
+    <p class="mdlg-portrait-note" hidden></p>
+  </div>
+</dialog>
 
 <script src="js/vendor/xlsx.full.min.js"></script>
 <script type="module" src="js/main.js"></script>

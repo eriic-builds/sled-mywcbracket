@@ -24,3 +24,7 @@ jobs:
           TZ: America/Los_Angeles
       - name: Validate committed results.json
         run: python3 scripts/validate_results.py
+      - name: Validate match-detail pipeline and committed data
+        run: |
+          python3 tests/match_details.py
+          python3 scripts/validate_match_details.py

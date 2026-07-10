@@ -46,6 +46,7 @@ TEAM_MAP = os.path.join(HERE, "team_map.json")
 DATA = os.path.join(os.path.dirname(HERE), "docs", "data")
 TOPOLOGY = os.path.join(DATA, "topology.json")
 RESULTS = os.path.join(DATA, "results.json")
+MATCH_DETAILS = os.path.join(DATA, "match-details.json")
 
 FD_URL = "https://api.football-data.org/v4/competitions/WC/matches?status=FINISHED"
 
@@ -141,7 +142,14 @@ def results_from_footballdata(tmap: dict):
             w = home if gh > ga else away
         out.append({"home": home, "away": away, "gh": int(gh), "ga": int(ga),
                     "winner": w, "note": note, "date": (m.get("utcDate") or ""),
-                    "stage": (m.get("stage") or ""), "city": ""})
+                    "stage": (m.get("stage") or ""), "city": "",
+                    "_source": {
+                        "provider": "football-data.org",
+                        "matchId": str(
+                            m.get("id")
+                            or f"{home}-{away}-{m.get('utcDate') or 'undated'}"
+                        ),
+                    }})
     return out, []  # schedule sync is FIFA-only
 
 
@@ -186,7 +194,9 @@ def results_from_fifa(tmap: dict):
             continue
         gh, ga = int(gh), int(ga)
         stage = _fifa_txt(m.get("StageName"))
-        city = _fifa_txt((m.get("Stadium") or {}).get("CityName"))
+        stadium_data = m.get("Stadium") or {}
+        city = _fifa_txt(stadium_data.get("CityName"))
+        stadium = _fifa_txt(stadium_data.get("Name"))
         win_id = m.get("Winner")
         ph, pa = m.get("HomeTeamPenaltyScore"), m.get("AwayTeamPenaltyScore")
         note = ""
@@ -210,7 +220,7 @@ def results_from_fifa(tmap: dict):
             w = home if gh > ga else away
         out.append({"home": home, "away": away, "gh": gh, "ga": ga,
                     "winner": w, "note": note, "date": (m.get("Date") or ""),
-                    "stage": stage, "city": city,
+                    "stage": stage, "city": city, "stadium": stadium,
                     # IDs let enrich_fifa_goals() pull scorers for the card recap.
                     "_ids": (m.get("IdCompetition"), m.get("IdSeason"),
                              m.get("IdStage"), m.get("IdMatch"))})
@@ -224,6 +234,7 @@ FIFA_LIVE = ("https://api.fifa.com/api/v3/live/football/"
 
 # FIFA goal Type enum (observed in the 2026 feed): 1=penalty, 2=goal, 3=own goal.
 _GOAL_PEN, _GOAL_NORMAL, _GOAL_OG = 1, 2, 3
+_FIFA_LIVE_CACHE = {}
 
 
 def _fifa_name(short) -> str:
@@ -250,6 +261,22 @@ def _goal_half(minute: str) -> str:
     return "ET"
 
 
+def fetch_fifa_live(ids) -> dict:
+    """Fetch one FIFA live payload, reusing it across highlights and details."""
+    key = tuple(str(value) for value in ids)
+    if not all(key):
+        raise ValueError("FIFA live routing IDs are incomplete")
+    if key in _FIFA_LIVE_CACHE:
+        return _FIFA_LIVE_CACHE[key]
+    ic, isea, ist, im = key
+    url = FIFA_LIVE.format(ic=ic, isea=isea, ist=ist, im=im)
+    req = urllib.request.Request(url, headers={"User-Agent": FIFA_UA})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        payload = json.load(resp)
+    _FIFA_LIVE_CACHE[key] = payload
+    return payload
+
+
 def fetch_match_goals(ids) -> list:
     """Return this match's goals as ordered dicts {name, minute, half, kind, side}.
 
@@ -258,14 +285,8 @@ def fetch_match_goals(ids) -> list:
     are looked up across both rosters. Returns [] on any error so cards degrade
     gracefully to the plain factual recap.
     """
-    ic, isea, ist, im = ids
-    if not all((ic, isea, ist, im)):
-        return []
-    url = FIFA_LIVE.format(ic=ic, isea=isea, ist=ist, im=im)
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": FIFA_UA})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            d = json.load(resp)
+        d = fetch_fifa_live(ids)
     except (urllib.error.URLError, ValueError, TimeoutError):
         return []
     roster = {}
@@ -330,7 +351,14 @@ def results_from_json(path: str, tmap: dict):
             w = home if gh > ga else away
         out.append({"home": home, "away": away, "gh": gh, "ga": ga,
                     "winner": w, "note": note, "date": (m.get("date") or ""),
-                    "stage": (m.get("stage", "")), "city": (m.get("city", ""))})
+                    "stage": (m.get("stage", "")), "city": (m.get("city", "")),
+                    "_source": {
+                        "provider": "local-result-feed",
+                        "matchId": str(
+                            m.get("id")
+                            or f"{home}-{away}-{m.get('date') or 'undated'}"
+                        ),
+                    }})
     return out, []  # schedule sync is FIFA-only
 
 
@@ -436,8 +464,20 @@ def match_all(r32, ko_feed, base_res, feed):
         else:
             gA, gB = f["ga"], f["gh"]
         res[code] = (gA, gB, f["winner"], f["note"])
-        applied[code] = {"a": a, "b": b, "gA": gA, "gB": gB,
-                         "winner": f["winner"], "note": f["note"], "date": f.get("date", "")}
+        applied[code] = {
+            "a": a,
+            "b": b,
+            "gA": gA,
+            "gB": gB,
+            "winner": f["winner"],
+            "note": f["note"],
+            "date": f.get("date", ""),
+            "stage": f.get("stage", ""),
+            "stadium": f.get("stadium", ""),
+            "city": f.get("city", ""),
+            "_ids": f.get("_ids"),
+            "_source": f.get("_source"),
+        }
 
     # Round of 32 — fixed fixtures.
     for code, a, b in r32:
@@ -933,15 +973,18 @@ def main() -> int:
     if args.input:
         feed, upcoming_feed = results_from_json(args.input, tmap)
         src = f"local file {args.input}"
+        is_fifa = False
     elif args.source == "footballdata":
         feed, upcoming_feed = results_from_footballdata(tmap)
         src = "football-data.org"
+        is_fifa = False
         if feed is None:
             print("No FOOTBALL_DATA_TOKEN set and no --input given, nothing to do.")
             return 0
     elif args.source == "fifa":
         feed, upcoming_feed = results_from_fifa(tmap)
         src = "FIFA public feed (api.fifa.com)"
+        is_fifa = True
         # Pull scorers/half/comeback context for just the games that will become
         # highlight cards (a handful of extra free FIFA calls, read-only).
         enrich_fifa_goals(feed)
@@ -985,7 +1028,28 @@ def main() -> int:
     auto_entries = build_auto_hl(feed)
     hl_changed = auto_entries != cur_auto_hl
 
-    if not changed and not hl_changed and not ko_fix_changed:
+    from match_details import update_details
+
+    old_details = None
+    if os.path.exists(MATCH_DETAILS):
+        with open(MATCH_DETAILS, encoding="utf-8") as fh:
+            old_details = json.load(fh)
+    prospective_results = dict(results)
+    prospective_results["res"] = {
+        code: list(new_res[code])
+        for code in sorted(new_res, key=lambda item: int(item[1:]))
+    }
+    details_document, detail_warnings, details_changed = update_details(
+        topo,
+        prospective_results,
+        old_details,
+        applied,
+        fetch_fifa_live if is_fifa else None,
+    )
+    for warning in detail_warnings:
+        print(f"  warning: {warning}")
+
+    if not changed and not hl_changed and not ko_fix_changed and not details_changed:
         if args.dry_run:
             print(f"Source: {src}. No new finished games to apply, results already current (dry-run).")
             return 0
@@ -1001,6 +1065,8 @@ def main() -> int:
           + (f": {', '.join(sorted(changed, key=lambda c: int(c[1:])))}" if changed else "")
           + (f"; refreshed {len(auto_entries)} game-fact highlight(s)" if hl_changed else "")
           + (f"; {len(new_ko_fix)} pending-fixture kickoff time(s)" if ko_fix_changed else "")
+          + (f"; refreshed {len(details_document['matches'])} match-detail record(s)"
+             if details_changed else "")
           + ".")
     for c in sorted(changed, key=lambda c: int(c[1:])):
         gA, gB, w, note = new_res[c]
@@ -1024,6 +1090,11 @@ def main() -> int:
     results["refreshed"] = now_utc_stamp()
     _write_results(results)
     print("Updated docs/data/results.json (res / ko_fix / auto_hl / refreshed).")
+    if details_changed:
+        from match_details import write_details
+
+        write_details(details_document)
+        print("Updated docs/data/match-details.json.")
     return 0
 
 

@@ -38,3 +38,42 @@ export function flagImg(name, cls = "bld-flag") {
   return `<img class="${_esc(cls)}" src="flags/${code}.svg" alt="${_esc(name)} flag" ` +
     `width="22" height="16" loading="lazy" decoding="async">`;
 }
+
+export const TEAM_CODE3 = {
+  "Algeria": "ALG",
+  "Argentina": "ARG",
+  "Australia": "AUS",
+  "Austria": "AUT",
+  "Belgium": "BEL",
+  "Bosnia & Herz.": "BIH",
+  "Brazil": "BRA",
+  "Canada": "CAN",
+  "Cape Verde": "CPV",
+  "Colombia": "COL",
+  "Croatia": "CRO",
+  "DR Congo": "COD",
+  "Ecuador": "ECU",
+  "Egypt": "EGY",
+  "England": "ENG",
+  "France": "FRA",
+  "Germany": "GER",
+  "Ghana": "GHA",
+  "Ivory Coast": "CIV",
+  "Japan": "JPN",
+  "Mexico": "MEX",
+  "Morocco": "MAR",
+  "Netherlands": "NED",
+  "Norway": "NOR",
+  "Paraguay": "PAR",
+  "Portugal": "POR",
+  "Senegal": "SEN",
+  "South Africa": "RSA",
+  "Spain": "ESP",
+  "Sweden": "SWE",
+  "Switzerland": "SUI",
+  "United States": "USA",
+};
+
+export function teamCode3(name) {
+  return TEAM_CODE3[name] || "";
+}

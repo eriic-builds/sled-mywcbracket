@@ -6,8 +6,9 @@ import fs from "fs";
 import { deriveStructure, teamsFor, buildPicks } from "../docs/js/builder.js";
 import { renderDashboard } from "../docs/js/render.js";
 
-const L = (n) => JSON.parse(fs.readFileSync(new URL("../docs/data/" + n, import.meta.url)));
-const topo = L("topology.json"), live = L("results.json");
+const data = (n) => JSON.parse(fs.readFileSync(new URL("../docs/data/" + n, import.meta.url)));
+const fixture = (n) => JSON.parse(fs.readFileSync(new URL("./fixtures/" + n, import.meta.url)));
+const topo = data("topology.json"), live = fixture("results.frozen.json");
 const S = deriveStructure(topo);
 
 let fails = 0, n = 0;
@@ -26,8 +27,10 @@ for (const round of S.rounds) for (const c of round.codes) {
 }
 const allWrong = buildPicks(topo, sel, "AllWrong", 0);
 const html = renderDashboard(allWrong, live, topo);
-const actual = html.split("bracket mode-actual")[1].split("bracket mode-picked")[0];
-const picked = html.split("bracket mode-picked")[1];
+const actual = html.split('class="bracket layout-mirror mode-actual"')[1]
+  .split('class="bracket layout-mirror mode-picked"')[0];
+const picked = html.split('class="bracket layout-mirror mode-picked"')[1]
+  .split('class="bracket layout-sideways mode-actual"')[0];
 
 // 1. no dead blanks anywhere in the actual view
 check("actual view has zero blank cells", !(actual.includes("team blank")));
@@ -38,9 +41,10 @@ const missing = r16Winners.filter(t => !new RegExp('st-actual[^>]*data-team="' +
 check("all decided R16 winners appear as actual (▲) in the QF column", missing.length === 0, missing.join(","));
 
 // 3. every undecided slot whose pick is out shows a labeled placeholder, never nothing
-const undecided = [...S.r16codes, ...S.qfcodes, ...S.sfcodes, S.finalcode].filter(c => !live.res[c]);
-const missingTBD = undecided.filter(c => !actual.includes("Winner " + c));
-check("every undecided busted slot shows 'Winner MXX'", missingTBD.length === 0, missingTBD.join(","));
+const unresolvedFeeders = [...S.r16codes, ...S.qfcodes, ...S.sfcodes]
+  .filter(c => !live.res[c]);
+const missingTBD = unresolvedFeeders.filter(c => !actual.includes("Winner " + c));
+check("every unresolved feeder shows 'Winner MXX'", missingTBD.length === 0, missingTBD.join(","));
 
 // 4. the picked view is untouched by actual-mode logic (user's path, no placeholders)
 check("picked view has no placeholders or blanks", !picked.includes("tbd-actual") && !picked.includes("team blank"));
@@ -55,7 +59,8 @@ check("picked view has no placeholders or blanks", !picked.includes("tbd-actual"
   }
   const allRight = buildPicks(topo, sel2, "AllRight", 0);
   const html2 = renderDashboard(allRight, live, topo);
-  const actual2 = html2.split("bracket mode-actual")[1].split("bracket mode-picked")[0];
+  const actual2 = html2.split('class="bracket layout-mirror mode-actual"')[1]
+    .split('class="bracket layout-mirror mode-picked"')[0];
   check("all-correct bracket: no ▲ and no blanks", !actual2.includes("st-actual") && !actual2.includes("team blank"));
 }
 

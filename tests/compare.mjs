@@ -7,8 +7,9 @@ import { standings, diffPicks } from "../docs/js/compare.js";
 import { deriveStructure, teamsFor, buildPicks } from "../docs/js/builder.js";
 import { renderDashboard } from "../docs/js/render.js";
 
-const L = (n) => JSON.parse(fs.readFileSync(new URL("../docs/data/" + n, import.meta.url)));
-const topo = L("topology.json"), demo = L("demo-picks.json"), live = L("results.json");
+const data = (n) => JSON.parse(fs.readFileSync(new URL("../docs/data/" + n, import.meta.url)));
+const fixture = (n) => JSON.parse(fs.readFileSync(new URL("./fixtures/" + n, import.meta.url)));
+const topo = data("topology.json"), demo = data("demo-picks.json"), live = fixture("results.frozen.json");
 const S = deriveStructure(topo);
 const RES = live.res;
 

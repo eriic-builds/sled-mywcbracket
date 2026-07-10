@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "refreshed": "not-a-timestamp",
+  "extra": null,
+  "matches": {
+    "M103": {
+      "source": {
+        "provider": "Unknown",
+        "matchId": 400021536
+      },
+      "state": "complete",
+      "home": "France",
+      "away": null,
+      "score": {
+        "home": -1,
+        "away": 0,
+        "note": null
+      },
+      "winner": "Spain",
+      "round": "Third-place",
+      "kickoff": null,
+      "attendance": -1,
+      "goals": [
+        {
+          "team": "Portugal",
+          "player": "",
+          "minute": null,
+          "kind": "guess"
+        }
+      ]
+    }
+  }
+}

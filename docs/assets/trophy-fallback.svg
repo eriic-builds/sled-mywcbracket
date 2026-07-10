@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 220">
+  <style>
+    :root { color: #d5aa35; }
+    .body { fill: currentColor; }
+    .shade { fill: #8f742b; }
+    .line { fill: none; stroke: #fff4b8; stroke-width: 2; opacity: .7; }
+  </style>
+  <g role="presentation">
+    <circle class="body" cx="90" cy="49" r="39"/>
+    <path class="shade" d="M90 10 69 24 76 47 104 47 111 24Z" opacity=".5"/>
+    <path class="shade" d="m51 49 25-2 14 25-16 13-17-12Z" opacity=".32"/>
+    <path class="shade" d="m129 49-25-2-14 25 16 13 17-12Z" opacity=".58"/>
+    <path class="line" d="M53 42c21 12 53 12 74 0M61 69c19-9 39-9 58 0"/>
+    <ellipse class="line" cx="90" cy="49" rx="15" ry="37"/>
+    <path class="body" d="m58 84 19 1 17 74-18 5Z"/>
+    <path class="body" d="m122 84-19 1-17 74 18 5Z"/>
+    <path class="shade" d="m77 124 13 20 13-20 4 21-17 20-17-20Z"/>
+    <path class="body" d="M70 145h40v17H70z"/>
+    <path class="shade" d="m70 145 20 8 20-8v8l-20 9-20-9Z" opacity=".55"/>
+    <path class="body" d="m55 170 35-10 35 10 9 31-44 13-44-13Z"/>
+    <path class="shade" d="m46 201 44-13 44 13-44 13Z" opacity=".62"/>
+    <path class="line" d="m55 170 35 12 35-12M90 182v32" opacity=".45"/>
+  </g>
+</svg>

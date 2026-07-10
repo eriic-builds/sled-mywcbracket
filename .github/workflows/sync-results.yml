@@ -57,23 +57,25 @@ jobs:
         if: steps.gate.outputs.skip != 'true'
         run: python scripts/fetch_results.py
 
-      - name: Validate results before committing
+      - name: Validate generated data before committing
         if: steps.gate.outputs.skip != 'true'
-        run: python scripts/validate_results.py
+        run: |
+          python scripts/validate_results.py
+          python scripts/validate_match_details.py
 
-      - name: Commit and push if results changed
+      - name: Commit and push if generated data changed
         id: commit
         if: steps.gate.outputs.skip != 'true'
         run: |
-          if [[ -n "$(git status --porcelain docs/data/results.json)" ]]; then
+          if [[ -n "$(git status --porcelain docs/data/results.json docs/data/match-details.json)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add docs/data/results.json
-            git commit -m "chore: auto-sync World Cup results"
+            git add docs/data/results.json docs/data/match-details.json
+            git commit -m "chore: auto-sync World Cup match data"
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "No changes — results already current."
+            echo "No changes — generated data already current."
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 

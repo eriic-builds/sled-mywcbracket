@@ -1,5 +1,5 @@
 {
- "refreshed": "2026-07-07T21:09:00Z",
+ "refreshed": "2026-07-10T06:41:10Z",
  "res": {
   "M73": [
    0,
@@ -138,23 +138,21 @@
    2,
    "Argentina",
    ""
+  ],
+  "M96": [
+   0,
+   0,
+   "Switzerland",
+   "4–3 pens"
+  ],
+  "M97": [
+   2,
+   0,
+   "France",
+   ""
   ]
  },
  "ko_fix": {
-  "M96": [
-   "2026-07-07T20:00:00Z",
-   "Tue Jul 7",
-   "4:00 PM",
-   "3:00 PM",
-   "1:00 PM"
-  ],
-  "M97": [
-   "2026-07-09T20:00:00Z",
-   "Thu Jul 9",
-   "4:00 PM",
-   "3:00 PM",
-   "1:00 PM"
-  ],
   "M98": [
    "2026-07-10T19:00:00Z",
    "Fri Jul 10",
@@ -168,15 +166,36 @@
    "5:00 PM",
    "4:00 PM",
    "2:00 PM"
+  ],
+  "M100": [
+   "2026-07-12T01:00:00Z",
+   "Sat Jul 11",
+   "9:00 PM",
+   "8:00 PM",
+   "6:00 PM"
   ]
  },
  "auto_hl": [
+  [
+   "🐓",
+   "France beat Morocco",
+   "France 2–0 Morocco",
+   "Thu Jul 9 · Boston",
+   "Job done for France, a composed 2–0 win over Morocco in the quarterfinal with Mbappe (60') and Dembele (66')."
+  ],
+  [
+   "🇨🇭",
+   "Switzerland win on penalties",
+   "Switzerland 0–0 Colombia",
+   "Tue Jul 7 · Vancouver",
+   "Ice-cold from twelve yards, Switzerland saw off Colombia on penalties (4–3 pens) after 0–0 in the Round of 16."
+  ],
   [
    "💙",
    "Argentina come from behind vs Egypt",
    "Argentina 3–2 Egypt",
    "Tue Jul 7 · Atlanta",
-   "Backs to the wall, Argentina rallied to see off Egypt 3–2 in the Round of 16 — Romero (79'), Messi (83') and Fernandez (90'+2') turning it around."
+   "Backs to the wall, Argentina rallied to see off Egypt 3–2 in the Round of 16, Romero (79'), Messi (83') and Fernandez (90'+2') turning it around."
   ],
   [
    "😈",
@@ -190,7 +209,7 @@
    "Spain edge Portugal",
    "Portugal 0–1 Spain",
    "Mon Jul 6 · Dallas",
-   "Heartbreak for Portugal — Spain nicked it 1–0 late in the Round of 16, Merino (90'+1') on target."
+   "Heartbreak for Portugal, Spain nicked it 1–0 late in the Round of 16, Merino (90'+1') on target."
   ],
   [
    "🦁",
@@ -198,20 +217,6 @@
    "Mexico 2–3 England",
    "Mon Jul 6 · Mexico City",
    "Bellingham struck twice in the first half (36', 38') as England beat Mexico 3–2 in the Round of 16, with Kane (60' pen) also on the mark."
-  ],
-  [
-   "🇳🇴",
-   "Haaland's brace sinks Brazil",
-   "Brazil 1–2 Norway",
-   "Sun Jul 5 · New Jersey",
-   "Haaland struck twice after the break (79', 90') as Norway beat Brazil 2–1 in the Round of 16."
-  ],
-  [
-   "🐓",
-   "France edge Paraguay",
-   "Paraguay 0–1 France",
-   "Sat Jul 4 · Philadelphia",
-   "Nervy but enough: France saw off Paraguay 1–0 in the Round of 16 thanks to Mbappe (70' pen)."
   ]
  ]
 }

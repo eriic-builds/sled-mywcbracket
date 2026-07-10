@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "permission": "approved-for-production",
+  "host": "https://wc26.bogachev.fr",
+  "matches": {
+    "M73": {
+      "slug": "saf-can",
+      "externalId": "1988523",
+      "date": "2026-06-28",
+      "stage": "Round of 32",
+      "teams": ["South Africa", "Canada"],
+      "score": [0, 1]
+    },
+    "M74": {
+      "slug": "ger-par",
+      "externalId": "1990970",
+      "date": "2026-06-29",
+      "stage": "Round of 32",
+      "teams": ["Germany", "Paraguay"],
+      "score": [1, 1]
+    },
+    "M75": {
+      "slug": "net-mor",
+      "externalId": "1990731",
+      "date": "2026-06-30",
+      "stage": "Round of 32",
+      "teams": ["Netherlands", "Morocco"],
+      "score": [1, 1]
+    },
+    "M76": {
+      "slug": "bra-jap",
+      "externalId": "1990729",
+      "date": "2026-06-29",
+      "stage": "Round of 32",
+      "teams": ["Brazil", "Japan"],
+      "score": [2, 1]
+    },
+    "M77": {
+      "slug": "fra-swe",
+      "externalId": "1990969",
+      "date": "2026-06-30",
+      "stage": "Round of 32",
+      "teams": ["France", "Sweden"],
+      "score": [3, 0]
+    },
+    "M78": {
+      "slug": "ico-nor",
+      "externalId": "1990967",
+      "date": "2026-06-30",
+      "stage": "Round of 32",
+      "teams": ["Ivory Coast", "Norway"],
+      "score": [1, 2]
+    },
+    "M79": {
+      "slug": "mex-ecu",
+      "externalId": "1992061",
+      "date": "2026-07-01",
+      "stage": "Round of 32",
+      "teams": ["Mexico", "Ecuador"],
+      "score": [2, 0]
+    },
+    "M80": {
+      "slug": "eng-dco",
+      "externalId": "1992064",
+      "date": "2026-07-01",
+      "stage": "Round of 32",
+      "teams": ["England", "DR Congo"],
+      "score": [2, 1]
+    },
+    "M81": {
+      "slug": "usa-ban",
+      "externalId": "1990730",
+      "date": "2026-07-02",
+      "stage": "Round of 32",
+      "teams": ["United States", "Bosnia & Herz."],
+      "score": [2, 0]
+    },
+    "M82": {
+      "slug": "bel-sen",
+      "externalId": "1992065",
+      "date": "2026-07-01",
+      "stage": "Round of 32",
+      "teams": ["Belgium", "Senegal"],
+      "score": [3, 2]
+    },
+    "M83": {
+      "slug": "por-cro",
+      "externalId": "1992063",
+      "date": "2026-07-02",
+      "stage": "Round of 32",
+      "teams": ["Portugal", "Croatia"],
+      "score": [2, 1]
+    },
+    "M84": {
+      "slug": "spa-aus",
+      "externalId": "1992067",
+      "date": "2026-07-02",
+      "stage": "Round of 32",
+      "teams": ["Spain", "Austria"],
+      "score": [3, 0]
+    },
+    "M85": {
+      "slug": "swi-alg",
+      "externalId": "1992066",
+      "date": "2026-07-03",
+      "stage": "Round of 32",
+      "teams": ["Switzerland", "Algeria"],
+      "score": [2, 0]
+    },
+    "M86": {
+      "slug": "arg-cve",
+      "externalId": "1990968",
+      "date": "2026-07-03",
+      "stage": "Round of 32",
+      "teams": ["Argentina", "Cape Verde"],
+      "score": [3, 2]
+    },
+    "M87": {
+      "slug": "col-gha",
+      "externalId": "1992062",
+      "date": "2026-07-04",
+      "stage": "Round of 32",
+      "teams": ["Colombia", "Ghana"],
+      "score": [1, 0]
+    },
+    "M88": {
+      "slug": "aus-egy",
+      "externalId": "1990971",
+      "date": "2026-07-03",
+      "stage": "Round of 32",
+      "teams": ["Australia", "Egypt"],
+      "score": [1, 1]
+    },
+    "M89": {
+      "slug": "par-fra",
+      "externalId": "1994739",
+      "date": "2026-07-04",
+      "stage": "Round of 16",
+      "teams": ["Paraguay", "France"],
+      "score": [0, 1]
+    },
+    "M90": {
+      "slug": "can-mor",
+      "externalId": "1993367",
+      "date": "2026-07-04",
+      "stage": "Round of 16",
+      "teams": ["Canada", "Morocco"],
+      "score": [0, 3]
+    },
+    "M91": {
+      "slug": "bra-nor",
+      "externalId": "1993896",
+      "date": "2026-07-05",
+      "stage": "Round of 16",
+      "teams": ["Brazil", "Norway"],
+      "score": [1, 2]
+    },
+    "M92": {
+      "slug": "mex-eng",
+      "externalId": "1995347",
+      "date": "2026-07-06",
+      "stage": "Round of 16",
+      "teams": ["Mexico", "England"],
+      "score": [2, 3]
+    },
+    "M93": {
+      "slug": "por-spa",
+      "externalId": "1998192",
+      "date": "2026-07-06",
+      "stage": "Round of 16",
+      "teams": ["Portugal", "Spain"],
+      "score": [0, 1]
+    },
+    "M94": {
+      "slug": "usa-bel",
+      "externalId": "1995348",
+      "date": "2026-07-07",
+      "stage": "Round of 16",
+      "teams": ["United States", "Belgium"],
+      "score": [1, 4]
+    },
+    "M95": {
+      "slug": "arg-egy",
+      "externalId": "1998571",
+      "date": "2026-07-07",
+      "stage": "Round of 16",
+      "teams": ["Argentina", "Egypt"],
+      "score": [3, 2]
+    },
+    "M96": {
+      "slug": "swi-col",
+      "externalId": "1998572",
+      "date": "2026-07-07",
+      "stage": "Round of 16",
+      "teams": ["Switzerland", "Colombia"],
+      "score": [0, 0]
+    },
+    "M97": {
+      "slug": "fra-mor",
+      "externalId": "1998582",
+      "date": "2026-07-09",
+      "stage": "Quarter-final",
+      "teams": ["France", "Morocco"],
+      "score": [2, 0]
+    }
+  }
+}
