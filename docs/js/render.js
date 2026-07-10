@@ -90,7 +90,7 @@ export function computeState(picks, live, topology) {
   D.R32 = picks.r32.map(r => r.slice(0, 5));         // [code,date,a,b,pick]
   D.R16_WIN = picks.r16_win; D.QF_WIN = picks.qf_win; D.SF_WIN = picks.sf_win;
   D.CHAMP = picks.champ; D.RUNNER = picks.runner;
-  D.REFRESHED = live.refreshed; D.CREDIT = "Built With Cowork, Imagined by Eric Lam";
+  D.REFRESHED = live.refreshed; D.CREDIT = "Built with Microsoft Cowork, GitHub Copilot, and pure vibes";
   D.SYNC_URL = topology.sync_url || "";
   D.RES = {}; for (const k in live.res) D.RES[k] = live.res[k];
   D.KO_FIX = {}; for (const k in (live.ko_fix || {})) D.KO_FIX[k] = live.ko_fix[k];
