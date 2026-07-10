@@ -366,7 +366,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visibl
 /* Easy — high-legibility reading mode: sentence case, no italics, roomier, left-aligned prose, single calm dark background for maximum stroke contrast */
 html[data-theme="easy"] body::before{display:none}
 html[data-theme="easy"] body{word-spacing:.1em}
-html[data-theme="easy"] .eyebrow,html[data-theme="easy"] .kpi-l,html[data-theme="easy"] .sb-cap,html[data-theme="easy"] .shead .cap,html[data-theme="easy"] .rr-h,html[data-theme="easy"] .story-tag,html[data-theme="easy"] .bb-cap,html[data-theme="easy"] .bb-tag,html[data-theme="easy"] .rhead,html[data-theme="easy"] .sb-stat span{text-transform:none;letter-spacing:.012em}
+html[data-theme="easy"] .eyebrow,html[data-theme="easy"] .kpi-l,html[data-theme="easy"] .sb-cap,html[data-theme="easy"] .shead .cap,html[data-theme="easy"] .rr-h,html[data-theme="easy"] .story-tag,html[data-theme="easy"] .bb-cap,html[data-theme="easy"] .bb-tag,html[data-theme="easy"] .rhead,html[data-theme="easy"] .sb-stat span,html[data-theme="easy"] .scrow.schead{text-transform:none;letter-spacing:.012em}
 html[data-theme="easy"] .story-title,html[data-theme="easy"] .kpi-v,html[data-theme="easy"] .hero h1,html[data-theme="easy"] .sb-big,html[data-theme="easy"] .bb-big{letter-spacing:0}
 /* OpenDyslexic renders large per em, so tame the big display sizes (small labels stay untouched for legibility) */
 html[data-theme="easy"] .hero h1{font-size:clamp(1.6rem,4vw,2.4rem)}
