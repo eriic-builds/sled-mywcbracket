@@ -304,10 +304,9 @@ function r32_cell(D, team, picked, decided, real_winner, freebie) {
     else if (!picked && real_winner) { cls.push("realadv"); badge = '<span class="rb up">\u25B2</span>'; }
     else cls.push("out");
   } else cls.push(picked ? "adv" : "out");
-  const sd = seedOf(D, team), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
   const ftag = freebie ? '<span class="tt" title="Freebie, Canada 1\u20130 South Africa, auto-credited">\u{1F381}</span>' : "";
   return `<div class="${cls.join(" ")}" data-team="${esc(team)}" data-round="r32" tabindex="0">` +
-    `<span class="fav-bar"></span>${sh}${flagImg(team, "bk-flag")}<span class="tname">${esc(team)}</span>${ftag}${badge}</div>`;
+    `<span class="fav-bar"></span>${flagImg(team, "bk-flag")}<span class="tname">${esc(team)}</span>${ftag}${badge}</div>`;
 }
 function pickBox(D, team, picked, short, champ, st) {
   const cls = ["team", "st-" + st];
@@ -322,9 +321,8 @@ function pickBox(D, team, picked, short, champ, st) {
     : "";
   const tag = champ ? '<span class="tt">\u{1F3C6}</span>' : "";
   const chev = (picked && !champ) ? '<span class="adv-arrow" title="you have this team advancing">\u203A</span>' : "";
-  const sd = seedOf(D, team), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
   return `<div class="${cls.join(" ")}" data-team="${esc(team)}" data-round="${short}" tabindex="0">` +
-    `<span class="fav-bar"></span>${sh}${flagImg(team, "bk-flag")}<span class="tname">${esc(team)}</span>${tag}${badge}${chev}</div>`;
+    `<span class="fav-bar"></span>${flagImg(team, "bk-flag")}<span class="tname">${esc(team)}</span>${tag}${badge}${chev}</div>`;
 }
 // One cell of a later round. In "actual" mode the slot's REAL occupant rules the cell:
 // `actual` is the winner of this side's feeder match (null while the feeder is unplayed),
@@ -335,13 +333,12 @@ function laterCell(D, team, picked, short, champ = false, actual = null, mode = 
   const st = D.reach_status(team, short);
   if (actual && actual !== team) {
     // the slot is decided and its occupant isn't your pick, show who actually went through
-    const sd = seedOf(D, actual), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
     const gone = D.ELIM.has(actual);
     const cls = "team st-actual" + (gone ? " gone" : "");
     const tip = gone ? `${actual} advanced in your ${team} pick's place, but is now out`
                      : `actually advanced, you picked ${team}`;
     return `<div class="${cls}" data-team="${esc(actual)}" data-round="${short}" tabindex="0">` +
-      `<span class="fav-bar"></span>${sh}${flagImg(actual, "bk-flag")}<span class="tname">${esc(actual)}</span>` +
+      `<span class="fav-bar"></span>${flagImg(actual, "bk-flag")}<span class="tname">${esc(actual)}</span>` +
       `<span class="rb up" title="${esc(tip)}">\u25B2</span></div>`;
   }
   if (!actual && st !== "won" && D.ELIM.has(team)) {
