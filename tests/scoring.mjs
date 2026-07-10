@@ -4,6 +4,8 @@
 // way, else still live) is compared against the engine's rendered scorecard across the
 // demo bracket + thousands of random valid brackets. Also asserts the invariant that
 // every bracket's points fully account to 80 (CONF + OUT + LIVE == POINTS_MAX).
+// Also checks the table's Settled total equals games actually played x round value
+// (pick-independent), which the engine renders in the points-per-round table.
 // Run: node tests/scoring.mjs
 import fs from "fs";
 import { deriveStructure, teamsFor, buildPicks } from "../docs/js/builder.js";
@@ -28,6 +30,8 @@ for (const c of [...S.r16codes, ...S.qfcodes, ...S.sfcodes, S.finalcode]) {
 }
 
 const PTS = [["r32", S.r32codes, 1], ["r16", S.r16codes, 2], ["qf", S.qfcodes, 4], ["sf", S.sfcodes, 8], ["final", [S.finalcode], 16]];
+// Settled is pick-independent: games actually played in each round times its value.
+const SETTLED_TOTAL = PTS.reduce((s, [, codes, pts]) => s + codes.filter(c => aw(c) != null).length * pts, 0);
 function refScore(sel) {
   let CONF = 0, OUT = 0, LIVE = 0;
   for (const [, codes, pts] of PTS) for (const c of codes) {
@@ -43,6 +47,7 @@ function engScore(sel) {
     CONF: +/<span id="scConfirmed">(\d+)<\/span>/.exec(html)[1],
     DECIDED: +/<b id="scSoFar">\d+\/(\d+)<\/b>/.exec(html)[1],
     ATTAIN: +/<b id="scMax"[^>]*>(\d+)<\/b>/.exec(html)[1],
+    SETTLED: +/<b id="scSettled">(\d+)<\/b>/.exec(html)[1],
   };
 }
 function demoSel() {
@@ -70,10 +75,13 @@ function check(name, sel) {
   if (eng.CONF !== ref.CONF || eng.DECIDED !== ref.DECIDED || eng.ATTAIN !== ref.ATTAIN) {
     fails++; console.log(`  DIFF ${name}: ref=${JSON.stringify(ref)} eng=${JSON.stringify(eng)}`); return;
   }
-  if (name === "demo") console.log(`  ok   demo: "${eng.CONF}/${eng.DECIDED} settled" · confirmed ${eng.CONF}/80 · attainable ${eng.ATTAIN}`);
+  if (eng.SETTLED !== SETTLED_TOTAL) {
+    fails++; console.log(`  DIFF ${name}: settled eng=${eng.SETTLED} exp=${SETTLED_TOTAL} (games played x round value)`); return;
+  }
+  if (name === "demo") console.log(`  ok   demo: "${eng.CONF}/${eng.DECIDED} settled" · confirmed ${eng.CONF}/80 · attainable ${eng.ATTAIN} · played-value ${eng.SETTLED}`);
 }
 
 check("demo", demoSel());
 for (let i = 0; i < 3000; i++) check("rand#" + i, randSel());
-console.log(fails ? `\nFAILED: ${fails}/${n}` : `\nSCORING OK: engine matches an independent scorer on all ${n} brackets; CONF+OUT+LIVE==80 always.`);
+console.log(fails ? `\nFAILED: ${fails}/${n}` : `\nSCORING OK: engine matches an independent scorer on all ${n} brackets; CONF+OUT+LIVE==80 always; Settled==games-played x value.`);
 process.exit(fails ? 1 : 0);
