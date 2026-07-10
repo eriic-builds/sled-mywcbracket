@@ -4,6 +4,8 @@ import fs from "node:fs";
 const read = (path) => fs.readFileSync(new URL(path, import.meta.url), "utf8");
 const css = read("../docs/css/dashboard.css");
 const fontsCss = read("../docs/css/fonts.css");
+const index = read("../docs/index.html");
+const normalizedIndex = index.replace(/\s+/g, " ");
 
 const easyTheme = css.match(/html\[data-theme="easy"\]\{([^}]*)\}/)?.[1] || "";
 assert.match(easyTheme, /color-scheme:dark/);
@@ -11,6 +13,16 @@ assert.match(easyTheme, /--bg:#1C1A17/);
 assert.match(easyTheme, /--fstack:"OpenDyslexic"/);
 assert.match(css, /\.kpi-l\{[^}]*padding-right:26px[^}]*\}/);
 assert.match(css, /html\[data-theme="easy"\] \.scrow\.schead\{[^}]*text-transform:none/);
+assert.match(css, /\.side\{[^}]*position:sticky/);
+assert.match(css, /\.side\{[^}]*max-height:calc\(100vh - 40px\)[^}]*overflow-y:auto/);
+assert.match(css, /\.railfilter\{[^}]*padding:14px 12px/);
+assert.match(css, /\.project-disclaimer\{[^}]*background:#141317[^}]*color:#F4F7EE/);
+assert.match(index, /Independent fan project\.<\/b> Not affiliated with, endorsed by, or sponsored by/);
+assert.match(index, /id="project-disclaimer" class="project-disclaimer"/);
+assert.equal(
+  (normalizedIndex.match(/Not affiliated with, endorsed by, or sponsored by FIFA, Microsoft, GitHub/g) || []).length,
+  2,
+);
 
 for (const weight of ["400", "700"]) {
   assert.match(fontsCss, new RegExp(`font-family:['"]OpenDyslexic['"];[^}]*font-weight:${weight}`));

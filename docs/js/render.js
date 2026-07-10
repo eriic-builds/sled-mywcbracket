@@ -981,7 +981,7 @@ export function renderDashboard(picks, live, topology) {
     '<button data-mode="doodle" role="menuitem"><span class="fm-em">\u270F\uFE0F</span> Doodle</button>' +
     '<button data-mode="sticker" role="menuitem"><span class="fm-em">\u{1F3F7}\uFE0F</span> Sticker Book</button>' +
     '</div></div></div></div>' +
-    '<div class="shell"><nav class="rail glass" id="rail">' +
+    '<div class="shell"><div class="side"><nav class="rail glass" id="rail">' +
     '<button class="navtoggle" id="navToggle" aria-expanded="false" aria-controls="railLinks">\u{1F4D1} Contents \u2630</button>' +
     '<div class="links" id="railLinks"><div class="rt">On this page</div>' +
     '<a href="#intro"><span class="ic">\u{1F50E}</span> Overview</a>' +
@@ -993,7 +993,15 @@ export function renderDashboard(picks, live, topology) {
     '<a href="#sec-finalfour"><span class="ic">\u{1F3C5}</span> Final four</a>' +
     '<a href="#sec-story"><span class="ic">\u2728</span> How it played out</a>' +
     '<a href="#sec-scoring"><span class="ic">\u{1F3AF}</span> Scoring &amp; schedule</a>' +
-    '</div></nav><div class="content">' +
+    '</div></nav>' +
+    '<div class="railfilter glass" id="railFilter">' +
+    '<button class="rf-toggle" id="rfToggle" type="button" aria-expanded="false" aria-controls="rfBody">' +
+    '<span class="rt">Filter by team</span><span class="rf-car">\u25BE</span></button>' +
+    '<div class="rf-body" id="rfBody">' +
+    '<div class="chips">' + r32_win.map(t => chip(D, t)).join("") + '</div>' +
+    '<div class="rf-foot"><label class="toggle"><input type="checkbox" id="favonly"><span class="tsw"></span>Favorites only</label>' +
+    '<span class="count" id="count"></span></div></div></div>' +
+    '</div><div class="content">' +
     `<section class="hero glass" id="intro"><div class="eyebrow">${esc(D.ENTRANT)} \u00b7 live results vs your picks</div>` +
     `<h1>Backing <span class="g">${esc(D.CHAMP)}</span> ${D.CHAMP_ALIVE ? "\u2014 and still in it" : "\u2014 but knocked out"}</h1>` +
     `<p class="sub">The <b>${esc(D.CUR_LABEL)}</b> is <b>${D.CUR_DONE} of ${D.CUR_TOTAL} final</b> \u2014 you're <b>${D.CUR_CORR} of ${D.CUR_DEC} right</b> this round, ` +
@@ -1007,8 +1015,6 @@ export function renderDashboard(picks, live, topology) {
     '<div class="composer"><span class="corb"></span><span class="plus">+</span>' +
     '<input id="search" type="text" placeholder="Track a team through the bracket \u2014 try England, Morocco, Paraguay\u2026" autocomplete="off">' +
     '<span class="mic">\u{1F3A4}</span><button class="clr" id="clear">Clear</button></div></section>' +
-    '<div class="filterbar glass"><div class="chips">' + r32_win.map(t => chip(D, t)).join("") +
-    '</div><label class="toggle"><input type="checkbox" id="favonly"><span class="tsw"></span>Favorites only</label><span class="count" id="count"></span></div>' +
     shead("sec-standing", "\u{1F4CA}", "Your live standing", "6 signals") +
     `<div class="kpigrid">${buildKpis(D)}</div>` + '</div>' +
     shead("sec-scorecard", "\u{1F9EE}", "Scorecard \u2014 your path, scored live", `${D.CONF} confirmed \u00b7 ${D.LIVE} live`) +

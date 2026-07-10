@@ -257,6 +257,18 @@ hostile.entrant = "<script>alert('entrant')</script>";
 const hostileHtml = renderDashboard(hostile, frozen, topology);
 check("hostile pick text is escaped", !hostileHtml.includes("<script") && hostileHtml.includes("&lt;script&gt;"));
 const dashboard = renderDashboard(picks, frozen, topology);
+const railFilterAt = dashboard.indexOf('<div class="railfilter glass" id="railFilter">');
+const contentAt = dashboard.indexOf('<div class="content">');
+const railFilter = dashboard.slice(railFilterAt, contentAt);
+check(
+  "dashboard restores a standalone team filter below page navigation",
+  railFilterAt > dashboard.indexOf('</nav>')
+    && contentAt > railFilterAt
+    && railFilter.includes('id="rfToggle"')
+    && railFilter.includes('id="count"')
+    && (railFilter.match(/<button class="chip/g) || []).length === 16
+    && !dashboard.includes('class="filterbar'),
+);
 check(
   "dashboard exposes mirrored and sideways layout controls",
   dashboard.includes('data-layout="mirror"') &&

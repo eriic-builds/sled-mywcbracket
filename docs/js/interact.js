@@ -24,7 +24,7 @@ return (function(){
  function saveFav(){try{LS.setItem(KFAV,JSON.stringify(favs))}catch(e){}}
  function isFav(t){return !!favs[t]}
  var search=document.getElementById('search'),favOnly=document.getElementById('favonly'),countEl=document.getElementById('count');
- var chips=[].slice.call(document.querySelectorAll('.chip'));
+ var chips=[].slice.call(document.querySelectorAll('.chip[data-team]'));
  var teamCells=[].slice.call(document.querySelectorAll('.team[data-team]'));
  var ffCells=[].slice.call(document.querySelectorAll('.ff[data-team]'));
  var scRows=[].slice.call(document.querySelectorAll('.scrow[data-team]'));
