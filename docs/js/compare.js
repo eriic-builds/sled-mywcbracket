@@ -1,6 +1,6 @@
 // compare.js — the local pool leaderboard. Rivals live ONLY in this browser
 // (localStorage). No network anywhere in this file, by design (dev-docs/SPEC.md invariant 7):
-// a bracket reaches this device only inside a share link its owner sent.
+// entries arrive through owner-created share links or an explicit private pool backup.
 import { computeState } from "./render.js";
 import { hashPicks, loadPicks } from "./storage.js";
 
@@ -13,8 +13,39 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 export function loadRivals() {
   try { return JSON.parse(localStorage.getItem(KEY_RIVALS) || "[]") || []; } catch (e) { return []; }
 }
-function saveRivals(list) {
-  try { localStorage.setItem(KEY_RIVALS, JSON.stringify(list)); } catch (e) {}
+export function saveRivals(list) {
+  try { localStorage.setItem(KEY_RIVALS, JSON.stringify(list)); return true; }
+  catch (e) {
+    try { window.dispatchEvent(new CustomEvent("wcb:storage-blocked")); } catch (_) {}
+    return false;
+  }
+}
+
+export function mergeRivals(existing, incoming, ownerPicks) {
+  const rivals = [];
+  const seen = new Set();
+  const ownerHash = ownerPicks ? hashPicks(ownerPicks) : null;
+  let added = 0, duplicates = 0, own = 0, overCap = 0;
+
+  for (const rival of Array.isArray(existing) ? existing : []) {
+    const h = hashPicks(rival.picks);
+    if (h === ownerHash) { own++; continue; }
+    if (seen.has(h)) { duplicates++; continue; }
+    seen.add(h);
+    rivals.push(rival);
+  }
+
+  for (const rival of Array.isArray(incoming) ? incoming : []) {
+    const h = hashPicks(rival.picks);
+    if (h === ownerHash) { own++; continue; }
+    if (seen.has(h)) { duplicates++; continue; }
+    if (rivals.length >= RIVALS_CAP) { overCap++; continue; }
+    seen.add(h);
+    rivals.push(rival);
+    added++;
+  }
+
+  return { rivals, added, duplicates, own, overCap };
 }
 // entry: { picks, alias? (local display override), added: iso }
 export function addRival(picks) {

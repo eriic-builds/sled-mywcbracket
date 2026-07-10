@@ -40,12 +40,15 @@ There is no step 5. No server, no pool code, no registry.
 | 6 | Diff lists undecided picks only, sorted by points at stake desc | `tests/compare.mjs` |
 | 7 | No `fetch(`/network write in `share.js`/`compare.js`; rivals never appear in a URL | grep check in CI-less review |
 | 8 | "Share as" alias changes only the display name in the link, never the picks | `tests/share.mjs` |
+| 9 | Pool backup stays local; import replaces "my bracket" and merges missing rivals without duplicates | `tests/backup.mjs` |
 
 ## Decisions (deliberate, not omissions)
 
-- **No "export whole pool" / re-share-others feature.** Re-broadcasting someone else's
-  bracket without their consent is exactly the leak this design avoids. If a group
-  wants a full-pool view, each member adds each link themselves.
+- **Private pool backup, not pool sharing.** "Back up my pool" may download the
+  owner's bracket plus the rivals already saved on that device so the same user can
+  recover or move their pool. The file is never uploaded or placed in a URL, and the
+  UI warns that it contains other people's shared picks and should be kept private.
+  There is still no "share whole pool" action.
 - **No backend, even a tiny one.** Free tier today is a bill or a deprecation tomorrow;
   links + localStorage have no such cliff. Revisit only if real usage shows the manual
   link exchange failing socially.
@@ -63,4 +66,4 @@ There is no step 5. No server, no pool code, no registry.
 
 ## Out of scope for the pilot
 
-Cross-device sync of rivals; editing a rival's bracket; notifications; any analytics.
+Automatic cross-device sync of rivals; editing a rival's bracket; notifications; any analytics.

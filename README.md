@@ -29,9 +29,9 @@ as JavaScript, so *anyone* can drop in their bracket and see their own board.
 2. It parses your **"My Bracket"** tab entirely in your browser (SheetJS), validates it, and
    renders your dashboard scored against live results.
 3. Your bracket is saved in `localStorage`, so it reopens instantly next time. The top bar has
-   **🏠 Home** (back to the start page — never deletes anything), **Save a copy**, and **Clear**
-   (the one destructive button). The landing shows **Open my dashboard** whenever a bracket is
-   saved on the device.
+   **🏠 Home** (back to the start page — never deletes anything), **Back up my pool** (downloads
+   your bracket and leaderboard as private JSON), and **Clear** (the one destructive button).
+   The landing shows **Open my dashboard** whenever a bracket is saved on the device.
 4. The **bracket map** has two views: *My picks* (your path) and *Actual path* — the latter reads
    every slot from real results, so the true tournament flows through all rounds even where your
    picks busted; not-yet-played slots show a "Winner M97"-style placeholder.
@@ -55,9 +55,10 @@ as JavaScript, so *anyone* can drop in their bracket and see their own board.
 | Your bracket | Your browser's storage — on your device, not ours |
 | Brackets you've added | Your browser's storage — same deal |
 | A share link | Entirely inside the URL you send — nothing is written anywhere when you generate it |
+| A pool backup | A private JSON file downloaded only when you choose **Back up my pool** |
 | Live match results | A JSON file on GitHub, updated 3× a day by a bot |
 
-When you hit "Share link", your 31 picks + display name get packed into the URL itself (the part after `#`). The recipient's browser unpacks it directly — no round-trip to any server, no account, no database row created. If they click "Add to my leaderboard", it saves to *their* browser. That's the whole chain.
+When you hit "Share link", your 31 picks + display name get packed into the URL itself (the part after `#`). The recipient's browser unpacks it directly — no round-trip to any server, no account, no database row created. If they click "Add to my leaderboard", it saves to *their* browser. **Back up my pool** downloads your bracket and that local leaderboard; importing it uses the backup's bracket and adds only leaderboard entries that are missing. Because the file contains picks people shared with you, keep it private.
 
 **Can I revoke a link I already sent?** No — a link *is* the data, like an email attachment,
 so nothing exists to revoke against (and even server-based revocation can't reach saved copies
@@ -65,7 +66,7 @@ or screenshots). Prevention beats revocation: use the **"share as"** field to sh
 initials or an alias, and the link never contained your name in the first place. Recipients can
 always remove your bracket from their board with one ✕.
 
-See `dev-docs/SPEC.md` for the wire format, behavioral invariants, and deliberate design decisions (e.g. no "re-share someone else's bracket" feature).
+See `dev-docs/SPEC.md` for the wire format, behavioral invariants, and the distinction between a private local pool backup and a whole-pool sharing feature.
 
 ## How it works
 
@@ -78,6 +79,7 @@ docs/data/results.json   (live, synced)  ─────────────
 
 share link   ⇄  share.js    (packs/unpacks your picks in the URL — no network)
 leaderboard  ⇄  compare.js  (ranks + diffs brackets you've added — localStorage only)
+pool backup  ⇄  storage.js  (versioned private JSON; import merges missing rivals)
 ```
 
 - **`docs/js/render.js`** — the render engine. `computeState(picks, live, topology)` builds the

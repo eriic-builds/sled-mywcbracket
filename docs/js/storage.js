@@ -1,4 +1,4 @@
-// storage.js — save/load/export/import the parsed bracket, entirely on this device.
+// storage.js — save/load the parsed bracket and create/validate local pool backups.
 // Nothing is ever uploaded. Namespaces the "what-if" score overrides per bracket so
 // two different uploads on the same device don't leak edits into each other.
 const KEY = "wcb.fan.picks.v1";
@@ -8,14 +8,15 @@ const KEY_SCORES = "wcb.scores.v3";   // the interaction layer's manual override
 function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 let _storageWarned = false;
 function safeSet(k, v) {
-  try { localStorage.setItem(k, v); }
+  try { localStorage.setItem(k, v); return true; }
   catch (e) {   // Safari private mode / quota: tell the app once so it can notify the user
     if (!_storageWarned) { _storageWarned = true; try { window.dispatchEvent(new CustomEvent("wcb:storage-blocked")); } catch (_) {} }
+    return false;
   }
 }
 function safeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
-export function savePicks(picks) { safeSet(KEY, JSON.stringify(picks)); }
+export function savePicks(picks) { return safeSet(KEY, JSON.stringify(picks)); }
 export function loadPicks() {
   const s = safeGet(KEY);
   if (!s) return null;
@@ -59,12 +60,72 @@ export function resetWhatIfsIfChanged(picks) {
   if (safeGet(KEY_HASH) !== h) { safeDel(KEY_SCORES); safeSet(KEY_HASH, h); }
 }
 
-export function exportPicks(picks) {
-  const blob = new Blob([JSON.stringify(picks, null, 1)], { type: "application/json" });
+export const POOL_BACKUP_FORMAT = "sled-mywcbracket-pool-backup";
+export const POOL_BACKUP_VERSION = 1;
+
+export function createPoolBackup(picks, rivals) {
+  return {
+    format: POOL_BACKUP_FORMAT,
+    version: POOL_BACKUP_VERSION,
+    bracket: picks,
+    leaderboard: Array.isArray(rivals) ? rivals : [],
+  };
+}
+
+export function isPoolBackup(value) {
+  return !!value && typeof value === "object" && value.format === POOL_BACKUP_FORMAT;
+}
+
+export class PoolBackupError extends Error {
+  constructor(problems) {
+    const list = Array.isArray(problems) ? problems : [String(problems)];
+    super(list.join(" "));
+    this.name = "PoolBackupError";
+    this.problems = list;
+  }
+}
+
+export function validatePoolBackup(value, validatePicks) {
+  if (!isPoolBackup(value))
+    throw new PoolBackupError("This JSON is not a pool backup from this site.");
+  if (value.version !== POOL_BACKUP_VERSION)
+    throw new PoolBackupError(`This pool backup uses version ${String(value.version ?? "unknown")}; this site supports version ${POOL_BACKUP_VERSION}.`);
+  if (!value.bracket || typeof value.bracket !== "object")
+    throw new PoolBackupError("The pool backup is missing your bracket.");
+  if (!Array.isArray(value.leaderboard))
+    throw new PoolBackupError("The pool backup has an invalid leaderboard.");
+
+  const validate = (picks, label) => {
+    try { return validatePicks(picks); }
+    catch (e) {
+      const problems = Array.isArray(e && e.problems) ? e.problems : [e && e.message ? e.message : String(e)];
+      throw new PoolBackupError(problems.map(p => `${label}: ${p}`));
+    }
+  };
+  const bracket = validate(value.bracket, "Your bracket");
+  const leaderboard = value.leaderboard.map((entry, i) => {
+    const label = `Leaderboard entry ${i + 1}`;
+    if (!entry || typeof entry !== "object" || !entry.picks || typeof entry.picks !== "object")
+      throw new PoolBackupError(`${label} is missing its bracket.`);
+    if (entry.alias != null && typeof entry.alias !== "string")
+      throw new PoolBackupError(`${label} has an invalid local alias.`);
+    if (entry.added != null && typeof entry.added !== "string")
+      throw new PoolBackupError(`${label} has an invalid saved date.`);
+    const rival = { picks: validate(entry.picks, label) };
+    const alias = String(entry.alias || "").trim().slice(0, 40);
+    if (alias) rival.alias = alias;
+    if (entry.added) rival.added = entry.added;
+    return rival;
+  });
+  return { bracket, leaderboard };
+}
+
+export function exportPoolBackup(picks, rivals) {
+  const blob = new Blob([JSON.stringify(createPoolBackup(picks, rivals), null, 1)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = String(picks.entrant || "bracket").replace(/[^\w.-]+/g, "_") + "-bracket.json";
+  a.download = String(picks.entrant || "bracket").replace(/[^\w.-]+/g, "_") + "-pool-backup.json";
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
