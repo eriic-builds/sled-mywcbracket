@@ -8,10 +8,10 @@ html[data-theme="dark"]{color-scheme:dark;--bg:#141317;--panel:#1c1b21;--text:#F
 html[data-theme="light"]{color-scheme:light;--bg:#EEF1F4;--panel:#FFF;--text:#323139;--text2:#323139;--muted:#6C6C6C;--border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
  --glass:linear-gradient(160deg,rgba(255,255,255,.85),rgba(255,255,255,.55));--shadow:0 10px 26px rgba(20,30,50,.10);--hover:rgba(0,0,0,.035);
  --gold:#E0A500;--gold-ink:#B57F00;--win:#00926f;--win-ink:#00805f;--out:#9aa0a8;--lose-ink:#C4353A;--g1:rgba(0,151,244,.14);--g2:rgba(0,178,145,.10);--g3:rgba(0,178,145,.10);}
-html[data-theme="easy"]{color-scheme:light;--bg:#F6F1E6;--panel:#FCFAF3;--text:#2b2a30;--text2:#33323a;--muted:#55545c;--border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
- --glass:linear-gradient(160deg,rgba(255,255,255,.92),rgba(255,255,255,.66));--shadow:0 8px 22px rgba(40,40,30,.10);--hover:rgba(0,0,0,.03);
- --gold:#C98A00;--gold-ink:#8f6300;--win:#0a7d54;--win-ink:#0a6b49;--out:#8a8790;--lose-ink:#A63A2E;--g1:rgba(0,151,244,.10);--g2:rgba(0,178,145,.08);--g3:rgba(0,178,145,.08);
- --fs:18px;--lh:1.8;--ls:.03em;--radius:22px;--radius-sm:15px;--gap:22px;--fstack:"Verdana","Tahoma","Trebuchet MS","Segoe UI",system-ui,sans-serif;}
+html[data-theme="easy"]{color-scheme:dark;--bg:#1C1A17;--panel:#26231F;--text:#FFF;--text2:#FFF;--muted:#D6D0C4;--border:rgba(255,255,255,.13);--border2:rgba(255,255,255,.22);
+ --glass:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.025));--shadow:0 8px 22px rgba(0,0,0,.38);--hover:rgba(255,255,255,.07);
+ --gold:#FFD54F;--gold-ink:#FFD54F;--win:#57D6B9;--win-ink:#72E6CB;--out:#9E9A93;--lose-ink:#FF8A80;--g1:rgba(0,151,244,.16);--g2:rgba(87,214,185,.12);--g3:rgba(87,214,185,.12);
+ --fs:18px;--lh:1.8;--ls:.03em;--radius:22px;--radius-sm:15px;--gap:22px;--fstack:"OpenDyslexic","Trebuchet MS","Segoe UI",system-ui,sans-serif;}
 /* Fun · GeoCities — 90s web nostalgia: neon on midnight, rainbow headers, Comic Sans, ridge borders, tiled starfield */
 html[data-theme="geocities"]{--bg:#000018;--panel:#1a0038;--text:#FFFF66;--text2:#7CFC00;--muted:#41E0E0;--border:#FF00FF;--border2:#00FFFF;
  --glass:linear-gradient(160deg,#2b005f,#12002f);--shadow:0 0 0 2px #00FFFF,0 6px 0 #FF00FF;--hover:rgba(255,0,255,.28);
@@ -145,7 +145,7 @@ body::before{content:"";position:fixed;inset:-20% -10% auto -10%;height:70vh;z-i
 .kpi{padding:17px 17px 15px;position:relative;overflow:hidden;transition:.16s}
 .kpi:hover{transform:translateY(-2px)}
 .kpi-ic{font-size:1.05rem;position:absolute;top:14px;right:15px}
-.kpi-l{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.kpi-l{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-right:26px}
 .kpi-v{font-size:1.7rem;font-weight:750;margin:6px 0 2px;line-height:1.05;letter-spacing:-.01em}
 .kpi-v .kunit{font-size:.72rem;font-weight:600;color:var(--muted);margin-left:5px}
 .kpi-n{font-size:.76rem;color:var(--muted)}
@@ -187,7 +187,7 @@ body::before{content:"";position:fixed;inset:-20% -10% auto -10%;height:70vh;z-i
 .bracket.layout-sideways .team{width:calc(100% - 20px);min-height:27px;margin:2px auto;padding:5px 7px;gap:5px;border-radius:7px;font-size:.72rem}
 .bracket.layout-sideways .mflag{width:14px;height:10px}
 .bracket.layout-sideways .champcol .team.champ{width:calc(100% - 20px)}
-.bracket.layout-sideways .team .seed{display:none}
+
 @media(max-width:860px){
  .layout-toggle,.map-expand-toggle{display:none}
 }
@@ -380,7 +380,6 @@ body::before{content:"";position:fixed;inset:-20% -10% auto -10%;height:70vh;z-i
 .mscore.up{color:var(--muted);opacity:.8;font-weight:600;font-style:italic}
 .team{position:relative;display:flex;align-items:center;gap:7px;padding:8px 10px;margin:3px 0;border-radius:10px;border:1px solid var(--border);background:var(--panel);font-size:.82rem;font-weight:600;transition:.16s}
 .round:not(:first-child) .team::before{content:"";position:absolute;left:-7px;top:50%;width:7px;height:1px;background:var(--border2)}
-.team .seed{font-size:.6rem;font-weight:700;color:var(--muted);background:var(--hover);border-radius:5px;padding:2px 5px;flex:0 0 auto}
 .team .tname{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .team .tt{font-size:.9rem}
 .team .rb{font-size:.72rem;font-weight:800;flex:0 0 auto}
@@ -487,6 +486,13 @@ html[data-theme="easy"] body::before{display:none}
 html[data-theme="easy"] body{word-spacing:.1em}
 html[data-theme="easy"] .eyebrow,html[data-theme="easy"] .kpi-l,html[data-theme="easy"] .sb-cap,html[data-theme="easy"] .shead .cap,html[data-theme="easy"] .rr-h,html[data-theme="easy"] .story-tag,html[data-theme="easy"] .bb-cap,html[data-theme="easy"] .bb-tag,html[data-theme="easy"] .rhead,html[data-theme="easy"] .sb-stat span{text-transform:none;letter-spacing:.012em}
 html[data-theme="easy"] .story-title,html[data-theme="easy"] .kpi-v,html[data-theme="easy"] .hero h1,html[data-theme="easy"] .sb-big,html[data-theme="easy"] .bb-big{letter-spacing:0}
+html[data-theme="easy"] .hero h1{font-size:1.9rem}
+html[data-theme="easy"] .story-title{font-size:1rem}
+html[data-theme="easy"] .kpi-v{font-size:1.8rem}
+html[data-theme="easy"] .sb-big{font-size:1.9rem}
+html[data-theme="easy"] .bb-big{font-size:1.8rem}
+html[data-theme="easy"] .ff-name{font-size:.9rem}
+html[data-theme="easy"] .scrow.schead{font-size:.68rem;text-transform:none;letter-spacing:.012em}
 html[data-theme="easy"] .mscore.up,html[data-theme="easy"] .rr-s i,html[data-theme="easy"] em,html[data-theme="easy"] i{font-style:normal}
 html[data-theme="easy"] .pill.live .dot{animation:none}
 html[data-theme="easy"] .g3{grid-template-columns:repeat(2,1fr)}
@@ -551,7 +557,7 @@ html[data-theme="doodle"] .orb,html[data-theme="doodle"] .pill.live .dot,html[da
 .mcard .team{display:grid;grid-template-columns:16px minmax(0,1fr) minmax(1.2ch,max-content) 1rem .75rem;align-items:center;column-gap:2px;min-width:0;min-height:23px;margin:1px 0;padding:2px 4px;border-radius:5px;font-size:.64rem;transition:transform .16s,border-color .16s,box-shadow .16s,opacity .16s,filter .16s,background-color .16s}
 .mflag{width:16px;height:12px;border-radius:2px;object-fit:cover;flex:0 0 auto;box-shadow:0 0 0 1px var(--border)}
 .mcard .mflag{grid-column:1;grid-row:1;justify-self:start}
-.mcard .seed{display:none;padding:1px 3px;font-size:.48rem}
+
 .mcard .tname{display:none;grid-column:2;grid-row:1}
 .mcard .tcode{display:inline;grid-column:2;grid-row:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
 .mcard .tscore{grid-column:3;grid-row:1;justify-self:end;margin-left:0;text-align:right}
@@ -570,7 +576,7 @@ html[data-theme="doodle"] .orb,html[data-theme="doodle"] .pill.live .dot,html[da
 .trophy-slot{min-height:112px;display:grid;place-items:center}
 .champ-state{display:flex;flex-direction:column;gap:5px;min-width:0}
 .champ-state .team{margin:0}
-.champ-state .seed,.champ-state .tcode{display:none}
+.champ-state .tcode{display:none}
 .champ-state .champ-note{position:relative;z-index:2;align-self:center;width:fit-content;max-width:22ch;padding:1px 5px;border-radius:4px;background:var(--panel);box-shadow:0 0 0 3px var(--panel)}
 .layout-mirror .center-stage>.bkhead{position:relative;z-index:2;align-self:center;width:fit-content;padding:2px 6px;border-radius:4px;background:var(--panel);box-shadow:0 0 0 3px var(--panel)}
 .mini-map{display:none;width:100%;height:auto;pointer-events:none}
@@ -584,7 +590,7 @@ html[data-theme="doodle"] .orb,html[data-theme="doodle"] .pill.live .dot,html[da
  .bkgrid{grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.15fr) repeat(4,minmax(0,1fr));gap:7px;min-height:820px}
  .mcard{width:calc(100% - 8px);min-height:70px;padding:2px}
  .mcard .team{min-height:23px;padding:2px 3px;gap:3px;font-size:.63rem}
- .mcard .seed{display:none}
+
  .mcard.st-pending[data-round="r32"] .mwhen{display:none}
 }
 
@@ -630,7 +636,7 @@ html[data-theme="doodle"] .orb,html[data-theme="doodle"] .pill.live .dot,html[da
  .mcard .team{grid-template-columns:22px minmax(0,1fr) minmax(1.5ch,max-content) 1rem 1rem;min-height:38px;padding:8px;column-gap:7px;font-size:.82rem}
  .mcard .tname{display:block}
  .mcard .tcode{display:none}
- .mcard .seed{display:none}
+
  .mcard .mflag{width:22px;height:16px}
  .mhead .mwhen{display:inline}
  .mhead .mnote{display:block}

@@ -338,10 +338,9 @@ function r32_cell(D, team, picked, decided, real_winner, freebie, score) {
     else if (!picked && real_winner) { cls.push("realadv"); badge = '<span class="rb up">\u25B2</span>'; }
     else cls.push("out");
   } else cls.push(picked ? "adv" : "out");
-  const sd = seedOf(D, team), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
   const ftag = freebie ? '<span class="tt" title="Freebie \u2014 Canada 1\u20130 South Africa, auto-credited">\u{1F381}</span>' : "";
   return `<div class="${cls.join(" ")}" data-team="${esc(team)}" data-round="r32" tabindex="0">` +
-    `<span class="fav-bar"></span>${flagImg(team, "mflag")}${sh}<span class="tname">${esc(team)}</span>` +
+    `<span class="fav-bar"></span>${flagImg(team, "mflag")}<span class="tname">${esc(team)}</span>` +
     `<span class="tcode" aria-hidden="true">${esc(teamCode3(team))}</span>` +
     `${score == null ? "" : `<span class="tscore">${esc(score)}</span>`}${ftag}${badge}</div>`;
 }
@@ -370,10 +369,9 @@ function pickBox(D, team, picked, short, champ, st, feeder = null, score = null)
     : (st === "lost" ? '<span class="rb no">\u2715</span>' : "");
   const tag = champ ? '<span class="tt">\u{1F3C6}</span>' : "";
   const chev = picked && !champ ? '<span class="adv-arrow" title="you have this team advancing">\u203A</span>' : "";
-  const sd = seedOf(D, team), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
   const feederAttr = feeder ? ` data-feeder="${esc(feeder)}"` : "";
   return `<div class="${cls.join(" ")}" data-team="${esc(team)}"${feederAttr} data-round="${short}" tabindex="0">` +
-    `<span class="fav-bar"></span>${flagImg(team, "mflag")}${sh}<span class="tname">${esc(team)}</span>` +
+    `<span class="fav-bar"></span>${flagImg(team, "mflag")}<span class="tname">${esc(team)}</span>` +
     `<span class="tcode" aria-hidden="true">${esc(teamCode3(team))}</span>` +
     `${score == null ? "" : `<span class="tscore">${esc(score)}</span>`}${tag}${badge}${chev}</div>`;
 }
@@ -385,9 +383,8 @@ function actualReplacementRow(D, team, pickedTeam, node, feeder, score) {
   const tip = gone
     ? `${team} advanced in your ${pickedTeam} pick's place, but is now out`
     : `actually advanced to the ${round} \u2014 you picked ${pickedTeam}`;
-  const sd = seedOf(D, team), sh = sd ? `<span class="seed">${esc(sd)}</span>` : "";
   return `<div class="${cls}" data-team="${esc(team)}" data-feeder="${esc(feeder)}" data-round="${node.round}" tabindex="0">` +
-    `<span class="fav-bar"></span>${flagImg(team, "mflag")}${sh}<span class="tname">${esc(team)}</span>` +
+    `<span class="fav-bar"></span>${flagImg(team, "mflag")}<span class="tname">${esc(team)}</span>` +
     `<span class="tcode" aria-hidden="true">${esc(teamCode3(team))}</span>` +
     `${score == null ? "" : `<span class="tscore">${esc(score)}</span>`}` +
     `<span class="rb up" title="${esc(tip)}">\u25B2</span></div>`;

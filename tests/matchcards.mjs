@@ -74,6 +74,7 @@ for (const [name, html] of [["actual", actual], ["picked", picked]]) {
   const tags = cardTags(html);
   const codes = tags.map((tag) => attribute(tag, "data-match-code"));
   check(`${name} has 31 match cards`, tags.length === 31, `got ${tags.length}`);
+  check(`${name} map has no seed labels`, !html.includes('class="seed"'));
   check(`${name} has every expected code once`, same(codes, tree.nodes.map((node) => node.code)), `got ${JSON.stringify(codes)}`);
   check(
     `${name} cards carry round and side`,
