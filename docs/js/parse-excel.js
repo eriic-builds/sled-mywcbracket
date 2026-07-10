@@ -89,17 +89,64 @@ export function parseWorkbook(arrayBuffer) {
 // Validate the uploaded fixtures against the tournament topology (same competition?).
 export function validateAgainstTopology(picks, topology) {
   const problems = [];
+  if (!picks || typeof picks !== "object")
+    throw new ValidationError(["The bracket JSON must be an object."]);
+  const rounds = [
+    ["r32", 16, "Round-of-32 matches"],
+    ["r16_win", 8, "Round-of-16 winners"],
+    ["qf_win", 4, "Quarterfinal winners"],
+    ["sf_win", 2, "Finalists"],
+  ];
+  for (const [key, count, label] of rounds) {
+    if (!Array.isArray(picks[key])) problems.push(`${label} are missing.`);
+    else if (picks[key].length !== count) problems.push(`${label}: expected ${count}, found ${picks[key].length}.`);
+  }
+  if (Array.isArray(picks.r32)) {
+    picks.r32.forEach((match, i) => {
+      if (!Array.isArray(match) || match.length < 5)
+        problems.push(`Round-of-32 match ${i + 1} is incomplete.`);
+    });
+  }
+  if (problems.length) throw new ValidationError(problems);
+
   const topByCode = {};
   for (const [code, date, a, b] of topology.r32) topByCode[code] = [a, b];
   const teamSet = new Set();
   for (const c in topByCode) { teamSet.add(topByCode[c][0]); teamSet.add(topByCode[c][1]); }
-  for (const [code, date, a, b] of picks.r32) {
+  for (let i = 0; i < picks.r32.length; i++) {
+    const [code, date, a, b, pick] = picks.r32[i];
+    const expectedCode = topology.r32[i] && topology.r32[i][0];
+    if (code !== expectedCode) problems.push(`Round-of-32 slot ${i + 1}: expected ${expectedCode}, found ${code || "no match code"}.`);
     const t = topByCode[code];
     if (!t) { problems.push(`Match ${code} isn't in the 2026 bracket — is this a different competition's sheet?`); continue; }
     const got = new Set([a, b]);
     if (!(got.has(t[0]) && got.has(t[1])))
       problems.push(`Match ${code}: teams ${a}/${b} don't match the official ${t[0]}/${t[1]}.`);
+    if (!pick) problems.push(`Match ${code}: your winner is missing.`);
+    else if (!t.includes(pick)) problems.push(`Match ${code}: winner "${pick}" isn't one of ${t.join(" / ")}.`);
   }
+  if (picks.r16_win.filter(Boolean).length !== 8) problems.push("Expected 8 Round-of-16 winners.");
+  if (picks.qf_win.filter(Boolean).length !== 4) problems.push("Expected 4 Quarterfinal winners.");
+  if (picks.sf_win.filter(Boolean).length !== 2) problems.push("Expected 2 finalists.");
+  if (!picks.champ) problems.push("Champion is missing.");
+  const r32picks = picks.r32.map(m => m[4]);
+  for (let j = 0; j < 8; j++) {
+    const options = [r32picks[2 * j], r32picks[2 * j + 1]];
+    if (picks.r16_win[j] && !options.includes(picks.r16_win[j]))
+      problems.push(`R16 winner "${picks.r16_win[j]}" isn't one of ${options.join(" / ")}.`);
+  }
+  for (let j = 0; j < 4; j++) {
+    const options = [picks.r16_win[2 * j], picks.r16_win[2 * j + 1]];
+    if (picks.qf_win[j] && !options.includes(picks.qf_win[j]))
+      problems.push(`QF winner "${picks.qf_win[j]}" isn't one of ${options.join(" / ")}.`);
+  }
+  for (let j = 0; j < 2; j++) {
+    const options = [picks.qf_win[2 * j], picks.qf_win[2 * j + 1]];
+    if (picks.sf_win[j] && !options.includes(picks.sf_win[j]))
+      problems.push(`SF winner "${picks.sf_win[j]}" isn't one of ${options.join(" / ")}.`);
+  }
+  if (picks.champ && !picks.sf_win.includes(picks.champ))
+    problems.push(`Champion "${picks.champ}" isn't one of your finalists ${picks.sf_win.join(" / ")}.`);
   const allPicks = [...picks.r32.map(m => m[4]), ...picks.r16_win, ...picks.qf_win, ...picks.sf_win, picks.champ].filter(Boolean);
   for (const p of allPicks) if (!teamSet.has(p)) problems.push(`Pick "${p}" isn't a team in the 2026 bracket.`);
   if (problems.length) throw new ValidationError(problems);

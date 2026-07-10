@@ -273,7 +273,7 @@
   <button id="vb-compare" title="Rank the brackets saved on this device">🏆 Leaderboard</button>
   <button id="vb-share" title="Copy a link that shows this bracket to anyone you send it to">🔗 Share link</button>
   <button id="vb-addrival" hidden title="Put this bracket on your local leaderboard">➕ Add to my leaderboard</button>
-  <button id="vb-export" title="Download a backup file, reopen it later or on another device">Save a copy</button>
+  <button id="vb-export" title="Download your bracket and leaderboard as a private JSON backup">Back up my pool</button>
   <button id="vb-clear" title="Remove this bracket from this device">Clear</button>
   <button id="vb-saveshared" hidden title="Keep this shared bracket as yours on this device">Save as mine</button>
   <button id="vb-back" hidden title="Return to your own saved bracket">← Back to my bracket</button>
@@ -350,7 +350,7 @@
   <input id="file" type="file" accept=".xlsx,.xlsm" hidden>
   <input id="importfile" type="file" accept=".json,application/json" hidden>
 
-  <div class="alt-head">Build one here, or reopen a saved bracket</div>
+  <div class="alt-head">Build one here, or import a pool backup</div>
   <div class="choices alt">
     <button class="choice" id="build">
       <span class="ch-ic">🏗️</span>
@@ -359,8 +359,8 @@
     </button>
     <button class="choice" id="import">
       <span class="ch-ic">📂</span>
-      <span class="ch-t">Open a saved backup</span>
-      <span class="ch-s">Returning? Load the .json you saved before</span>
+      <span class="ch-t">Import pool backup</span>
+      <span class="ch-s">Uses its bracket and adds missing leaderboard entries without duplicates</span>
     </button>
   </div>
 

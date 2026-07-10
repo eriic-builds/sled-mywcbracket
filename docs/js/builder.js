@@ -118,7 +118,7 @@ export function openBuilder(topology, onDone, onCancel, resume = true) {
         <div class="bld-fh">${champ ? "\u{1F3C6} Your champion: <b>" + esc(champ) + "</b>" : "\u{1F3C6} Tap your winner above to crown your champion"}</div>
         <label class="bld-field"><span>Your name</span><input id="bld-name" type="text" maxlength="40" placeholder="e.g. Alex" value="${esc(entrant)}"></label>
         <label class="bld-field"><span>Tiebreaker <small>(total goals in the Final)</small></span><input id="bld-tb" type="number" min="0" max="20" placeholder="e.g. 3" value="${esc(tiebreaker)}"></label>
-        <div class="bld-note">\u{1F512} Saves right here in <b>this browser</b> \u2014 nothing is uploaded. Want a backup or another device? Tap <b>Save a copy</b> on your dashboard.</div>
+        <div class="bld-note">\u{1F512} Saves right here in <b>this browser</b> \u2014 nothing is uploaded. Want a backup or another device? Tap <b>Back up my pool</b> on your dashboard; keep that private file safe.</div>
       </div>` : "";
     const status = complete
       ? `<span class="bld-ok-tag">\u2713 ${isFinal ? "bracket complete" : esc(r.label) + " done"}</span>`

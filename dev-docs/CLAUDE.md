@@ -24,8 +24,9 @@ python3 scripts/fetch_results.py --dry-run # preview a results sync
   the change is intentional, in which case update the fixture and say so.
 - `docs/js/builder.js` — pure core (`deriveStructure`, `teamsFor`, `repair`,
   `buildPicks`) + the click-to-pick overlay. Reuse the pure core; don't duplicate it.
-- `docs/js/storage.js` — localStorage keys. `wcb.fan.picks.v1` = the user's own
-  bracket; what-if overrides are namespaced per-bracket via `hashPicks`.
+- `docs/js/storage.js` — localStorage keys and the versioned local pool-backup JSON.
+  `wcb.fan.picks.v1` = the user's own bracket; what-if overrides are namespaced
+  per-bracket via `hashPicks`.
 - `docs/data/results.json` — rewritten by the sync bot up to 3×/day. Never make a
   test or fixture depend on its live contents.
 - `scripts/fetch_results.py` — results sync (FIFA feed + fallback), runs via
@@ -39,9 +40,10 @@ python3 scripts/fetch_results.py --dry-run # preview a results sync
 
 - **SPEC.md is the source of truth** for share/compare behavior. Update it when
   behavior changes; consult it before re-deriving intent from code.
-- Privacy invariants (non-negotiable): no network writes in social code; a bracket
-  leaves the browser only inside a link its owner created; rivals stored locally
-  only (`wcb.rivals.v1`); no feature re-shares someone else's bracket.
+- Privacy invariants (non-negotiable): no network writes in social code; rivals
+  never appear in a URL; the explicit "Back up my pool" action may download the
+  owner's bracket plus locally saved rivals as a private JSON file, but no feature
+  shares a whole pool and the UI must warn that the backup should be kept private.
 - Viewing a shared/demo bracket must never mutate the visitor's saved bracket or
   what-if overrides.
 

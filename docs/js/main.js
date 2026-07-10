@@ -1,15 +1,15 @@
 // main.js — glue: load topology + live results, handle upload/demo/import/share-links,
 // render, and run the interaction layer after injection. All bracket parsing stays in
-// the browser; a bracket only ever leaves it inside a link its owner creates.
+// the browser; data leaves only through an owner-created link or explicit private backup.
 import { renderDashboard } from "./render.js";
 import { initInteractions } from "./interact.js";
-import { savePicks, loadPicks, clearPicks, exportPicks, resetWhatIfsIfChanged,
-         stashWhatIfs, restoreWhatIfs } from "./storage.js";
+import { savePicks, loadPicks, clearPicks, exportPoolBackup, isPoolBackup,
+         validatePoolBackup, PoolBackupError, resetWhatIfsIfChanged, stashWhatIfs,
+         restoreWhatIfs, hashPicks } from "./storage.js";
 import { parseWorkbook, validateAgainstTopology, ValidationError } from "./parse-excel.js";
 import { openBuilder } from "./builder.js";
 import { encodeShare, decodeShare } from "./share.js";
-import { openCompare, addRival, loadRivals } from "./compare.js";
-import { hashPicks } from "./storage.js";
+import { openCompare, addRival, loadRivals, saveRivals, mergeRivals } from "./compare.js";
 import { initMatchDetails } from "./match-details.js";
 
 const $ = (s) => document.querySelector(s);
@@ -141,6 +141,32 @@ function showDashboard(picks, isDemo = false, isShared = false) {
 
 function accept(picks) { savePicks(picks); showDashboard(picks); }   // real bracket -> persist
 
+function importPoolBackup(value) {
+  const { bracket, leaderboard } = validatePoolBackup(value, picks => validateAgainstTopology(picks, TOPO));
+  const previousRivals = loadRivals();
+  const merged = mergeRivals(previousRivals, leaderboard, bracket);
+  if (!saveRivals(merged.rivals))
+    throw new Error("Your browser could not save the imported leaderboard. No changes were made.");
+  if (!savePicks(bracket)) {
+    const rolledBack = saveRivals(previousRivals);
+    throw new Error(rolledBack
+      ? "Your browser could not save the imported bracket, so your previous leaderboard was restored."
+      : "Your browser could not save the imported bracket or restore your previous leaderboard. Reload before making more changes.");
+  }
+  showDashboard(bracket);
+  return merged;
+}
+
+function poolImportSummary(result) {
+  const parts = [];
+  if (result.added) parts.push(`${result.added} leaderboard entr${result.added === 1 ? "y was" : "ies were"} added.`);
+  if (result.duplicates) parts.push(`${result.duplicates} duplicate entr${result.duplicates === 1 ? "y was" : "ies were"} already present.`);
+  if (result.own) parts.push(`${result.own} entr${result.own === 1 ? "y matched" : "ies matched"} your bracket and ${result.own === 1 ? "was" : "were"} left off the leaderboard.`);
+  if (result.overCap) parts.push(`${result.overCap} entr${result.overCap === 1 ? "y was" : "ies were"} skipped because the leaderboard is full.`);
+  if (!parts.length) parts.push("Your leaderboard was already up to date.");
+  return "Pool backup imported. " + parts.join(" ");
+}
+
 function showError(problems) {
   const box = $("#errbox");
   box.innerHTML = '<div class="err-h">⚠️ That didn’t look like a valid bracket</div><ul>' +
@@ -148,6 +174,14 @@ function showError(problems) {
     '</ul><div class="err-f">Fix the sheet and try again, or <button id="err-demo" class="linkbtn">view the demo bracket</button>.</div>';
   box.hidden = false;
   $("#err-demo").onclick = onDemo;
+}
+
+function showBackupError(problems) {
+  const box = $("#errbox");
+  box.innerHTML = '<div class="err-h">⚠️ That pool backup couldn’t be imported</div><ul>' +
+    problems.map(p => `<li>${String(p).replace(/&/g, "&amp;").replace(/</g, "&lt;")}</li>`).join("") +
+    '</ul><div class="err-f">Choose a pool backup from this site, or an older bracket-only JSON backup.</div>';
+  box.hidden = false;
 }
 
 // Live data (topology + results) failed to load. Show a readable, retryable banner
@@ -405,13 +439,29 @@ function wire() {
     b.addEventListener("click", () => setLandingTheme(b.getAttribute("data-theme-btn"))));
   $("#importfile").onchange = async () => {
     const f = $("#importfile").files[0]; if (!f) return;
-    try { accept(validateAgainstTopology(JSON.parse(await f.text()), TOPO)); }
-    catch (e) { showError(e instanceof ValidationError ? e.problems : ["That JSON wasn’t a valid bracket: " + (e.message || e)]); }
+    let poolFile = /pool-backup\.json$/i.test(f.name);
+    try {
+      const value = JSON.parse(await f.text());
+      poolFile = poolFile || isPoolBackup(value);
+      if (isPoolBackup(value)) alert(poolImportSummary(importPoolBackup(value)));
+      else accept(validateAgainstTopology(value, TOPO));
+    } catch (e) {
+      const problems = e instanceof ValidationError || e instanceof PoolBackupError ? e.problems : [e.message || String(e)];
+      if (poolFile) showBackupError(problems);
+      else showError(e instanceof ValidationError ? e.problems : ["That JSON wasn’t a valid bracket: " + (e.message || e)]);
+    } finally {
+      $("#importfile").value = "";
+    }
   };
   $("#vb-home").onclick = goHome;
   $("#vb-clear").onclick = toLanding;
   const om = $("#openmine"); if (om) om.onclick = () => { const p = loadPicks(); if (p) showDashboard(p); };
-  $("#vb-export").onclick = () => { const p = loadPicks(); if (p) exportPicks(p); };
+  $("#vb-export").onclick = () => {
+    const p = SHOWN; if (!p) return;
+    const rivals = loadRivals();
+    exportPoolBackup(p, rivals);
+    if (rivals.length) alert("Your pool backup includes brackets people shared with you. Keep the downloaded file private.");
+  };
   $("#vb-saveshared").onclick = () => {
     if (!SHOWN || !IS_SHARED) return;
     savePicks(SHOWN); clearHash();
