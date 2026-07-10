@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "refreshed": "2026-07-10T08:53:16Z",
+  "refreshed": "2026-07-10T21:01:16Z",
   "matches": {
     "M73": {
       "source": {
@@ -1578,6 +1578,78 @@
           "team": "Morocco",
           "player": "Diop",
           "minute": "63'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M98": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289289",
+        "matchId": "400021538"
+      },
+      "state": "complete",
+      "home": "Spain",
+      "away": "Belgium",
+      "score": {
+        "home": 2,
+        "away": 1,
+        "note": ""
+      },
+      "winner": "Spain",
+      "round": "Quarterfinal",
+      "kickoff": "2026-07-10T19:00:00Z",
+      "venue": {
+        "stadium": "Los Angeles Stadium",
+        "city": "Los Angeles"
+      },
+      "attendance": 70492,
+      "referee": "Michael Oliver",
+      "goals": [
+        {
+          "team": "Spain",
+          "player": "Ruiz",
+          "minute": "30'",
+          "kind": "goal"
+        },
+        {
+          "team": "Spain",
+          "player": "Merino",
+          "minute": "88'",
+          "kind": "goal"
+        },
+        {
+          "team": "Belgium",
+          "player": "Ketelaere",
+          "minute": "41'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Spain",
+          "player": "Cubarsi",
+          "minute": "43'",
+          "card": "yellow"
+        },
+        {
+          "team": "Spain",
+          "player": "Laporte",
+          "minute": "90'+3'",
+          "card": "yellow"
+        },
+        {
+          "team": "Belgium",
+          "player": "Bruyne",
+          "minute": "85'",
+          "card": "yellow"
+        },
+        {
+          "team": "Belgium",
+          "player": "Witsel",
+          "minute": "90'+5'",
           "card": "yellow"
         }
       ]
