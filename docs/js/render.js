@@ -681,6 +681,7 @@ export function renderDashboard(picks, live, topology) {
     '<button data-mode="minecraft" role="menuitem"><span class="fm-em">\u26CF\uFE0F</span> Minecraft</button>' +
     '<button data-mode="winxp" role="menuitem"><span class="fm-em">\u{1FA9F}</span> Windows XP</button>' +
     '<button data-mode="doodle" role="menuitem"><span class="fm-em">\u270F\uFE0F</span> Doodle</button>' +
+    '<button data-mode="sticker" role="menuitem"><span class="fm-em">\u{1F3F7}\uFE0F</span> Sticker Book</button>' +
     '</div></div></div></div>' +
     '<div class="shell"><div class="side"><nav class="rail glass" id="rail">' +
     '<button class="navtoggle" id="navToggle" aria-expanded="false" aria-controls="railLinks">\u{1F4D1} Contents \u2630</button>' +
