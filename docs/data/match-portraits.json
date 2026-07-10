@@ -202,6 +202,14 @@
       "stage": "Quarter-final",
       "teams": ["France", "Morocco"],
       "score": [2, 0]
+    },
+    "M98": {
+      "slug": "spa-bel",
+      "externalId": "1998994",
+      "date": "2026-07-10",
+      "stage": "Quarter-final",
+      "teams": ["Spain", "Belgium"],
+      "score": [2, 1]
     }
   }
 }

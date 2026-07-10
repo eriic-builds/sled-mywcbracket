@@ -274,6 +274,8 @@ check(
     && railFilter.includes('id="rfToggle"')
     && railFilter.includes('id="count"')
     && (railFilter.match(/<button class="chip/g) || []).length === 16
+    && (railFilter.match(/class="chip-flag"/g) || []).length === 16
+    && !railFilter.includes('class="cseed"')
     && !dashboard.includes('class="filterbar'),
 );
 check(

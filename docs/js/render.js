@@ -949,7 +949,7 @@ export function buildLegend() {
 function chip(D, t) {
   const el = D.ELIM.has(t) ? " eliminated" : "";
   return `<button class="chip${el}" data-team="${esc(t)}"><span class="star" data-star="${esc(t)}" role="button" aria-label="favorite" tabindex="0">\u2606</span>` +
-    `<span class="cseed">${esc(seedOf(D, t))}</span><span class="ctxt">${esc(t)}</span></button>`;
+    `${flagImg(t, "chip-flag")}<span class="ctxt">${esc(t)}</span></button>`;
 }
 function shead(sid, icon, title, cap) {
   return `<div class="shead" id="${sid}">` +

@@ -6,7 +6,9 @@ from __future__ import annotations
 import json
 import sys
 from copy import deepcopy
+from http.client import IncompleteRead
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -27,6 +29,15 @@ from validate_match_details import (  # noqa: E402
     validate_portraits,
 )
 from fetch_results import match_all  # noqa: E402
+from portrait_sync import (  # noqa: E402
+    PORTRAIT_HOST,
+    PORTRAIT_TEAM_CODES,
+    fetch_portrait_catalog,
+    portrait_slug,
+    portrait_slug_candidates,
+    serialize_portraits,
+    update_portraits,
+)
 
 
 def load(path: Path):
@@ -489,6 +500,333 @@ swiss_errors = validate_portraits(
     topology,
 )
 assert any("expected reviewed team slug swi-col" in error for error in swiss_errors)
+
+
+assert {
+    team: PORTRAIT_TEAM_CODES[team]
+    for team in ("Norway", "England", "Argentina", "Switzerland", "France", "Spain")
+} == {
+    "Norway": "nor",
+    "England": "eng",
+    "Argentina": "arg",
+    "Switzerland": "swi",
+    "France": "fra",
+    "Spain": "spa",
+}
+assert portrait_slug("Spain", "Belgium") == "spa-bel"
+assert portrait_slug("Argentina", "Switzerland") == "arg-swi"
+assert portrait_slug("France", "Spain") == "fra-spa"
+assert portrait_slug_candidates("Norway", "England") == ("nor-eng", "eng-nor")
+
+m98_document = {
+    "version": 1,
+    "refreshed": committed_details["refreshed"],
+    "matches": {
+        "M98": deepcopy(committed_details["matches"]["M98"]),
+    },
+}
+empty_portraits = {
+    "version": 1,
+    "permission": "approved-for-production",
+    "host": PORTRAIT_HOST,
+    "matches": {},
+}
+m98_catalog_entry = {
+    "id": "1998994",
+    "date": "2026-07-10",
+    "round": "knockout",
+    "stage": "Quarter-final",
+    "home": {
+        "name": "Spain",
+        "abbr": "SPA",
+        "score": 2,
+    },
+    "away": {
+        "name": "Belgium",
+        "abbr": "BEL",
+        "score": 1,
+    },
+    "slug": "spa-bel",
+}
+m98_portrait_page = """
+<!doctype html>
+<html>
+<head>
+  <script>window.__MATCH_ID='1998994';</script>
+  <title>SPA 2–1 BEL — FIFA World Cup 2026 Data Portraits</title>
+</head>
+</html>
+"""
+portrait_fetch_calls = []
+
+
+def portrait_catalog_fetch(host):
+    portrait_fetch_calls.append(("catalog", host))
+    return [deepcopy(m98_catalog_entry)]
+
+
+def portrait_page_fetch(host, slug):
+    portrait_fetch_calls.append(("page", host, slug))
+    return m98_portrait_page
+
+
+synced_portraits, warnings, changed = update_portraits(
+    m98_document,
+    empty_portraits,
+    portrait_catalog_fetch,
+    portrait_page_fetch,
+)
+assert changed is True
+assert warnings == []
+assert portrait_fetch_calls == [
+    ("catalog", PORTRAIT_HOST),
+    ("page", PORTRAIT_HOST, "spa-bel"),
+]
+assert empty_portraits["matches"] == {}, "portrait sync mutated the old document"
+assert synced_portraits["permission"] == "approved-for-production"
+assert synced_portraits["matches"]["M98"] == {
+    "slug": "spa-bel",
+    "externalId": "1998994",
+    "date": "2026-07-10",
+    "stage": "Quarter-final",
+    "teams": ["Spain", "Belgium"],
+    "score": [2, 1],
+}
+serialized_portraits = serialize_portraits(synced_portraits)
+assert '"teams": ["Spain", "Belgium"]' in serialized_portraits
+assert '"score": [2, 1]' in serialized_portraits
+
+missing_page, warnings, changed = update_portraits(
+    m98_document,
+    empty_portraits,
+    lambda _host: [deepcopy(m98_catalog_entry)],
+    lambda _host, _slug: None,
+)
+assert changed is False
+assert missing_page == empty_portraits
+assert any("portrait page not published yet" in warning for warning in warnings)
+
+bad_score_entry = deepcopy(m98_catalog_entry)
+bad_score_entry["home"]["score"] = 3
+bad_score, warnings, changed = update_portraits(
+    m98_document,
+    empty_portraits,
+    lambda _host: [bad_score_entry],
+    lambda _host, _slug: (_ for _ in ()).throw(
+        AssertionError("mismatched catalog entries must not fetch a page")
+    ),
+)
+assert changed is False
+assert bad_score == empty_portraits
+assert any("catalog score disagrees" in warning for warning in warnings)
+
+bad_team_entry = deepcopy(m98_catalog_entry)
+bad_team_entry["home"]["abbr"] = "ESP"
+bad_teams, warnings, changed = update_portraits(
+    m98_document,
+    empty_portraits,
+    lambda _host: [bad_team_entry],
+    lambda _host, _slug: (_ for _ in ()).throw(
+        AssertionError("mismatched catalog entries must not fetch a page")
+    ),
+)
+assert changed is False
+assert bad_teams == empty_portraits
+assert any("catalog team codes disagree" in warning for warning in warnings)
+
+bad_team_name_entry = deepcopy(m98_catalog_entry)
+bad_team_name_entry["home"]["name"] = "Australia"
+bad_team_names, warnings, changed = update_portraits(
+    m98_document,
+    empty_portraits,
+    lambda _host: [bad_team_name_entry],
+    lambda _host, _slug: (_ for _ in ()).throw(
+        AssertionError("mismatched catalog entries must not fetch a page")
+    ),
+)
+assert changed is False
+assert bad_team_names == empty_portraits
+assert any("catalog team names disagree" in warning for warning in warnings)
+
+bad_page_score = m98_portrait_page.replace("SPA 2–1 BEL", "SPA 3–1 BEL")
+bad_page, warnings, changed = update_portraits(
+    m98_document,
+    empty_portraits,
+    lambda _host: [deepcopy(m98_catalog_entry)],
+    lambda _host, _slug: bad_page_score,
+)
+assert changed is False
+assert bad_page == empty_portraits
+assert any("portrait page score disagrees" in warning for warning in warnings)
+
+duplicate_slug_portraits = deepcopy(empty_portraits)
+duplicate_slug_portraits["matches"]["M97"] = {
+    "slug": "spa-bel",
+    "externalId": "1111111",
+    "date": "2026-07-09",
+    "stage": "Quarter-final",
+    "teams": ["France", "Morocco"],
+    "score": [2, 0],
+}
+duplicate_slug, warnings, changed = update_portraits(
+    m98_document,
+    duplicate_slug_portraits,
+    lambda _host: [deepcopy(m98_catalog_entry)],
+    lambda _host, _slug: m98_portrait_page,
+)
+assert changed is False
+assert duplicate_slug == duplicate_slug_portraits
+assert any("portrait slug already mapped to M97" in warning for warning in warnings)
+
+duplicate_id_portraits = deepcopy(empty_portraits)
+duplicate_id_portraits["matches"]["M97"] = {
+    "slug": "fra-mor",
+    "externalId": "1998994",
+    "date": "2026-07-09",
+    "stage": "Quarter-final",
+    "teams": ["France", "Morocco"],
+    "score": [2, 0],
+}
+duplicate_id, warnings, changed = update_portraits(
+    m98_document,
+    duplicate_id_portraits,
+    lambda _host: [deepcopy(m98_catalog_entry)],
+    lambda _host, _slug: m98_portrait_page,
+)
+assert changed is False
+assert duplicate_id == duplicate_id_portraits
+assert any("portrait ID already mapped to M97" in warning for warning in warnings)
+
+m99_document = {
+    "version": 1,
+    "refreshed": "2026-07-11T23:00:00Z",
+    "matches": {
+        "M99": {
+            "source": {"provider": "FIFA", "matchId": "future-M99"},
+            "state": "complete",
+            "home": "Norway",
+            "away": "England",
+            "score": {"home": 1, "away": 2, "note": ""},
+            "winner": "England",
+            "round": "Quarterfinal",
+            "kickoff": "2026-07-11T21:00:00Z",
+        }
+    },
+}
+eng_nor_entry = {
+    "id": "2000001",
+    "date": "2026-07-11",
+    "round": "knockout",
+    "stage": "Quarter-final",
+    "home": {"name": "England", "abbr": "ENG", "score": 2},
+    "away": {"name": "Norway", "abbr": "NOR", "score": 1},
+    "slug": "eng-nor",
+}
+eng_nor_page = """
+<script>window.__MATCH_ID='2000001';</script>
+<title>ENG 2–1 NOR — FIFA World Cup 2026 Data Portraits</title>
+"""
+reversed_portraits, warnings, changed = update_portraits(
+    m99_document,
+    empty_portraits,
+    lambda _host: [eng_nor_entry],
+    lambda _host, _slug: eng_nor_page,
+)
+assert changed is True
+assert warnings == []
+assert reversed_portraits["matches"]["M99"] == {
+    "slug": "eng-nor",
+    "externalId": "2000001",
+    "date": "2026-07-11",
+    "stage": "Quarter-final",
+    "teams": ["England", "Norway"],
+    "score": [2, 1],
+}
+
+rematch_document = {
+    "version": 1,
+    "refreshed": "2026-07-19T22:00:00Z",
+    "matches": {
+        "M104": {
+            "source": {"provider": "FIFA", "matchId": "future-M104"},
+            "state": "complete",
+            "home": "France",
+            "away": "Norway",
+            "score": {"home": 2, "away": 1, "note": ""},
+            "winner": "France",
+            "round": "Final",
+            "kickoff": "2026-07-19T19:00:00Z",
+        }
+    },
+}
+stale_nor_fra_entry = {
+    "id": "1900001",
+    "date": "2026-06-17",
+    "round": "group",
+    "stage": "Group stage",
+    "home": {"name": "Norway", "abbr": "NOR", "score": 1},
+    "away": {"name": "France", "abbr": "FRA", "score": 2},
+    "slug": "nor-fra",
+}
+final_fra_nor_entry = {
+    "id": "2000002",
+    "date": "2026-07-19",
+    "round": "knockout",
+    "stage": "Final",
+    "home": {"name": "France", "abbr": "FRA", "score": 2},
+    "away": {"name": "Norway", "abbr": "NOR", "score": 1},
+    "slug": "fra-nor",
+}
+rematch_page_calls = []
+
+
+def rematch_page_fetch(_host, slug):
+    rematch_page_calls.append(slug)
+    if slug != "fra-nor":
+        raise AssertionError("stale rematch orientation must fail before page fetch")
+    return """
+    <script>window.__MATCH_ID='2000002';</script>
+    <title>FRA 2–1 NOR — FIFA World Cup 2026 Data Portraits</title>
+    """
+
+
+rematch_portraits, warnings, changed = update_portraits(
+    rematch_document,
+    empty_portraits,
+    lambda _host: [stale_nor_fra_entry, final_fra_nor_entry],
+    rematch_page_fetch,
+)
+assert changed is True
+assert warnings == []
+assert rematch_page_calls == ["fra-nor"]
+assert rematch_portraits["matches"]["M104"] == {
+    "slug": "fra-nor",
+    "externalId": "2000002",
+    "date": "2026-07-19",
+    "stage": "Final",
+    "teams": ["France", "Norway"],
+    "score": [2, 1],
+}
+
+
+class TruncatedResponse:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, _error_type, _error, _traceback):
+        return False
+
+    def read(self):
+        raise IncompleteRead(b"{", 20)
+
+
+with patch("portrait_sync.urlopen", return_value=TruncatedResponse()):
+    try:
+        fetch_portrait_catalog(PORTRAIT_HOST)
+    except OSError as error:
+        assert "HTTP response failed" in str(error)
+    else:
+        raise AssertionError("truncated portrait responses must become OSError")
 
 
 print("match_details fixture tests passed")

@@ -10,6 +10,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
 
+from portrait_sync import (
+    PORTRAIT_HOST,
+    PORTRAIT_PERMISSIONS,
+    PORTRAIT_STAGE_BY_ROUND,
+    PORTRAIT_TEAM_CODES,
+)
+
 
 ROOT = Path(__file__).resolve().parent.parent
 DETAILS_PATH = ROOT / "docs" / "data" / "match-details.json"
@@ -17,10 +24,6 @@ PORTRAITS_PATH = ROOT / "docs" / "data" / "match-portraits.json"
 TOPOLOGY_PATH = ROOT / "docs" / "data" / "topology.json"
 RESULTS_PATH = ROOT / "docs" / "data" / "results.json"
 
-_PORTRAIT_PERMISSIONS = {
-    "pending-author-approval",
-    "approved-for-production",
-}
 _DETAIL_PROVIDERS = {
     "FIFA",
     "football-data.org",
@@ -65,49 +68,8 @@ _ROUND_BY_NUMBER = {
     **{number: "Semifinal" for number in range(101, 103)},
     104: "Final",
 }
-_PORTRAIT_STAGE = {
-    "Round of 32": "Round of 32",
-    "Round of 16": "Round of 16",
-    "Quarterfinal": "Quarter-final",
-    "Semifinal": "Semi-final",
-    "Final": "Final",
-}
 _SLUG_RE = re.compile(r"^[a-z]{3}-[a-z]{3}$")
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_PORTRAIT_TEAM_CODES = {
-    "Algeria": "alg",
-    "Argentina": "arg",
-    "Australia": "aus",
-    "Austria": "aus",
-    "Belgium": "bel",
-    "Bosnia & Herz.": "ban",
-    "Brazil": "bra",
-    "Canada": "can",
-    "Cape Verde": "cve",
-    "Colombia": "col",
-    "Croatia": "cro",
-    "DR Congo": "dco",
-    "Ecuador": "ecu",
-    "Egypt": "egy",
-    "England": "eng",
-    "France": "fra",
-    "Germany": "ger",
-    "Ghana": "gha",
-    "Ivory Coast": "ico",
-    "Japan": "jap",
-    "Mexico": "mex",
-    "Morocco": "mor",
-    "Netherlands": "net",
-    "Norway": "nor",
-    "Paraguay": "par",
-    "Portugal": "por",
-    "Senegal": "sen",
-    "South Africa": "saf",
-    "Spain": "spa",
-    "Sweden": "swe",
-    "Switzerland": "swi",
-    "United States": "usa",
-}
 
 
 def _object(value: Any, path: str, errors: list[str]) -> Mapping[str, Any] | None:
@@ -467,12 +429,12 @@ def validate_portraits(
     )
     if portraits.get("version") != 1:
         errors.append("portraits.version: expected 1")
-    if portraits.get("permission") not in _PORTRAIT_PERMISSIONS:
+    if portraits.get("permission") not in PORTRAIT_PERMISSIONS:
         errors.append(
             "portraits.permission: expected pending-author-approval "
             "or approved-for-production"
         )
-    if portraits.get("host") != "https://wc26.bogachev.fr":
+    if portraits.get("host") != PORTRAIT_HOST:
         errors.append("portraits.host: host is not allowlisted")
     mappings = _object(portraits.get("matches"), "portraits.matches", errors)
     details = details_document.get("matches")
@@ -520,7 +482,7 @@ def validate_portraits(
         if not _text(date, f"{path}.date", errors) or not _DATE_RE.fullmatch(date):
             errors.append(f"{path}.date: expected YYYY-MM-DD")
         expected_round = _expected_round(code)
-        expected_stage = _PORTRAIT_STAGE.get(expected_round)
+        expected_stage = PORTRAIT_STAGE_BY_ROUND.get(expected_round)
         if mapping.get("stage") != expected_stage:
             errors.append(f"{path}.stage: expected {expected_stage}")
 
@@ -533,8 +495,8 @@ def validate_portraits(
         ):
             errors.append(f"{path}.teams: expected two distinct team names")
             teams = []
-        elif all(team in _PORTRAIT_TEAM_CODES for team in teams):
-            expected_slug = "-".join(_PORTRAIT_TEAM_CODES[team] for team in teams)
+        elif all(team in PORTRAIT_TEAM_CODES for team in teams):
+            expected_slug = "-".join(PORTRAIT_TEAM_CODES[team] for team in teams)
             if slug != expected_slug:
                 errors.append(
                     f"{path}.slug: expected reviewed team slug {expected_slug}"

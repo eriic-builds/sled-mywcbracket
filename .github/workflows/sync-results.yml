@@ -1,8 +1,8 @@
 name: Sync World Cup results
 
-# Pulls finished-game results from FIFA's free public feed and writes the shared
-# docs/data/results.json. The fan-viewer page is static and renders client-side, so
-# there is no HTML to rebuild — the browser fetches results.json directly.
+# Pulls finished-game results from FIFA's free public feed, refreshes match details,
+# and discovers verified data portraits. The fan-viewer page is static and renders
+# client-side, so there is no HTML to rebuild.
 on:
   schedule:
     - cron: "0 22 * * *"   # ~6:00 PM ET  (daily baseline)
@@ -53,7 +53,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Fetch results into docs/data/results.json
+      - name: Fetch results, details, and portraits
         if: steps.gate.outputs.skip != 'true'
         run: python scripts/fetch_results.py
 
@@ -67,10 +67,10 @@ jobs:
         id: commit
         if: steps.gate.outputs.skip != 'true'
         run: |
-          if [[ -n "$(git status --porcelain docs/data/results.json docs/data/match-details.json)" ]]; then
+          if [[ -n "$(git status --porcelain docs/data/results.json docs/data/match-details.json docs/data/match-portraits.json)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add docs/data/results.json docs/data/match-details.json
+            git add docs/data/results.json docs/data/match-details.json docs/data/match-portraits.json
             git commit -m "chore: auto-sync World Cup match data"
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"

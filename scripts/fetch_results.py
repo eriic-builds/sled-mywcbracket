@@ -1029,6 +1029,12 @@ def main() -> int:
     hl_changed = auto_entries != cur_auto_hl
 
     from match_details import update_details
+    from portrait_sync import (
+        PORTRAITS_PATH,
+        fetch_portrait_catalog,
+        fetch_portrait_page,
+        update_portraits,
+    )
 
     old_details = None
     if os.path.exists(MATCH_DETAILS):
@@ -1049,7 +1055,28 @@ def main() -> int:
     for warning in detail_warnings:
         print(f"  warning: {warning}")
 
-    if not changed and not hl_changed and not ko_fix_changed and not details_changed:
+    old_portraits = None
+    if PORTRAITS_PATH.exists():
+        with PORTRAITS_PATH.open(encoding="utf-8") as fh:
+            old_portraits = json.load(fh)
+    portraits_document, portrait_warnings, portraits_changed = update_portraits(
+        details_document,
+        old_portraits,
+        fetch_portrait_catalog if not args.input else None,
+        fetch_portrait_page if not args.input else None,
+    )
+    for warning in portrait_warnings:
+        print(f"  warning: {warning}")
+    old_portrait_count = len((old_portraits or {}).get("matches", {}))
+    portrait_added = len(portraits_document["matches"]) - old_portrait_count
+
+    if (
+        not changed
+        and not hl_changed
+        and not ko_fix_changed
+        and not details_changed
+        and not portraits_changed
+    ):
         if args.dry_run:
             print(f"Source: {src}. No new finished games to apply, results already current (dry-run).")
             return 0
@@ -1067,6 +1094,8 @@ def main() -> int:
           + (f"; {len(new_ko_fix)} pending-fixture kickoff time(s)" if ko_fix_changed else "")
           + (f"; refreshed {len(details_document['matches'])} match-detail record(s)"
              if details_changed else "")
+          + (f"; added {portrait_added} verified portrait mapping(s)"
+             if portraits_changed else "")
           + ".")
     for c in sorted(changed, key=lambda c: int(c[1:])):
         gA, gB, w, note = new_res[c]
@@ -1095,6 +1124,11 @@ def main() -> int:
 
         write_details(details_document)
         print("Updated docs/data/match-details.json.")
+    if portraits_changed:
+        from portrait_sync import write_portraits
+
+        write_portraits(portraits_document)
+        print("Updated docs/data/match-portraits.json.")
     return 0
 
 
