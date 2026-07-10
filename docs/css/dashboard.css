@@ -168,7 +168,7 @@ body::before{content:"";position:fixed;inset:-20% -10% auto -10%;height:70vh;z-i
 .kpi{padding:17px 17px 15px;position:relative;overflow:hidden;transition:.16s}
 .kpi:hover{transform:translateY(-2px)}
 .kpi-ic{font-size:1.05rem;position:absolute;top:14px;right:15px}
-.kpi-l{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.kpi-l{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding-right:26px}
 .kpi-v{font-size:1.7rem;font-weight:750;margin:6px 0 2px;line-height:1.05;letter-spacing:-.01em}
 .kpi-v .kunit{font-size:.72rem;font-weight:600;color:var(--muted);margin-left:5px}
 .kpi-n{font-size:.76rem;color:var(--muted)}
