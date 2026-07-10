@@ -257,6 +257,13 @@ hostile.entrant = "<script>alert('entrant')</script>";
 const hostileHtml = renderDashboard(hostile, frozen, topology);
 check("hostile pick text is escaped", !hostileHtml.includes("<script") && hostileHtml.includes("&lt;script&gt;"));
 const dashboard = renderDashboard(picks, frozen, topology);
+check(
+  "dashboard footer links LinkedIn and GitHub icons",
+  dashboard.includes('href="https://www.linkedin.com/in/ericxlam/"')
+    && dashboard.includes('aria-label="Eric Lam on LinkedIn"')
+    && dashboard.includes('href="https://github.com/eriic-builds/sled-mywcbracket"')
+    && dashboard.includes('aria-label="This project on GitHub"'),
+);
 const railFilterAt = dashboard.indexOf('<div class="railfilter glass" id="railFilter">');
 const contentAt = dashboard.indexOf('<div class="content">');
 const railFilter = dashboard.slice(railFilterAt, contentAt);

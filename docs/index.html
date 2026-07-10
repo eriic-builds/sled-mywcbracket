@@ -37,11 +37,7 @@
 
 /* nav: brand doubles as back-to-top (left) + theme switcher (right) */
 #landing .lnav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px}
-/* Home tab: consistent chrome with the dashboard viewer bar; on the start page it is the current view. */
 #landing .lnav-l{display:inline-flex;align-items:center;gap:10px;min-width:0}
-#landing .ltab{font:inherit;font-size:.82rem;font-weight:700;border-radius:9px;padding:6px 12px;cursor:pointer;color:var(--text);background:var(--hover);border:1px solid var(--border2);white-space:nowrap;transition:.16s}
-#landing .ltab:hover{background:var(--border)}
-#landing .ltab[aria-current="page"]{color:#fff;background:var(--blue);border-color:transparent;box-shadow:0 4px 14px rgba(0,151,244,.35)}
 #landing .lbrand{display:inline-flex;align-items:center;gap:11px;background:transparent;border:0;cursor:pointer;
   font:inherit;color:var(--text);padding:6px 10px;border-radius:12px;transition:background .15s,transform .15s}
 #landing .lbrand:hover{background:var(--hover);transform:translateY(-1px)}
@@ -312,7 +308,6 @@
     <div class="hero-bg" aria-hidden="true"></div>
     <nav class="lnav">
       <div class="lnav-l">
-        <button class="ltab" id="lhometab" type="button" aria-current="page" title="You are on the start page">🏠 Home</button>
         <button class="lbrand" id="lhome" type="button" aria-label="Back to top" title="Back to top">
           <span class="orb" aria-hidden="true"></span>
           <span class="lbrand-tx">Bring Your Own Bracket<small>World Cup 2026 · SLED</small></span>
