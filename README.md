@@ -218,16 +218,6 @@ new output, not correctness of the change.
 - Bot data commits dispatch Pages directly because GitHub blocks workflow recursion from the
   built-in token.
 
-## Why `dev-docs/CLAUDE.md` stays
-
-[`dev-docs/CLAUDE.md`](dev-docs/CLAUDE.md) is tracked repository guidance, not a personal
-local settings file. It records commands, architecture boundaries, byte-locked files,
-privacy rules, and documentation conventions that future coding agents need.
-
-It contains no credentials or private machine data. Keeping it in the repository makes
-those safety rules portable across sessions. Secrets, tokens, private workbook contents,
-and machine-specific paths must never be added to it.
-
 ## Credits and scope
 
 This is a fan project. It is not affiliated with FIFA, GitHub, or Microsoft. Public match
