@@ -1,5 +1,5 @@
 {
- "refreshed": "2026-07-11T22:49:21Z",
+ "refreshed": "2026-07-11T23:48:11Z",
  "res": {
   "M73": [
    0,
@@ -156,16 +156,15 @@
    1,
    "Spain",
    ""
+  ],
+  "M99": [
+   1,
+   2,
+   "England",
+   ""
   ]
  },
  "ko_fix": {
-  "M99": [
-   "2026-07-11T21:00:00Z",
-   "Sat Jul 11",
-   "5:00 PM",
-   "4:00 PM",
-   "2:00 PM"
-  ],
   "M100": [
    "2026-07-12T01:00:00Z",
    "Sat Jul 11",
@@ -182,6 +181,13 @@
   ]
  },
  "auto_hl": [
+  [
+   "🦁",
+   "Bellingham's brace sinks Norway",
+   "Norway 1–2 England",
+   "Sat Jul 11 · Miami",
+   "Bellingham struck twice (45'+2', 93') to settle England's 2–1 win over Norway in the quarterfinal."
+  ],
   [
    "🐂",
    "Spain edge Belgium",
@@ -216,13 +222,6 @@
    "United States 1–4 Belgium",
    "Tue Jul 7 · Seattle",
    "Ketelaere struck twice in the first half (0', 33') as Belgium beat United States 4–1 in the Round of 16, with Vanaken (57') and Lukaku (90'+3') also on the mark."
-  ],
-  [
-   "🐂",
-   "Spain edge Portugal",
-   "Portugal 0–1 Spain",
-   "Mon Jul 6 · Dallas",
-   "Heartbreak for Portugal, Spain nicked it 1–0 late in the Round of 16, Merino (90'+1') on target."
   ]
  ]
 }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "refreshed": "2026-07-10T21:01:16Z",
+  "refreshed": "2026-07-11T23:48:10Z",
   "matches": {
     "M73": {
       "source": {
@@ -1650,6 +1650,60 @@
           "team": "Belgium",
           "player": "Witsel",
           "minute": "90'+5'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M99": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289289",
+        "matchId": "400021539"
+      },
+      "state": "complete",
+      "home": "Norway",
+      "away": "England",
+      "score": {
+        "home": 1,
+        "away": 2,
+        "note": ""
+      },
+      "winner": "England",
+      "round": "Quarterfinal",
+      "kickoff": "2026-07-11T21:00:00Z",
+      "venue": {
+        "stadium": "Miami Stadium",
+        "city": "Miami"
+      },
+      "attendance": 64478,
+      "referee": "Clément Turpin",
+      "goals": [
+        {
+          "team": "Norway",
+          "player": "Schjelderup",
+          "minute": "36'",
+          "kind": "goal"
+        },
+        {
+          "team": "England",
+          "player": "Bellingham",
+          "minute": "45'+2'",
+          "kind": "goal"
+        },
+        {
+          "team": "England",
+          "player": "Bellingham",
+          "minute": "93'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Norway",
+          "player": "Ajer",
+          "minute": "117'",
           "card": "yellow"
         }
       ]
