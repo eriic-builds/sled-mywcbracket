@@ -135,7 +135,8 @@ h1 {
 .depth button,
 .print-button,
 .hotspot-list button,
-.reset-button {
+.reset-button,
+.copy-button {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--panel);
@@ -148,7 +149,8 @@ h1 {
 .depth button:hover,
 .print-button:hover,
 .hotspot-list button:hover,
-.reset-button:hover {
+.reset-button:hover,
+.copy-button:hover {
   color: var(--text);
   border-color: var(--blue);
   transform: translateY(-1px);
@@ -370,6 +372,29 @@ code {
   color: #d5edff;
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   font-size: .88em;
+}
+.prompt-box {
+  max-height: 560px;
+  margin: 16px 0;
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #0d131b;
+  color: #d5edff;
+  white-space: pre-wrap;
+  word-break: normal;
+  font: .86rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+.prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.copy-status {
+  color: var(--muted);
+  font-size: .82rem;
 }
 .file-table {
   width: 100%;
@@ -811,6 +836,7 @@ footer {
       <button type="button" role="tab" aria-selected="false" data-panel-target="hotspots">What changed</button>
       <button type="button" role="tab" aria-selected="false" data-panel-target="plans">Six plans</button>
       <button type="button" role="tab" aria-selected="false" data-panel-target="council">Council</button>
+      <button type="button" role="tab" aria-selected="false" data-panel-target="reuse">Reuse prompt</button>
       <button type="button" role="tab" aria-selected="false" data-panel-target="checklist">Validation</button>
     </nav>
     <div class="depth" aria-label="Explanation depth">
@@ -1549,6 +1575,111 @@ footer {
     </div>
   </section>
 
+  <section class="panel" id="reuse" role="tabpanel" hidden>
+    <div class="section-head">
+      <h2>Reuse this client-side performance review</h2>
+      <p>This prompt keeps the method and removes project-specific names, files, metrics, and
+        source material. Replace the bracketed fields before using it elsewhere.</p>
+    </div>
+    <div class="callout">
+      <p class="eli5"><strong>ELI5:</strong> keep the same inspection checklist, then swap in
+        the next project's rules and favorite motion.</p>
+      <p class="technical"><strong>Scope:</strong> CSS transitions, DOM motion, pointer
+        followers, sliding surfaces, modals, progress fills, canvas, WebGL, frame pacing,
+        reduced motion, responsive fallbacks, and teardown.</p>
+    </div>
+    <div class="prompt-actions">
+      <button class="copy-button" type="button" data-copy-prompt>Copy reusable prompt</button>
+      <span class="copy-status" data-copy-status aria-live="polite"></span>
+    </div>
+    <pre class="prompt-box" id="reusable-audit-prompt">Review and revise the client-side animation performance of [PROJECT].
+
+GOAL
+Keep approved motion and interaction quality while reducing unnecessary Layout, Paint,
+main-thread, canvas, and WebGL work. Prioritize lower-end mobile hardware and the browsers
+listed below.
+
+PROJECT CONTRACT
+- Runtime: [VANILLA / FRAMEWORK / OTHER]
+- Supported browsers and devices: [TARGETS]
+- Build and dependency constraints: [CONSTRAINTS]
+- Features and visual behavior that must remain: [PRESERVE]
+- Persistence, privacy, and reduced-motion rules: [RULES]
+
+AUDIT BEFORE EDITING
+1. Inventory every CSS animation and transition, JavaScript frame loop, pointer-following
+   element, sliding menu, modal, progress fill, canvas, and WebGL scene.
+2. Record a controlled baseline in each target browser. Use the same viewport, device pixel
+   ratio, CPU throttle, interaction script, and recording duration before and after.
+3. Measure Layout, Paint, scripting, long tasks, RAF activity, GPU or graphics work, canvas
+   count, and WebGL context lifetime where available.
+4. Find animation-time writes to left, right, top, bottom, width, and height. Separate real
+   frame-loop hot paths from one-time static placement.
+5. Find layout reads inside frame loops, unbounded requestAnimationFrame loops, hidden or
+   settled scenes that keep rendering, broad transition rules, and paint-heavy animated
+   shadows or filters.
+
+PLAN BEFORE REFACTORING
+Create a ranked plan set. Each plan must state the goal, exact files, implementation order,
+edge cases, tests, browser evidence, and acceptance criteria. Measure first. Change one
+bounded area at a time. Run overlapping plans sequentially.
+
+IMPLEMENTATION DIRECTION
+- Prefer transform and opacity for visual motion. Treat them as compositor-eligible, not a
+  guarantee of GPU execution or a separate browser thread.
+- Keep layout geometry stable during motion. Use translate or scale for pointer followers,
+  sliding surfaces, toggle knobs, and progress fills where behavior allows.
+- Coalesce high-frequency input into at most one DOM write per animation frame.
+- Cache dimensions outside hot loops and refresh them on explicit resize or content-change
+  events.
+- Replace repaint-heavy effects with prepared layers animated through transform and opacity
+  when the visual result stays equivalent.
+- Give every loop pause, resume, sleep, wake, visibility, and teardown rules.
+- Stop requesting frames when a simulation is settled. Wake only for real triggers.
+- Budget passive canvas and WebGL rendering. Keep direct input responsive.
+- Dispose WebGL resources and contexts when a responsive fallback replaces the scene.
+- Preserve prefers-reduced-motion and any in-product motion control.
+- Do not add blanket will-change rules. Permanent layers also consume memory.
+
+VERIFICATION
+1. Repeat the exact baseline scenarios after each bounded change.
+2. Compare source guards, unit tests, snapshots, browser behavior, and traces.
+3. Report raw before-and-after values. Do not claim a percentage when the scenarios do not
+   match.
+4. Separate cold-start cost from steady interaction cost.
+5. State limits honestly. Headless traces do not prove every physical device, and transform
+   use does not prove compositor promotion.
+
+DELIVERABLES
+- A brief that records the project contract and technical corrections.
+- A measured BASELINE.md.
+- Ranked, self-contained execution plans.
+- Focused regression tests for the identified hot paths and lifecycle rules.
+- A RESULTS.md with exact changes, matched measurements, validation, and remaining costs.
+- A no-build interactive report when the repository supports static HTML documentation.
+
+ACCEPTANCE GATE
+- Approved motion and controls still behave correctly.
+- No unapproved dependency, build step, storage key, or architecture change.
+- No repeated layout writes in identified animation hot paths.
+- Hidden or settled continuous scenes perform no useful frame work.
+- Responsive fallbacks release resources they replace.
+- Direct interactions stay below the agreed long-task and p95 main-thread budgets.
+- All existing tests, snapshots, reduced-motion checks, and target-browser checks pass.</pre>
+
+    <div class="section-head">
+      <h2>Six reusable components</h2>
+    </div>
+    <div class="learning-grid">
+      <article class="card"><h3>1. Contract</h3><p>Define what must stay before optimizing.</p></article>
+      <article class="card"><h3>2. Inventory</h3><p>Find CSS, DOM, canvas, and WebGL motion.</p></article>
+      <article class="card"><h3>3. Baseline</h3><p>Capture matched evidence before editing.</p></article>
+      <article class="card"><h3>4. Bounded refactors</h3><p>Separate layout, paint, frame pacing, and lifecycle work.</p></article>
+      <article class="card"><h3>5. Integrated gate</h3><p>Repeat tests and identical browser scenarios.</p></article>
+      <article class="card"><h3>6. Report</h3><p>Publish measurements, tradeoffs, and uncertainty.</p></article>
+    </div>
+  </section>
+
   <section class="panel" id="checklist" role="tabpanel" hidden>
     <div class="section-head">
       <h2>Validation record</h2>
@@ -1629,6 +1760,8 @@ const hotspotPanels = [...document.querySelectorAll("[data-hotspot-panel]")];
 const checks = [...document.querySelectorAll("[data-check]")];
 const checkLabel = document.querySelector("[data-check-label]");
 const checkMeter = document.querySelector("[data-check-meter]");
+const copyPrompt = document.querySelector("[data-copy-prompt]");
+const copyStatus = document.querySelector("[data-copy-status]");
 
 function showPanel(id, focus = false) {
   panelButtons.forEach((button) => {
@@ -1691,6 +1824,14 @@ document.querySelector("[data-reset-checks]").addEventListener("click", () => {
   updateChecklist();
 });
 document.querySelector("[data-print]").addEventListener("click", () => window.print());
+copyPrompt.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(document.getElementById("reusable-audit-prompt").textContent);
+    copyStatus.textContent = "Prompt copied.";
+  } catch {
+    copyStatus.textContent = "Copy was blocked. Select the prompt text and copy it manually.";
+  }
+});
 
 const initialPanel = location.hash.slice(1);
 if (panels.some((panel) => panel.id === initialPanel)) showPanel(initialPanel);

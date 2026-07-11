@@ -110,3 +110,96 @@ safer and easier to review.
 - Each `plans/PLAN-*.md` file is self-contained for a less capable execution model.
 - Plan 01 creates `BASELINE.md`.
 - Plan 06 creates `RESULTS.md` and updates the interactive guide with measured outcomes.
+
+## Reusable client-side performance review prompt
+
+Copy this prompt into another web project. Replace the bracketed fields. It carries the
+method, not this project's implementation.
+
+```text
+Review and revise the client-side animation performance of [PROJECT].
+
+GOAL
+Keep approved motion and interaction quality while reducing unnecessary Layout, Paint,
+main-thread, canvas, and WebGL work. Prioritize lower-end mobile hardware and the browsers
+listed below.
+
+PROJECT CONTRACT
+- Runtime: [VANILLA / FRAMEWORK / OTHER]
+- Supported browsers and devices: [TARGETS]
+- Build and dependency constraints: [CONSTRAINTS]
+- Features and visual behavior that must remain: [PRESERVE]
+- Persistence, privacy, and reduced-motion rules: [RULES]
+
+AUDIT BEFORE EDITING
+1. Inventory every CSS animation and transition, JavaScript frame loop, pointer-following
+   element, sliding menu, modal, progress fill, canvas, and WebGL scene.
+2. Record a controlled baseline in each target browser. Use the same viewport, device pixel
+   ratio, CPU throttle, interaction script, and recording duration before and after.
+3. Measure Layout, Paint, scripting, long tasks, RAF activity, GPU or graphics work, canvas
+   count, and WebGL context lifetime where available.
+4. Find animation-time writes to left, right, top, bottom, width, and height. Separate real
+   frame-loop hot paths from one-time static placement.
+5. Find layout reads inside frame loops, unbounded requestAnimationFrame loops, hidden or
+   settled scenes that keep rendering, broad transition rules, and paint-heavy animated
+   shadows or filters.
+
+PLAN BEFORE REFACTORING
+Create a ranked plan set. Each plan must state the goal, exact files, implementation order,
+edge cases, tests, browser evidence, and acceptance criteria. Measure first. Change one
+bounded area at a time. Run overlapping plans sequentially.
+
+IMPLEMENTATION DIRECTION
+- Prefer transform and opacity for visual motion. Treat them as compositor-eligible, not a
+  guarantee of GPU execution or a separate browser thread.
+- Keep layout geometry stable during motion. Use translate or scale for pointer followers,
+  sliding surfaces, toggle knobs, and progress fills where behavior allows.
+- Coalesce high-frequency input into at most one DOM write per animation frame.
+- Cache dimensions outside hot loops and refresh them on explicit resize or content-change
+  events.
+- Replace repaint-heavy effects with prepared layers animated through transform and opacity
+  when the visual result stays equivalent.
+- Give every loop pause, resume, sleep, wake, visibility, and teardown rules.
+- Stop requesting frames when a simulation is settled. Wake only for real triggers.
+- Budget passive canvas and WebGL rendering. Keep direct input responsive.
+- Dispose WebGL resources and contexts when a responsive fallback replaces the scene.
+- Preserve prefers-reduced-motion and any in-product motion control.
+- Do not add blanket will-change rules. Permanent layers also consume memory.
+
+VERIFICATION
+1. Repeat the exact baseline scenarios after each bounded change.
+2. Compare source guards, unit tests, snapshots, browser behavior, and traces.
+3. Report raw before-and-after values. Do not claim a percentage when the scenarios do not
+   match.
+4. Separate cold-start cost from steady interaction cost.
+5. State limits honestly. Headless traces do not prove every physical device, and transform
+   use does not prove compositor promotion.
+
+DELIVERABLES
+- A brief that records the project contract and technical corrections.
+- A measured BASELINE.md.
+- Ranked, self-contained execution plans.
+- Focused regression tests for the identified hot paths and lifecycle rules.
+- A RESULTS.md with exact changes, matched measurements, validation, and remaining costs.
+- A no-build interactive report when the repository supports static HTML documentation.
+
+ACCEPTANCE GATE
+- Approved motion and controls still behave correctly.
+- No unapproved dependency, build step, storage key, or architecture change.
+- No repeated layout writes in identified animation hot paths.
+- Hidden or settled continuous scenes perform no useful frame work.
+- Responsive fallbacks release resources they replace.
+- Direct interactions stay below the agreed long-task and p95 main-thread budgets.
+- All existing tests, snapshots, reduced-motion checks, and target-browser checks pass.
+```
+
+### Component checklist
+
+The reusable method has six parts:
+
+1. **Contract:** define what must stay before optimizing.
+2. **Inventory:** find CSS, DOM, canvas, and WebGL motion.
+3. **Baseline:** capture matched evidence before editing.
+4. **Bounded refactors:** fix layout, paint, frame pacing, and lifecycle separately.
+5. **Integrated gate:** rerun tests and identical browser scenarios.
+6. **Report:** publish measurements, tradeoffs, and remaining uncertainty.

@@ -1,5 +1,9 @@
 # Zero-backend social loop
 
+Status: complete
+
+Project phase: social foundation and pilot promotion, July 7-8, 2026.
+
 This package records how bracket sharing and local comparison were designed, built, and
 verified.
 
@@ -28,3 +32,14 @@ report shows what was built around the preserved plans.
 
 The old `dev-docs/ANALYSIS.html` path remains as a compatibility redirect for
 `JOURNEY.html`.
+
+## Place in the project
+
+This work followed the first client-side viewer port. It established the privacy and local
+ownership rules that every later workstream preserved.
+
+The next formal package is
+[live tournament readiness](../live-tournament-readiness/README.md). The production match
+port later added richer bracket and match surfaces without changing this share format.
+
+See the [project history](../PROJECT-HISTORY.md) for the full sequence.

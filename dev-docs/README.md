@@ -1,34 +1,95 @@
-# Development briefs
+# Development documentation
 
-New multi-plan work is grouped by brief instead of adding more loose plan files to this
-directory.
+This directory explains how the product was designed, implemented, tested, and revised.
+Runtime files stay under `docs/`. Planning and engineering evidence stay here.
 
-Each completed brief package follows this shape:
+## Start here
+
+| Document | Use it for |
+| --- | --- |
+| [`PROJECT-HISTORY.md`](PROJECT-HISTORY.md) | Follow the repository from the first client-side port through the current documentation system. |
+| [Interactive project history](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/project-history/) | Filter the ten product phases and inspect the current system and build process. |
+| [Interactive report gallery](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/) | Review completed workstreams as rendered web pages. |
+| [`TECHNICAL_TASTE_COUNCIL.md`](TECHNICAL_TASTE_COUNCIL.md) | Apply the architecture and execution review lens. |
+| [`CLAUDE.md`](CLAUDE.md) | Load current commands, safety rails, privacy rules, and agent-facing repository guidance. |
+
+## Brief package convention
+
+Multi-plan work receives one directory:
 
 ```text
 brief-name/
 ├── BRIEF.md
 ├── BASELINE.md        optional measured starting point
-├── plans/
+├── plans/             present when source plan files exist
 │   ├── PLAN-01-*.md
 │   └── PLAN-02-*.md
 ├── RESULTS.md
 └── README.md
 ```
 
-Interactive HTML reports live under `docs/dev-reports/` so GitHub Pages renders them as web
-pages instead of GitHub showing the HTML source.
+Interactive HTML belongs under `docs/dev-reports/<brief-name>/` so GitHub Pages renders it
+instead of GitHub showing raw HTML source.
+
+If an original brief or plan is missing:
+
+- reconstruct only from verified plans, commits, reports, tests, and repository history
+- label the reconstruction
+- do not create fake historical plan files
+- link the exact delivery commits
+
+## Current process
+
+```text
+Goal / Context / Source / Expectations
+                  |
+                  v
+                brief
+                  |
+                  v
+        ranked execution plans
+                  |
+                  v
+       review-sized implementation
+                  |
+                  v
+ tests + validators + browser evidence
+                  |
+                  v
+       results + rendered report
+```
 
 ## Brief packages
 
-| Brief | Status | Final report | Interactive preview |
-| --- | --- | --- | --- |
-| [Zero-backend social loop](zero-backend-social-loop/BRIEF.md) | Complete | [Results](zero-backend-social-loop/RESULTS.md) | [Open build story](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/zero-backend-social-loop/) |
-| [Live tournament readiness](live-tournament-readiness/BRIEF.md) | Complete | [Results](live-tournament-readiness/RESULTS.md) | [Open dashboard](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/live-tournament-readiness/) |
-| [Animation performance revision](animation-performance-revision/BRIEF.md) | Complete | [Results](animation-performance-revision/RESULTS.md) | [Open dashboard](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/animation-performance-revision/) |
+| Brief | Provenance | Status | Final report | Interactive preview |
+| --- | --- | --- | --- | --- |
+| [Zero-backend social loop](zero-backend-social-loop/README.md) | Original spec, two preserved product plans, one historical CI plan link | Complete | [Results](zero-backend-social-loop/RESULTS.md) | [Open build story](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/zero-backend-social-loop/) |
+| [Live tournament readiness](live-tournament-readiness/README.md) | Reconstructed from six committed plans | Complete | [Results](live-tournament-readiness/RESULTS.md) | [Open report](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/live-tournament-readiness/) |
+| [Production match experience](production-match-experience/README.md) | Reconstructed from the shipped report and production port | Complete | [Results](production-match-experience/RESULTS.md) | [Open report](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/production-match-experience/) |
+| [Animation performance revision](animation-performance-revision/README.md) | Original brief, baseline, six plans, matched browser traces | Complete | [Results](animation-performance-revision/RESULTS.md) | [Open report](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/animation-performance-revision/) |
 
-## Compatibility path
+## Smaller milestones
 
-`ANALYSIS.html` redirects the older `JOURNEY.html` link to the rendered zero-backend social
-loop report. It is the only compatibility file left at this level. Future brief-driven work
-should use the package structure above.
+Not every focused commit needs a synthetic brief. Typography, themes, scoring clarity,
+private pool backup, and the first soccer-ball hero delivery are mapped in
+[`PROJECT-HISTORY.md`](PROJECT-HISTORY.md).
+
+Create a new package when work needs multiple ranked plans, a measured baseline, or a
+separate review and acceptance boundary.
+
+## Why `CLAUDE.md` is tracked
+
+`CLAUDE.md` is repository guidance, not private local configuration. It contains no keys,
+tokens, workbook data, or user secrets. It stays tracked because future coding agents need
+the same no-build, privacy, fixture, testing, and documentation rules.
+
+Do not place credentials, personal data, or machine-specific private paths in it.
+
+## Compatibility paths
+
+- `ANALYSIS.html` redirects the older `JOURNEY.html` link to the rendered social-loop report.
+- `docs/reports/production-port.html` redirects the original production report route to its
+  brief-centered Pages location.
+
+Compatibility redirects preserve old links while keeping full report sources inside the
+report gallery.

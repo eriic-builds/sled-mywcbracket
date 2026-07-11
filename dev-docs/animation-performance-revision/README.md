@@ -2,6 +2,8 @@
 
 Status: complete
 
+Project phase: client-side animation and WebGL performance, July 11, 2026.
+
 This folder keeps the original brief, its six execution plans, the measured starting point,
 and the final result together.
 
@@ -11,11 +13,14 @@ and the final result together.
 2. [Measured baseline](BASELINE.md)
 3. [Execution plans](plans/)
 4. [Final results](RESULTS.md)
-5. [Interactive report](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/animation-performance-revision/)
+5. [Reusable audit prompt](BRIEF.md#reusable-client-side-performance-review-prompt)
+6. [Interactive report](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/animation-performance-revision/)
 
 The interactive report source lives at
 [`docs/dev-reports/animation-performance-revision/index.html`](../../docs/dev-reports/animation-performance-revision/index.html).
 Keeping it under `docs/` lets the existing GitHub Pages workflow render the dashboard.
+The report's **Reuse prompt** tab contains the same project-agnostic client-side audit
+prompt in a copy-ready format.
 
 ## Package structure
 
@@ -33,3 +38,12 @@ animation-performance-revision/
 ├── RESULTS.md
 └── README.md
 ```
+
+## Place in the project
+
+This revision followed the
+[production match experience](../production-match-experience/README.md), private pool
+backup, and the interactive soccer-ball hero. It kept the approved motion while reducing
+layout, paint, RAF, and WebGL work.
+
+See the [project history](../PROJECT-HISTORY.md) for the full sequence.

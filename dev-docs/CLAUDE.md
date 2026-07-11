@@ -1,54 +1,148 @@
-# sled-mywcbracket
+# Repository guidance for coding agents
 
-Pilot fork of `my-wc26-bracket` testing the **zero-backend social layer**: share a
-bracket as a URL, add received links to a local leaderboard, compare picks. Production
-(my-wc26-bracket) stays untouched; this repo is where we move fast.
+This tracked file contains project-wide engineering rules. It is not personal local
+configuration and contains no credentials, private workbook data, or machine-specific
+secrets.
+
+Keep it in the repository so future coding sessions load the same architecture, privacy,
+fixture, testing, and documentation boundaries.
+
+## Project contract
+
+`sled-mywcbracket` is a static, zero-backend World Cup bracket dashboard.
+
+Preserve:
+
+- GitHub Pages hosting from `docs/`.
+- Vanilla HTML, CSS, and ES modules.
+- No frontend build step.
+- No package-manager runtime dependency.
+- Browser-local picks, rivals, themes, favorites, Motion, and what-if values.
+- Consent-based one-bracket sharing through a URL fragment.
+- Public live data generated and validated by GitHub Actions.
+
+Do not add an account system, central pool registry, analytics, server session, or network
+write from social modules without an explicit new brief.
 
 ## Commands
 
 ```bash
-cd docs && python3 -m http.server 8000    # dev server (no build step, ever)
-npm test                                   # all tests; hermetic, repo-local data only
-node tests/golden.mjs --update             # accept an INTENTIONAL render change
-python3 scripts/fetch_results.py --dry-run # preview a results sync
+python3 -m http.server 8000 --directory docs
+npm test
+node tests/golden.mjs --update
+python3 scripts/fetch_results.py --dry-run
+python3 scripts/validate_results.py
+python3 scripts/validate_match_details.py
+python3 tests/match_details.py
 ```
 
-## Architecture (read before changing anything)
+Use Node 22 and Python 3.12 to match CI. No `npm install` is required.
 
-- `docs/` is the deployed site (GitHub Pages). Vanilla ES modules, **no dependencies,
-  no build step** — keep it that way.
-- `docs/js/render.js` — pure render engine: `(picks, live, topology) → HTML string`.
-  Its output is **byte-locked** by `tests/fixtures/golden-sections.json` (rendered
-  against the frozen `tests/fixtures/results.frozen.json`, NOT live results.json).
-  New UI goes in `main.js` / `index.html` / new modules — not in render.js — unless
-  the change is intentional, in which case update the fixture and say so.
-- `docs/js/builder.js` — pure core (`deriveStructure`, `teamsFor`, `repair`,
-  `buildPicks`) + the click-to-pick overlay. Reuse the pure core; don't duplicate it.
-- `docs/js/storage.js` — localStorage keys and the versioned local pool-backup JSON.
-  `wcb.fan.picks.v1` = the user's own bracket; what-if overrides are namespaced
-  per-bracket via `hashPicks`.
-- `docs/data/results.json` — rewritten by the sync bot up to 3×/day. Never make a
-  test or fixture depend on its live contents.
-- `scripts/fetch_results.py` — results sync (FIFA feed + fallback), runs via
-  `.github/workflows/sync-results.yml`.
-- `scripts/validate_results.py` — schema + sanity gate for `results.json` (stdlib only).
-  The sync workflow runs it between fetch and commit, and `tests.yml` runs it on push, so
-  a malformed feed never ships. Run it locally after a manual data edit:
-  `python3 scripts/validate_results.py`.
-- New multi-plan work belongs in `dev-docs/<brief-name>/`: keep `BRIEF.md`, optional
-  `BASELINE.md`, `plans/PLAN-*.md`, `RESULTS.md`, and a short `README.md` together.
-  Put interactive HTML reports in `docs/dev-reports/<brief-name>/` so GitHub Pages renders
-  them, then link the preview from the brief README.
+## Runtime architecture
 
-## Social-layer rules (the point of this pilot)
+- `docs/js/render.js` computes scored state and returns dashboard HTML.
+- `docs/js/bracket-tree.js` derives the shared tournament tree for mirrored and Sideways
+  layouts.
+- `docs/js/builder.js` owns the pure pick topology and click-to-pick flow.
+- `docs/js/parse-excel.js` validates the workbook entirely in the browser.
+- `docs/js/main.js` orchestrates landing, loading, render modes, social controls, backup,
+  freshness, and feature lifecycle.
+- `docs/js/interact.js` owns themes, navigation, filtering, map layout, fit-screen behavior,
+  and stat interactions.
+- `docs/js/share.js` owns versioned bracket URL encoding and decoding.
+- `docs/js/compare.js` owns local rival storage, standings, and pick differences.
+- `docs/js/storage.js` owns local persistence, preview isolation, and private pool backup.
+- `docs/js/match-details.js` owns facts, accessible dialogs, and intent-gated portraits.
+- `docs/js/trophy.js` owns the desktop WebGL trophy and responsive fallback.
+- `docs/js/landing-ballpit.js` owns landing physics, Motion control, sleep, wake, and WebGL
+  lifecycle.
+- `docs/js/vendor/` contains reviewed local SheetJS and Three.js files. Do not edit vendored
+  bundles.
 
-- **`zero-backend-social-loop/BRIEF.md` is the source of truth** for share/compare
-  behavior. Update it when behavior changes; consult it before re-deriving intent from code.
-- Privacy invariants (non-negotiable): no network writes in social code; rivals
-  never appear in a URL; the explicit "Back up my pool" action may download the
-  owner's bracket plus locally saved rivals as a private JSON file, but no feature
-  shares a whole pool and the UI must warn that the backup should be kept private.
-- Viewing a shared/demo bracket must never mutate the visitor's saved bracket or
-  what-if overrides.
+Reuse existing pure helpers. Do not duplicate bracket, score, flag, or storage logic.
 
-Also read TECHNICAL_TASTE_COUNCIL.md for build philosophy and decision-making judgment before making non-trivial changes.
+## Generated data
+
+- `docs/data/topology.json` is fixed tournament structure and schedule.
+- `docs/data/results.json` is bot-written canonical score data.
+- `docs/data/match-details.json` and `docs/data/match-portraits.json` are bot-written
+  enrichment data.
+- `docs/data/demo-picks.json` is the deterministic demo bracket.
+- `scripts/fetch_results.py` writes the generated files.
+- `scripts/validate_results.py` and `scripts/validate_match_details.py` gate publishing.
+
+Never make a golden fixture depend on live `results.json`. Use frozen test inputs.
+
+## Byte-locked output
+
+`docs/js/render.js` output is protected by:
+
+- `tests/fixtures/golden-sections.json`
+- `tests/fixtures/map-sections.frozen.json`
+
+An intentional render change requires:
+
+1. Run the focused test before updating a fixture.
+2. Run the fixture update command.
+3. Review every changed section.
+4. Explain why each byte-level output change is expected.
+5. Run the full suite.
+
+A regenerated passing snapshot does not prove the new output is correct.
+
+## Social and privacy rules
+
+[`zero-backend-social-loop/BRIEF.md`](zero-backend-social-loop/BRIEF.md) is the source of
+truth.
+
+Non-negotiable rules:
+
+- `share.js` and `compare.js` make no network writes.
+- Rivals never appear in a URL.
+- A share URL contains only the sender's chosen name, tiebreaker, and one bracket.
+- Whole-pool backup is a private local download, not a sharing feature.
+- Demo and shared previews never mutate the owner's saved bracket or what-if values.
+- External match portraits wait for user intent and keep visible credit.
+
+## Motion and WebGL rules
+
+- Prefer transform and opacity for repeated visual motion.
+- Treat compositor eligibility as a browser decision, not a guaranteed GPU thread.
+- Do not add broad `transition: all` or blanket `will-change`.
+- Coalesce high-frequency pointer DOM writes.
+- Pause hidden work and sleep settled simulations.
+- Dispose WebGL resources when a responsive fallback replaces a scene.
+- Preserve `prefers-reduced-motion` and the in-product Motion setting.
+
+The reusable audit method is in
+[`animation-performance-revision/BRIEF.md`](animation-performance-revision/BRIEF.md#reusable-client-side-performance-review-prompt).
+
+## Documentation process
+
+Read [`PROJECT-HISTORY.md`](PROJECT-HISTORY.md) before reconstructing why a feature exists.
+
+New multi-plan work belongs in `dev-docs/<brief-name>/`:
+
+```text
+BRIEF.md
+BASELINE.md        optional
+plans/             when source plans exist
+RESULTS.md
+README.md
+```
+
+Put interactive reports in `docs/dev-reports/<brief-name>/` and link the rendered Pages URL
+from the package README.
+
+Preserve original source artifacts. Mark reconstructed briefs. Do not invent missing
+historical plans.
+
+## Change workflow
+
+1. Read this file, the relevant brief, and `TECHNICAL_TASTE_COUNCIL.md`.
+2. Inspect `git status` and preserve unrelated user changes.
+3. Use the smallest focused test while editing.
+4. Run `npm test` and relevant Python validators before completion.
+5. Serve `docs/` and inspect changed UI in a target browser.
+6. Review generated and golden diffs.
+7. Do not commit, push, or deploy unless the task includes that approval.
