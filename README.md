@@ -7,7 +7,8 @@
 > The **social edition** of [my-wc26-bracket](https://github.com/eriic-builds/my-wc26-bracket)
 > (started as a pilot, now the main): share your bracket as a link, add colleagues'
 > links to a local leaderboard, compare picks — still 100% client-side, still free.
-> See `dev-docs/SPEC.md` for the social-loop spec and `dev-docs/PLAN-*.md` for the build plans.
+> See `dev-docs/zero-backend-social-loop/BRIEF.md` for the social-loop spec and
+> `dev-docs/zero-backend-social-loop/plans/` for its preserved build plans.
 
 > Upload your own filled-in **SLED World Cup 2026** bracket Excel and get your personal,
 > live-scored dashboard — bracket map, KPIs, scorecard, round-by-round results (with kickoff
@@ -59,7 +60,7 @@ as JavaScript, so *anyone* can drop in their bracket and see their own board.
 | Brackets you've added | Your browser's storage — same deal |
 | A share link | Entirely inside the URL you send — nothing is written anywhere when you generate it |
 | A pool backup | A private JSON file downloaded only when you choose **Back up my pool** |
-| Live match results | A JSON file on GitHub, updated 3× a day by a bot |
+| Live match results | A JSON file on GitHub, updated 3× a day plus half-hour match-window runs |
 
 When you hit "Share link", your 31 picks + display name get packed into the URL itself (the part after `#`). The recipient's browser unpacks it directly — no round-trip to any server, no account, no database row created. If they click "Add to my leaderboard", it saves to *their* browser. **Back up my pool** downloads your bracket and that local leaderboard; importing it uses the backup's bracket and adds only leaderboard entries that are missing. Because the file contains picks people shared with you, keep it private.
 
@@ -69,7 +70,9 @@ or screenshots). Prevention beats revocation: use the **"share as"** field to sh
 initials or an alias, and the link never contained your name in the first place. Recipients can
 always remove your bracket from their board with one ✕.
 
-See `dev-docs/SPEC.md` for the wire format, behavioral invariants, and the distinction between a private local pool backup and a whole-pool sharing feature.
+See `dev-docs/zero-backend-social-loop/BRIEF.md` for the wire format, behavioral
+invariants, and the distinction between a private local pool backup and a whole-pool sharing
+feature.
 
 ## How it works
 

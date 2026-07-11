@@ -1,4 +1,4 @@
-# SPEC — the zero-backend social loop
+# Zero-backend social loop brief
 
 Intent (stable across sessions; code is the byproduct): let coworkers compare World Cup
 brackets **without any central storage**, so nobody's name or picks are surfaced

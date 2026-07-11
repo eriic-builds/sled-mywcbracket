@@ -42,8 +42,8 @@ python3 scripts/fetch_results.py --dry-run # preview a results sync
 
 ## Social-layer rules (the point of this pilot)
 
-- **SPEC.md is the source of truth** for share/compare behavior. Update it when
-  behavior changes; consult it before re-deriving intent from code.
+- **`zero-backend-social-loop/BRIEF.md` is the source of truth** for share/compare
+  behavior. Update it when behavior changes; consult it before re-deriving intent from code.
 - Privacy invariants (non-negotiable): no network writes in social code; rivals
   never appear in a URL; the explicit "Back up my pool" action may download the
   owner's bracket plus locally saved rivals as a private JSON file, but no feature

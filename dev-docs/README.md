@@ -23,10 +23,12 @@ pages instead of GitHub showing the HTML source.
 
 | Brief | Status | Final report | Interactive preview |
 | --- | --- | --- | --- |
+| [Zero-backend social loop](zero-backend-social-loop/BRIEF.md) | Complete | [Results](zero-backend-social-loop/RESULTS.md) | [Open build story](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/zero-backend-social-loop/) |
+| [Live tournament readiness](live-tournament-readiness/BRIEF.md) | Complete | [Results](live-tournament-readiness/RESULTS.md) | [Open dashboard](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/live-tournament-readiness/) |
 | [Animation performance revision](animation-performance-revision/BRIEF.md) | Complete | [Results](animation-performance-revision/RESULTS.md) | [Open dashboard](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/animation-performance-revision/) |
 
-## Existing reference documents
+## Compatibility path
 
-The loose `SPEC.md`, `PLAN-*.md`, and `ANALYSIS.html` files predate this convention. They
-remain in place so existing links do not break. Future brief-driven work should use the
-package structure above.
+`ANALYSIS.html` redirects the older `JOURNEY.html` link to the rendered zero-backend social
+loop report. It is the only compatibility file left at this level. Future brief-driven work
+should use the package structure above.
