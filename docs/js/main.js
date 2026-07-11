@@ -19,6 +19,71 @@ let PORTRAIT_STATE = { ok: false, data: null, error: new Error("Not loaded") };
 let SHOWN = null;          // the picks currently rendered (needed by "Save as mine")
 let IS_SHARED = false;     // viewing someone else's bracket via a share link
 const HINT_KEY = "wcb.hint.compare.v1";   // dismissal flag for the compare-with-friends nudge
+const LANDING_BALLPIT_KEY = "wcb.landing.ballpit.v1";
+let LANDING_BALLPIT = null;
+let LANDING_BALLPIT_LOAD = null;
+let LANDING_BALLPIT_FAILED = false;
+let LANDING_BALLPIT_WANTED = false;
+let LANDING_BALLPIT_ENABLED = true;
+try { LANDING_BALLPIT_ENABLED = localStorage.getItem(LANDING_BALLPIT_KEY) !== "0"; } catch (e) {}
+
+function syncLandingBallpitToggle() {
+  const button = $("#balltoggle");
+  const label = $("#balltoggle-label");
+  if (button) {
+    button.classList.toggle("on", LANDING_BALLPIT_ENABLED);
+    button.setAttribute("aria-pressed", LANDING_BALLPIT_ENABLED ? "true" : "false");
+    button.title = LANDING_BALLPIT_ENABLED
+      ? "Hide the interactive soccer balls"
+      : "Show the interactive soccer balls";
+  }
+  if (label) label.textContent = LANDING_BALLPIT_ENABLED ? "Motion on" : "Motion off";
+  document.querySelector(".hero-frame")?.classList.toggle("ballpit-off", !LANDING_BALLPIT_ENABLED);
+}
+
+function setLandingBallpitActive(nextActive) {
+  LANDING_BALLPIT_WANTED = Boolean(nextActive);
+  if (LANDING_BALLPIT) {
+    LANDING_BALLPIT.setActive(LANDING_BALLPIT_WANTED);
+    return;
+  }
+  if (!LANDING_BALLPIT_WANTED || !LANDING_BALLPIT_ENABLED ||
+      LANDING_BALLPIT_LOAD || LANDING_BALLPIT_FAILED) return;
+
+  const host = document.querySelector("[data-landing-ballpit]");
+  if (!host) return;
+  LANDING_BALLPIT_LOAD = import("./landing-ballpit.js")
+    .then(module => {
+      if (!LANDING_BALLPIT_WANTED) return;
+      LANDING_BALLPIT = module.initLandingBallpit(host);
+      LANDING_BALLPIT.setEnabled(LANDING_BALLPIT_ENABLED, true);
+      LANDING_BALLPIT.setActive(true);
+    })
+    .catch(error => {
+      LANDING_BALLPIT_FAILED = true;
+      host.classList.add("ballpit-fallback");
+      console.warn("Landing ballpit module unavailable; using the static hero background.", error);
+    })
+    .finally(() => {
+      LANDING_BALLPIT_LOAD = null;
+      if (LANDING_BALLPIT_WANTED && !LANDING_BALLPIT && !LANDING_BALLPIT_FAILED) {
+        setLandingBallpitActive(true);
+      }
+    });
+}
+
+function setLandingBallpitEnabled(nextEnabled) {
+  const changed = LANDING_BALLPIT_ENABLED !== Boolean(nextEnabled);
+  LANDING_BALLPIT_ENABLED = Boolean(nextEnabled);
+  try { localStorage.setItem(LANDING_BALLPIT_KEY, LANDING_BALLPIT_ENABLED ? "1" : "0"); } catch (e) {}
+  syncLandingBallpitToggle();
+  if (LANDING_BALLPIT) {
+    LANDING_BALLPIT.setEnabled(LANDING_BALLPIT_ENABLED, changed && LANDING_BALLPIT_ENABLED);
+    LANDING_BALLPIT.setActive(LANDING_BALLPIT_WANTED);
+  } else if (LANDING_BALLPIT_ENABLED) {
+    setLandingBallpitActive(LANDING_BALLPIT_WANTED);
+  }
+}
 
 function teardownTrophies() {
   (window.__trophyTeardowns || []).forEach(teardown => teardown());
@@ -87,6 +152,7 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   resetWhatIfsIfChanged(picks);
   teardownMatchDetails();
   teardownInteractions();
+  setLandingBallpitActive(false);
   const trophyGeneration = teardownTrophies();
   SHOWN = picks; IS_SHARED = isShared;
   const app = $("#app");
@@ -259,6 +325,7 @@ function showLanding() {
   $("#errbox").hidden = true;
   $("#landing").hidden = false;
   refreshLanding();
+  setLandingBallpitActive(true);
   window.scrollTo(0, 0);
 }
 
@@ -364,7 +431,13 @@ async function addDemoRival() {
 }
 
 function openLeaderboard() {
-  if (TOPO && LIVE) openCompare(TOPO, LIVE, { onAddLink: addRivalFromLink, onAddDemo: addDemoRival });
+  if (!TOPO || !LIVE) return;
+  setLandingBallpitActive(false);
+  openCompare(TOPO, LIVE, {
+    onAddLink: addRivalFromLink,
+    onAddDemo: addDemoRival,
+    onClose: () => { if (!$("#landing").hidden) setLandingBallpitActive(true); },
+  });
 }
 
 // Landing theme switcher (light/dark). Persists to the same key the dashboard
@@ -401,6 +474,7 @@ function refreshLanding() {
   card.hidden = n === 0;
   const c = $("#poolcount"); if (c) c.textContent = n;
   syncLandingThemeButtons();   // keep the landing light/dark switcher in sync
+  syncLandingBallpitToggle();
 }
 
 function openSharedFromHash() {
@@ -421,7 +495,11 @@ function openSharedFromHash() {
 
 function wire() {
   const fileInput = $("#file");
-  $("#build").onclick = () => { if (TOPO) openBuilder(TOPO, accept, () => {}); };  // build -> save+show
+  $("#build").onclick = () => {
+    if (!TOPO) return;
+    setLandingBallpitActive(false);
+    openBuilder(TOPO, accept, () => setLandingBallpitActive(true));
+  };  // build -> save+show
   $("#pick").onclick = () => fileInput.click();
   fileInput.onchange = () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); };
   const dz = $("#drop");
@@ -437,6 +515,9 @@ function wire() {
   if (lhome) lhome.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
   document.querySelectorAll("[data-theme-btn]").forEach(b =>
     b.addEventListener("click", () => setLandingTheme(b.getAttribute("data-theme-btn"))));
+  const ballToggle = $("#balltoggle");
+  if (ballToggle) ballToggle.addEventListener("click", () =>
+    setLandingBallpitEnabled(!LANDING_BALLPIT_ENABLED));
   $("#importfile").onchange = async () => {
     const f = $("#importfile").files[0]; if (!f) return;
     let poolFile = /pool-backup\.json$/i.test(f.name);
@@ -503,11 +584,26 @@ function wire() {
   let dataOk = true;
   try { await loadData(); } catch (e) { console.warn("data load failed", e); dataOk = false; }
   refreshLanding();
-  if (!dataOk) { showDataError(); return; }   // landing stays visible; the banner explains and offers retry
+  if (!dataOk) {
+    setLandingBallpitActive(true);
+    showDataError();
+    return;
+  }   // landing stays visible; the banner explains and offers retry
   maybeShowStaleNotice(LIVE);
   const hash = openSharedFromHash();     // a share link wins over the saved bracket
   if (hash === "shown") return;
-  if (hash === "failed") return;         // keep the landing + error visible, don't cover it
+  if (hash === "failed") {
+    setLandingBallpitActive(true);
+    return;
+  }                                      // keep the landing + error visible, don't cover it
   const saved = loadPicks();
-  if (saved) { try { showDashboard(saved); } catch (e) { console.warn(e); } }
+  if (saved) {
+    try {
+      showDashboard(saved);
+      return;
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+  setLandingBallpitActive(true);
 })();

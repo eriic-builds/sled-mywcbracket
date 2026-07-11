@@ -103,7 +103,7 @@ export function diffPicks(mine, theirs, live, topology) {
 // ── overlay UI ───────────────────────────────────────────────────────────────
 const ROUND_TAG = { r32: "R32", r16: "R16", qf: "QF", sf: "SF", final: "Final" };
 
-export function openCompare(topology, live, { onAddLink, onAddDemo } = {}) {
+export function openCompare(topology, live, { onAddLink, onAddDemo, onClose } = {}) {
   const host = document.getElementById("compare");
   const inner = host.querySelector(".bld-inner");
   const prevFocus = document.activeElement;             // a11y: return focus here on close
@@ -116,6 +116,7 @@ export function openCompare(topology, live, { onAddLink, onAddDemo } = {}) {
   function close() {
     host.hidden = true; inner.innerHTML = ""; document.removeEventListener("keydown", onKey);
     if (prevFocus && prevFocus.focus) prevFocus.focus();   // a11y: restore focus to the trigger
+    if (onClose) onClose();
   }
   function onKey(e) { if (e.key === "Escape") close(); }
   document.addEventListener("keydown", onKey);
