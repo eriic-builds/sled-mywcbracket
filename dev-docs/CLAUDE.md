@@ -35,6 +35,10 @@ python3 scripts/fetch_results.py --dry-run # preview a results sync
   The sync workflow runs it between fetch and commit, and `tests.yml` runs it on push, so
   a malformed feed never ships. Run it locally after a manual data edit:
   `python3 scripts/validate_results.py`.
+- New multi-plan work belongs in `dev-docs/<brief-name>/`: keep `BRIEF.md`, optional
+  `BASELINE.md`, `plans/PLAN-*.md`, `RESULTS.md`, and a short `README.md` together.
+  Put interactive HTML reports in `docs/dev-reports/<brief-name>/` so GitHub Pages renders
+  them, then link the preview from the brief README.
 
 ## Social-layer rules (the point of this pilot)
 

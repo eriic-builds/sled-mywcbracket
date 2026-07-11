@@ -1,4 +1,4 @@
-// Interaction layer — extracted VERBATIM from wc26-bracket build_dashboard.py (JS constant).
+// Interaction layer — adapted from wc26-bracket build_dashboard.py (JS constant).
 // Wrapped in initInteractions() so it runs AFTER render.js injects the dashboard DOM.
 export function initInteractions(){
 
@@ -7,6 +7,7 @@ return (function(){
  function later(fn,delay){var id=setTimeout(function(){timers.delete(id);if(!signal.aborted)fn();},delay);timers.add(id);return id;}
  function cancelLater(id){clearTimeout(id);timers.delete(id);}
  function nextFrame(fn){var id=requestAnimationFrame(function(){frames.delete(id);if(!signal.aborted)fn();});frames.add(id);return id;}
+ function cancelFrame(id){if(!id)return;cancelAnimationFrame(id);frames.delete(id);}
  var root=document.documentElement,LS=window.localStorage;
  document.body.classList.remove('map-expanded','map-fit-screen','map-fit-mirror','map-fit-sideways');
  root.classList.remove('map-fit-screen-root');
@@ -56,7 +57,8 @@ return (function(){
   function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
   set('scConfirmed',conf);set('scConfirmed2',conf);set('scLive',live);set('scOut',out);set('scMax',conf+live);set('scSoFar',conf+'/'+(conf+out));
   set('kpiConfirmed',conf);set('kpiLive',live);
-  var bar=document.getElementById('scBar');if(bar)bar.style.width=Math.round(conf/MAXP*100)+'%';}
+  var ratio=MAXP>0?Math.max(0,Math.min(1,conf/MAXP)):0;
+  var bar=document.getElementById('scBar');if(bar)bar.style.transform='scaleX('+ratio+')';}
  rows.forEach(function(r){r.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){var id=r.dataset.pick,s=b.dataset.set;if(s===r.dataset.default)delete scores[id];else scores[id]=s;saveScores();recalc();});});});
  var rst=document.getElementById('scReset');if(rst)rst.addEventListener('click',function(){scores={};saveScores();recalc();});
  // ---- bracket connector lines (elbow paths, coloured by whether each pick came true) ----
@@ -180,20 +182,22 @@ return (function(){
  var _rt;window.addEventListener('resize',function(){cancelLater(_rt);_rt=later(function(){if(window.innerWidth<=860&&document.body.classList.contains('map-expanded'))setMapExpanded(false,false);if(layoutWrap&&layoutWrap.dataset.layout==='sideways'&&window.innerWidth<=860)setLayout('mirror',true);else drawConnectors();},120);},{signal:signal});
  window.addEventListener('load',function(){later(drawConnectors,60);},{signal:signal});
  // ---- hover: quick World Cup stat card on each team box ----
- var card=document.getElementById('statcard');
- function posCard(ev){var pad=14,w=card.offsetWidth,h=card.offsetHeight,x=ev.clientX+16,y=ev.clientY+16;
-   if(x+w>window.innerWidth-pad)x=ev.clientX-w-16; if(x<pad)x=pad;
-   if(y+h>window.innerHeight-pad)y=window.innerHeight-h-pad; if(y<pad)y=pad;
-   card.style.left=x+'px'; card.style.top=y+'px';}
+ var card=document.getElementById('statcard'),cardFrame=0,cardX=0,cardY=0,cardW=0,cardH=0;
+ function placeCard(){cardFrame=0;var pad=14,x=cardX+16,y=cardY+16;
+   if(x+cardW>window.innerWidth-pad)x=cardX-cardW-16; if(x<pad)x=pad;
+   if(y+cardH>window.innerHeight-pad)y=window.innerHeight-cardH-pad; if(y<pad)y=pad;
+   card.style.translate=x+'px '+y+'px';}
+ function posCard(ev){if(!card.classList.contains('show'))return;cardX=ev.clientX;cardY=ev.clientY;if(!cardFrame)cardFrame=nextFrame(placeCard);}
  function showCard(el,ev){var t=el.getAttribute('data-team'),s=window.WCSTATS&&window.WCSTATS[t]; if(!s||!card)return;
    card.innerHTML='<div class="sc-name"><span class="seed">'+(s.s||'')+'</span>'+t+'</div>'
      +'<div class="sc-row"><span class="k">World Cup titles</span><span class="v gold">'+(s.t?('🏆 '+s.t):'—')+'</span></div>'
      +'<div class="sc-row"><span class="k">Best finish</span><span class="v">'+s.b+'</span></div>';
-   posCard(ev); card.classList.add('show');}
+   cardW=card.offsetWidth;cardH=card.offsetHeight;cardX=ev.clientX;cardY=ev.clientY;placeCard();card.classList.add('show');}
  document.querySelectorAll('.team[data-team]').forEach(function(el){
    el.addEventListener('mouseenter',function(ev){showCard(el,ev)});
    el.addEventListener('mousemove',posCard);
-   el.addEventListener('mouseleave',function(){card.classList.remove('show')});});
+   el.addEventListener('mouseleave',function(){cancelFrame(cardFrame);cardFrame=0;card.classList.remove('show')});});
+ window.addEventListener('resize',function(){if(card.classList.contains('show')){cardW=card.offsetWidth;cardH=card.offsetHeight;placeCard();}},{signal:signal});
  paintFav();apply();recalc();drawConnectors();
  // ── side-nav rail: mobile toggle + scrollspy ──
  var rail=document.getElementById('rail'),navToggle=document.getElementById('navToggle');

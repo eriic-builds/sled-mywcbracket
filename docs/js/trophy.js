@@ -2,6 +2,7 @@ import * as THREE from "./vendor/three.module.min.js";
 
 const DEG = Math.PI / 180;
 const AUTO_TURN_SECONDS = 32;
+const AUTO_FRAME_MS = 1000 / 30;
 const PHONE_WIDTH = 600;
 const FALLBACK_SRC = "assets/trophy-fallback.svg";
 
@@ -103,6 +104,10 @@ export function initTrophy(slot) {
   function animate(now) {
     frame = 0;
     if (!canAutoRotate()) return;
+    if (lastFrame && now - lastFrame < AUTO_FRAME_MS) {
+      frame = requestAnimationFrame(animate);
+      return;
+    }
     const delta = lastFrame ? Math.min((now - lastFrame) / 1000, 0.1) : 0;
     lastFrame = now;
     autoYaw = (autoYaw + delta * Math.PI * 2 / AUTO_TURN_SECONDS) % (Math.PI * 2);
@@ -309,6 +314,7 @@ export function initTrophy(slot) {
     stopLoop();
     clearTimeout(resumeTimer);
     resumeTimer = 0;
+    resumeAfter = 0;
     detachCanvasEvents();
     if (canvas && pointerId !== null && canvas.hasPointerCapture(pointerId)) {
       canvas.releasePointerCapture(pointerId);
@@ -411,7 +417,10 @@ export function initTrophy(slot) {
     }
     phone = nextPhone;
     slot.classList.toggle("trophy-phone", phone);
-    if (phone) stopLoop();
+    if (phone) {
+      disposeScene();
+      slot.classList.remove("trophy-ready");
+    }
     else if (intersecting) {
       initializeScene();
       resizeRenderer();

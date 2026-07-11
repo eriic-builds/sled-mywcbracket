@@ -16,6 +16,9 @@
 
 **Live site:** https://eriic-builds.github.io/sled-mywcbracket/
 
+**Development briefs:** [organized brief packages](dev-docs/) ·
+[interactive report previews](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/)
+
 This is a client-side fork of [**wc26-bracket**](https://github.com/eriic-builds/wc26-bracket)
 (which renders one person's dashboard in Python at build time). Here the same render engine runs
 as JavaScript, so *anyone* can drop in their bracket and see their own board.

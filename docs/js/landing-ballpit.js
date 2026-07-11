@@ -9,6 +9,10 @@ const GRAVITY = 3.4;
 const WALL_BOUNCE = 0.72;
 const COLLISION_BOUNCE = 0.78;
 const DPR_LIMIT = 1.5;
+const COARSE_FRAME_MS = 1000 / 30;
+const SLEEP_SPEED = 0.12;
+const SLEEP_TARGET_DISTANCE = 0.015;
+const SLEEP_FRAMES = 45;
 const FLAG_DECALS = [
   [1, "us"], [3, "ca"], [6, "mx"], [9, "ar"],
   [12, "br"], [15, "gb-eng"], [18, "fr"], [21, "jp"],
@@ -124,6 +128,25 @@ export function setBallpitTarget(state, bounds, x, y) {
   state.targetY = clamp(y, -bounds.y + radius, bounds.y - radius);
 }
 
+export function isBallPhysicsSettled(state) {
+  if (!state || !Number.isInteger(state.count) || state.count < 2 ||
+      !state.position || !state.velocity) {
+    throw new TypeError("Ball-pit settled state requires active position and velocity data.");
+  }
+  if (Math.hypot(
+    state.position[0] - state.targetX,
+    state.position[1] - state.targetY,
+  ) > SLEEP_TARGET_DISTANCE) return false;
+
+  for (let i = 0; i < state.count; i++) {
+    const offset = i * 2;
+    if (Math.hypot(state.velocity[offset], state.velocity[offset + 1]) > SLEEP_SPEED) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function capVelocity(velocity, offset) {
   const x = velocity[offset];
   const y = velocity[offset + 1];
@@ -153,7 +176,12 @@ function constrainBall(state, bounds, index) {
 
   if (state.position[offset + 1] < minY) {
     state.position[offset + 1] = minY;
-    if (state.velocity[offset + 1] < 0) state.velocity[offset + 1] *= -WALL_BOUNCE;
+    if (state.velocity[offset + 1] < 0) {
+      state.velocity[offset + 1] *= -WALL_BOUNCE;
+      if (index > 0 && state.velocity[offset + 1] < SLEEP_SPEED) {
+        state.velocity[offset + 1] = 0;
+      }
+    }
   } else if (state.position[offset + 1] > maxY) {
     state.position[offset + 1] = maxY;
     if (state.velocity[offset + 1] > 0) state.velocity[offset + 1] *= -WALL_BOUNCE;
@@ -481,6 +509,11 @@ export function initLandingBallpit(host) {
   let bounds = { x: WORLD_HALF_HEIGHT, y: WORLD_HALF_HEIGHT };
   let frame = 0;
   let lastFrame = 0;
+  let frameWidth = 0;
+  let frameHeight = 0;
+  let touchSize = 0;
+  let settledFrames = 0;
+  let sleeping = false;
   let active = true;
   let enabled = true;
   let intersecting = false;
@@ -497,6 +530,7 @@ export function initLandingBallpit(host) {
   const flagDecals = [];
 
   const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
   let reduced = reducedQuery.matches;
   const dummy = new THREE.Object3D();
   const flagNormal = new THREE.Vector3();
@@ -507,13 +541,19 @@ export function initLandingBallpit(host) {
 
   function canAnimate() {
     return initialized && active && enabled && intersecting && !document.hidden && !reduced &&
-      !failed && !destroyed;
+      !sleeping && !failed && !destroyed;
   }
 
   function stopLoop() {
     if (frame) cancelAnimationFrame(frame);
     frame = 0;
     lastFrame = 0;
+  }
+
+  function wakeLoop() {
+    sleeping = false;
+    settledFrames = 0;
+    startLoop();
   }
 
   function setDummyForBall(index) {
@@ -551,13 +591,10 @@ export function initLandingBallpit(host) {
     }
 
     if (touchTarget) {
-      const width = frameHost.clientWidth;
-      const height = frameHost.clientHeight;
-      const size = Math.max(44, physics.radius[0] / bounds.y * height);
-      touchTarget.style.width = `${size}px`;
-      touchTarget.style.height = `${size}px`;
-      touchTarget.style.left = `${(physics.position[0] / bounds.x + 1) * width * 0.5}px`;
-      touchTarget.style.top = `${(1 - physics.position[1] / bounds.y) * height * 0.5}px`;
+      const x = (physics.position[0] / bounds.x + 1) * frameWidth * 0.5;
+      const y = (1 - physics.position[1] / bounds.y) * frameHeight * 0.5;
+      touchTarget.style.transform =
+        `translate3d(${x}px,${y}px,0) translate(-50%,-50%)`;
     }
   }
 
@@ -570,12 +607,23 @@ export function initLandingBallpit(host) {
   function animate(now) {
     frame = 0;
     if (!canAnimate()) return;
+    if (coarsePointerQuery.matches && touchPointerId === null &&
+        lastFrame && now - lastFrame < COARSE_FRAME_MS) {
+      frame = requestAnimationFrame(animate);
+      return;
+    }
     const delta = lastFrame ? (now - lastFrame) / 1000 : 1 / 60;
     lastFrame = now;
     try {
       stepBallPhysics(physics, bounds, delta);
       renderNow();
-      frame = requestAnimationFrame(animate);
+      settledFrames = isBallPhysicsSettled(physics) ? settledFrames + 1 : 0;
+      if (settledFrames >= SLEEP_FRAMES) {
+        sleeping = true;
+        lastFrame = 0;
+      } else {
+        frame = requestAnimationFrame(animate);
+      }
     } catch (error) {
       useFallback(error);
     }
@@ -599,11 +647,12 @@ export function initLandingBallpit(host) {
     setBallpitTarget(
       physics,
       bounds,
-      frameHost.clientWidth < 600 ? -bounds.x * 0.72 : bounds.x * 0.83,
+      frameWidth < 600 ? -bounds.x * 0.72 : bounds.x * 0.83,
       -bounds.y * 0.72,
     );
     dropPending = false;
     renderNow();
+    wakeLoop();
   }
 
   function updateTheme() {
@@ -633,6 +682,9 @@ export function initLandingBallpit(host) {
     const width = frameHost.clientWidth;
     const height = frameHost.clientHeight;
     if (width < 2 || height < 2) return;
+    const dimensionsChanged = width !== frameWidth || height !== frameHeight;
+    frameWidth = width;
+    frameHeight = height;
 
     bounds = {
       x: WORLD_HALF_HEIGHT * width / height,
@@ -650,9 +702,16 @@ export function initLandingBallpit(host) {
       physics.position[0] = physics.targetX = idleX;
       physics.position[1] = physics.targetY = idleY;
     }
+    const nextTouchSize = Math.max(44, physics.radius[0] / bounds.y * height);
+    if (touchTarget && nextTouchSize !== touchSize) {
+      touchSize = nextTouchSize;
+      touchTarget.style.width = `${touchSize}px`;
+      touchTarget.style.height = `${touchSize}px`;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_LIMIT));
     renderer.setSize(width, height, false);
     renderNow();
+    if (dimensionsChanged) wakeLoop();
   }
 
   function pointerToWorld(event) {
@@ -662,7 +721,7 @@ export function initLandingBallpit(host) {
     const y = (1 - (event.clientY - rect.top) / rect.height * 2) * bounds.y;
     pointerEngaged = true;
     setBallpitTarget(physics, bounds, x, y);
-    startLoop();
+    wakeLoop();
   }
 
   function onPointerDown(event) {
@@ -690,9 +749,10 @@ export function initLandingBallpit(host) {
     setBallpitTarget(
       physics,
       bounds,
-      frameHost.clientWidth < 600 ? -bounds.x * 0.72 : bounds.x * 0.83,
+      frameWidth < 600 ? -bounds.x * 0.72 : bounds.x * 0.83,
       -bounds.y * 0.72,
     );
+    wakeLoop();
   }
 
   function attachPointerEvents() {
@@ -888,6 +948,8 @@ export function initLandingBallpit(host) {
       scene.add(bodyMesh, panelMesh, seamMesh);
 
       physics = createBallPhysics(MAX_BALLS, bounds);
+      sleeping = false;
+      settledFrames = 0;
       loadFlagDecals();
       canvas.addEventListener("webglcontextlost", onContextLost);
       attachPointerEvents();
@@ -905,13 +967,13 @@ export function initLandingBallpit(host) {
 
   function onVisibilityChange() {
     if (document.hidden) stopLoop();
-    else startLoop();
+    else wakeLoop();
   }
 
   function onReducedMotionChange(event) {
     reduced = event.matches;
     if (reduced) stopLoop();
-    else startLoop();
+    else wakeLoop();
     renderNow();
   }
 
@@ -937,7 +999,7 @@ export function initLandingBallpit(host) {
       if (intersecting) {
         initializeScene();
         resize();
-        startLoop();
+        wakeLoop();
       } else {
         stopLoop();
       }
@@ -957,7 +1019,7 @@ export function initLandingBallpit(host) {
       }
       initializeScene();
       resize();
-      startLoop();
+      wakeLoop();
     },
     setEnabled(nextEnabled, restart = false) {
       enabled = Boolean(nextEnabled);
@@ -972,7 +1034,7 @@ export function initLandingBallpit(host) {
       initializeScene();
       if (dropPending && physics) performDrop();
       renderNow();
-      startLoop();
+      wakeLoop();
     },
     destroy() {
       if (destroyed) return;

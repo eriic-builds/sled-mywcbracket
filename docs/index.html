@@ -38,8 +38,8 @@
     color-mix(in srgb,var(--panel) 48%,transparent) 64%,transparent 86%)}
 #landing .landing-ballpit-canvas{position:absolute;inset:0;z-index:1;width:100%;height:100%;display:block;
   pointer-events:none;opacity:.82;animation:lballpit-in .5s ease-out both;transition:opacity .2s ease}
-#landing .landing-ballpit-touch{position:absolute;z-index:3;display:block;border-radius:50%;
-  transform:translate(-50%,-50%);pointer-events:none;touch-action:none}
+#landing .landing-ballpit-touch{position:absolute;left:0;top:0;z-index:3;display:block;border-radius:50%;
+  transform:translate3d(0,0,0) translate(-50%,-50%);pointer-events:none;touch-action:none}
 @media(pointer:coarse){#landing .landing-ballpit-touch{pointer-events:auto}}
 #landing .hero-frame.ballpit-off .landing-ballpit-canvas{opacity:0;visibility:hidden;animation:none}
 #landing .hero-frame.ballpit-off .landing-ballpit-touch{display:none}
@@ -63,7 +63,7 @@
   background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border:1px solid var(--border);box-shadow:var(--shadow)}
 #landing .lthemes button{font-family:inherit;font-size:1rem;line-height:1;color:var(--muted,#9aa2ad);background:transparent;
-  border:0;padding:7px 12px;border-radius:999px;cursor:pointer;transition:.16s}
+  border:0;padding:7px 12px;border-radius:999px;cursor:pointer;transition:color .16s,background-color .16s}
 #landing .lthemes button:hover{color:var(--text);background:var(--hover)}
 #landing .lthemes button.on{color:#fff;background:var(--blue);box-shadow:0 4px 14px rgba(0,151,244,.4)}
 #landing .lthemes button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
@@ -81,7 +81,9 @@
   font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--win-ink);
   background:color-mix(in srgb,var(--teal) 14%,transparent);border:1px solid color-mix(in srgb,var(--teal) 34%,transparent);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-#landing .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:lbadge-pulse 1.8s infinite}
+#landing .badge .dot{position:relative;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+#landing .badge .dot::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--green);
+  pointer-events:none;animation:lbadge-pulse 1.8s infinite}
 #landing .headline{font-size:clamp(2rem,5.2vw,3.7rem);line-height:1.07;margin:.22em 0 .3em;max-width:20ch;font-weight:800;letter-spacing:-.01em;color:var(--text)}
 #landing .headline .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
 #landing .tag{color:var(--text2);opacity:.92;font-size:1.06rem;max-width:60ch;margin:.2em auto 0}
@@ -89,11 +91,11 @@
 
 @keyframes lhero-in{from{opacity:0;transform:scale(.986)}to{opacity:1;transform:none}}
 @keyframes lballpit-in{from{opacity:0}to{opacity:.82}}
-@keyframes lbadge-pulse{0%{box-shadow:0 0 0 0 rgba(155,199,42,.6)}70%{box-shadow:0 0 0 8px rgba(155,199,42,0)}100%{box-shadow:0 0 0 0 rgba(155,199,42,0)}}
-@media(prefers-reduced-motion:reduce){#landing .hero-frame,#landing .landing-ballpit-canvas{animation:none}#landing .badge .dot{animation:none}}
+@keyframes lbadge-pulse{0%{opacity:.6;transform:scale(1)}70%,100%{opacity:0;transform:scale(2.2)}}
+@media(prefers-reduced-motion:reduce){#landing .hero-frame,#landing .landing-ballpit-canvas{animation:none}#landing .badge .dot::after{animation:none}}
 @media(max-width:560px){#landing .lnav{padding:12px 14px}#landing .lbrand-tx small,#landing .lball-label{display:none}#landing .lball-toggle{padding:8px 10px}#landing .hero-body{padding:6px 16px 8px}}
 #drop{border:2px dashed var(--border2);border-radius:20px;padding:34px 24px;background:var(--hover);
-  transition:.18s;cursor:pointer}
+  transition:border-color .18s,background-color .18s;cursor:pointer}
 #drop.over{border-color:#0097F4;background:rgba(0,151,244,.10)}
 #drop .ball{font-size:2.6rem}
 #drop .dh{font-weight:700;font-size:1.15rem;margin:8px 0 2px}
@@ -152,14 +154,14 @@
 /* Landing choices */
 .choices{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:26px 0 12px}
 .choice{flex:1 1 260px;max-width:320px;text-align:left;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:0 12px;
-  padding:16px 18px;border-radius:16px;cursor:pointer;color:var(--text);background:var(--hover);border:1px solid var(--border2);transition:.16s}
+  padding:16px 18px;border-radius:16px;cursor:pointer;color:var(--text);background:var(--hover);border:1px solid var(--border2);transition:transform .16s,border-color .16s}
 .choice:hover{background:var(--border);transform:translateY(-2px)}
 .choice.primary{background:linear-gradient(120deg,rgba(0,151,244,.22),rgba(0,178,145,.22));border-color:rgba(0,151,244,.5)}
 .choice.primary:hover{background:linear-gradient(120deg,rgba(0,151,244,.32),rgba(0,178,145,.32))}
 .choice .ch-ic{grid-row:1/3;font-size:1.9rem;align-self:center}
 .choice .ch-t{font-weight:800;font-size:1.06rem;color:var(--text)}
 .choice .ch-s{font-size:.82rem;color:var(--muted,#9aa2ad)}
-#drop{border:2px dashed var(--border2);border-radius:14px;padding:12px;margin:2px auto 4px;max-width:360px;transition:.16s;cursor:pointer}
+#drop{border:2px dashed var(--border2);border-radius:14px;padding:12px;margin:2px auto 4px;max-width:360px;transition:border-color .16s,background-color .16s;cursor:pointer}
 #drop.over{border-color:#0097F4;background:rgba(0,151,244,.10)}
 .drop-hint{font-size:.86rem;color:var(--muted,#9aa2ad)}
 .mini-row{display:flex;gap:10px;align-items:center;justify-content:center;margin:12px 0 4px}
@@ -172,7 +174,7 @@
   padding:14px 16px;box-shadow:0 18px 50px rgba(0,0,0,.45);text-align:left}
 .sp-close{position:absolute;top:8px;right:8px;width:26px;height:26px;display:flex;align-items:center;
   justify-content:center;font:inherit;font-size:.9rem;line-height:1;color:var(--muted,#9aa2ad);
-  background:transparent;border:1px solid transparent;border-radius:8px;cursor:pointer;transition:.14s}
+  background:transparent;border:1px solid transparent;border-radius:8px;cursor:pointer;transition:color .14s,background-color .14s,border-color .14s}
 .sp-close:hover{color:var(--text);background:var(--hover);border-color:var(--border2)}
 .sp-close:focus-visible{outline:2px solid #0097F4;outline-offset:2px}
 .sharepop .sp-field{padding-right:30px}
@@ -248,7 +250,7 @@
 .bld-mc{font-size:.6rem;font-weight:700;letter-spacing:.05em;color:var(--muted,#9aa2ad);text-align:center;margin-bottom:2px}
 .bld-vs{text-align:center;font-size:.62rem;color:var(--muted,#9aa2ad);margin:3px 0}
 .bld-team{width:100%;display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:9px;border:1px solid var(--border2);
-  background:var(--hover);color:var(--text);font:inherit;font-size:.9rem;font-weight:650;cursor:pointer;transition:.14s;text-align:left}
+  background:var(--hover);color:var(--text);font:inherit;font-size:.9rem;font-weight:650;cursor:pointer;transition:opacity .14s,border-color .14s;text-align:left}
 .bld-team:hover{background:var(--border);border-color:var(--border2)}
 .bld-team .seed{font-size:.6rem;font-weight:700;color:var(--muted,#9aa2ad);background:var(--border);border-radius:5px;padding:2px 5px}
 .bld-team .bld-flag{width:22px;height:16px;border-radius:3px;object-fit:cover;flex:0 0 auto;box-shadow:0 0 0 1px var(--border2)}
@@ -283,7 +285,7 @@
 .bld-btn.go{color:#04121a;background:linear-gradient(120deg,#0097F4,#00B291);margin-left:auto}
 .bld-btn.go:disabled{opacity:.45;cursor:default;filter:grayscale(.3)}
 .bld-prog{flex:1;height:7px;border-radius:999px;background:var(--border);overflow:hidden;max-width:260px}
-.bld-prog i{display:block;height:100%;background:linear-gradient(90deg,#0097F4,#00B291);transition:width .2s}
+.bld-prog i{display:block;width:100%;height:100%;background:linear-gradient(90deg,#0097F4,#00B291);transform-origin:left center;transition:transform .2s}
 </style>
 </head>
 <body>

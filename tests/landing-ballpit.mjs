@@ -3,6 +3,7 @@ import fs from "node:fs";
 import {
   createBallPhysics,
   createSoccerBallTopology,
+  isBallPhysicsSettled,
   resetBallDrop,
   resizeBallPhysics,
   setBallpitTarget,
@@ -91,6 +92,36 @@ check("motion restart resets every ball near the top with downward velocity", ()
   }
 });
 
+check("settled predicate distinguishes rest, target error, and motion", () => {
+  const state = createBallPhysics(3, bounds, 6);
+  state.velocity.fill(0);
+  state.targetX = state.position[0];
+  state.targetY = state.position[1];
+  assert.equal(isBallPhysicsSettled(state), true);
+
+  state.targetX += 0.2;
+  assert.equal(isBallPhysicsSettled(state), false);
+  state.targetX = state.position[0];
+  state.velocity[4] = 0.4;
+  assert.equal(isBallPhysicsSettled(state), false);
+
+  state.velocity.fill(0);
+  resetBallDrop(state, bounds, 7);
+  assert.equal(isBallPhysicsSettled(state), false);
+});
+
+check("a dropped pile eventually reaches a stable sleep state", () => {
+  const state = createBallPhysics(12, bounds, 8);
+  resetBallDrop(state, bounds, 9);
+  setBallpitTarget(state, bounds, bounds.x * 0.72, -bounds.y * 0.72);
+  let settledFrames = 0;
+  for (let frame = 0; frame < 6000 && settledFrames < 45; frame++) {
+    stepBallPhysics(state, bounds, 1 / 60);
+    settledFrames = isBallPhysicsSettled(state) ? settledFrames + 1 : 0;
+  }
+  assert.equal(settledFrames, 45, "the resting pile should become eligible for loop sleep");
+});
+
 check("soccer shell has the classic truncated-icosahedron topology", () => {
   const topology = createSoccerBallTopology();
   assert.equal(topology.vertices.length, 60);
@@ -113,7 +144,7 @@ check("landing mounts a decorative non-blocking canvas", () => {
   assert.match(index, /id="balltoggle-label">Motion on/);
   assert.match(index, /\.landing-ballpit-canvas\{[^}]*pointer-events:none/);
   assert.match(index, /\.hero-frame\{[^}]*touch-action:pan-y/);
-  assert.match(index, /\.landing-ballpit-touch\{[^}]*touch-action:none/);
+  assert.match(index, /\.landing-ballpit-touch\{[^}]*left:0;top:0[^}]*touch-action:none/);
   assert.match(index, /@media\(pointer:coarse\)\{#landing \.landing-ballpit-touch\{pointer-events:auto/);
 });
 
@@ -137,6 +168,15 @@ check("renderer uses local instancing and resilient lifecycle paths", () => {
   assert.match(moduleSource, /visibilitychange/);
   assert.match(moduleSource, /webglcontextlost/);
   assert.match(moduleSource, /powerPreference: "low-power"/);
+});
+
+check("frame loop moves the touch target without layout properties", () => {
+  const matrices = moduleSource.match(/function updateMatrices\(\)\s*\{[\s\S]*?\n  \}\n\n  function renderNow/)?.[0] || "";
+  assert.match(matrices, /touchTarget\.style\.transform/);
+  assert.doesNotMatch(matrices, /clientWidth|clientHeight/);
+  assert.doesNotMatch(matrices, /touchTarget\.style\.(?:left|top|width|height)/);
+  assert.match(moduleSource, /isBallPhysicsSettled\(physics\)/);
+  assert.match(moduleSource, /COARSE_FRAME_MS/);
 });
 
 check("curated ball flags use bundled SVG assets", () => {

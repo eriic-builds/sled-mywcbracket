@@ -743,10 +743,13 @@ export function buildScorecard(D) {
   return '<div class="scard" id="scard">' + head + rows.join("") + '</div>';
 }
 export function buildScorebar(D) {
+  const progress = D.POINTS_MAX
+    ? Math.max(0, Math.min(1, D.CONF / D.POINTS_MAX))
+    : 0;
   return '<div class="scorebar glass" id="scorebar"><div class="sb-main">' +
     `<div class="sb-big"><span id="scConfirmed">${D.CONF}</span><span class="sb-slash">/ ${D.POINTS_MAX}</span></div>` +
     '<div class="sb-cap" title="Settled = points you\u2019ve already won or lost. Still-live points aren\u2019t counted here yet, so this total grows \u2014 and can differ between brackets \u2014 as your picks get decided.">points confirmed \u00b7 <b id="scSoFar">' + `${D.CONF}/${D.DECIDED}` + '</b> settled</div>' +
-    `<div class="sb-track"><i id="scBar" style="width:${Math.trunc(D.CONF / D.POINTS_MAX * 100)}%"></i></div></div>` +
+    `<div class="sb-track"><i id="scBar" style="transform:scaleX(${progress})"></i></div></div>` +
     '<div class="sb-stats">' +
     `<div class="sb-stat s-win"><b id="scConfirmed2">${D.CONF}</b><span>confirmed</span></div>` +
     `<div class="sb-stat s-live"><b id="scLive">${D.LIVE}</b><span>still live</span></div>` +

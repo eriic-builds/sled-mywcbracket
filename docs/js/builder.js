@@ -133,7 +133,7 @@ export function openBuilder(topology, onDone, onCancel, resume = true) {
       <div class="bld-body">${grid}${finishPanel}</div>
       <div class="bld-foot">
         <button class="bld-btn ghost" id="bld-back"${step === 0 ? " disabled" : ""}>\u2190 Back</button>
-        <div class="bld-prog"><i style="width:${Math.round(totalPicked() / 31 * 100)}%"></i></div>
+        <div class="bld-prog"><i style="transform:scaleX(${totalPicked() / 31})"></i></div>
         <span class="bld-count">${totalPicked()}/31</span>
         ${isFinal
           ? `<button class="bld-btn go" id="bld-done"${champ ? "" : " disabled"}>See my dashboard \u2192</button>`
