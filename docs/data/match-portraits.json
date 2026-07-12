@@ -218,6 +218,14 @@
       "stage": "Quarter-final",
       "teams": ["Norway", "England"],
       "score": [1, 2]
+    },
+    "M100": {
+      "slug": "arg-swi",
+      "externalId": "1999238",
+      "date": "2026-07-12",
+      "stage": "Quarter-final",
+      "teams": ["Argentina", "Switzerland"],
+      "score": [3, 1]
     }
   }
 }
