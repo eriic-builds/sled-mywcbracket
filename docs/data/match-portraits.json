@@ -210,6 +210,14 @@
       "stage": "Quarter-final",
       "teams": ["Spain", "Belgium"],
       "score": [2, 1]
+    },
+    "M99": {
+      "slug": "nor-eng",
+      "externalId": "1998901",
+      "date": "2026-07-11",
+      "stage": "Quarter-final",
+      "teams": ["Norway", "England"],
+      "score": [1, 2]
     }
   }
 }
