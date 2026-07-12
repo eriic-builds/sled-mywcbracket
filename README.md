@@ -1,36 +1,133 @@
 # My World Cup Bracket
 
+Turn your World Cup picks into a live dashboard that scores itself against real results.
+
+## [Open the live dashboard ->](https://eriic-builds.github.io/sled-mywcbracket/)
+
+Built for anyone tracking a World Cup 2026 bracket, whether you are following your own picks or
+comparing a pool with friends.
+
+Upload the SLED workbook, build a bracket in the browser, or reopen one already saved on your
+device. No install or account is required, and your personal pool stays in your browser.
+
+<p align="center">
+  <a href="https://eriic-builds.github.io/sled-mywcbracket/">
+    <img src="docs/assets/readme/dashboard-bracket-map.png"
+      alt="World Cup bracket dashboard showing the legend, actual path, match results, and champion pick"
+      width="960">
+  </a>
+</p>
+
 [![Sync World Cup results](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/sync-results.yml)
 [![Deploy GitHub Pages](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/deploy-pages.yml)
 [![Tests](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/tests.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/tests.yml)
 
-A no-build, zero-backend World Cup bracket dashboard. Build or import your picks, follow live
-results, compare brackets through private links, and keep your pool in your own browser.
-
-[Open the live site](https://eriic-builds.github.io/sled-mywcbracket/) ·
 [Read the project history](dev-docs/PROJECT-HISTORY.md) ·
 [Explore the interactive history](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/project-history/) ·
-[Open interactive development reports](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/)
+[Open the development reports](https://eriic-builds.github.io/sled-mywcbracket/dev-reports/)
 
-This project started as a client-side port of
-[`wc26-bracket`](https://github.com/eriic-builds/wc26-bracket). It grew into the main social
-edition while preserving static GitHub Pages hosting, browser-local ownership, vanilla
-modules, and no frontend build step.
+## See what you get
 
-## What you can do
+Once your bracket is open, the dashboard gives you:
 
-| Area | Current experience |
+- **Your score at a glance:** confirmed, settled, attainable, and maximum points update against
+  the published tournament results.
+- **The tournament and your prediction:** compare the Actual path with My picks and see where
+  your bracket remains alive.
+- **The story behind each result:** open match cards for scorers, cards, venue, attendance,
+  referee, decider notes, and credited portraits.
+- **A leaderboard you control:** add bracket links from friends and compare standings and
+  undecided picks without creating a shared server pool.
+
+[![Argentina versus Egypt match details showing the final 3-2 facts and the portrait at 88 minutes with the score level at 2-2](docs/assets/readme/argentina-egypt-match-details.png)](https://eriic-builds.github.io/sled-mywcbracket/)
+
+Open a completed match to move beyond the bracket line and into the story of the game. Argentina's
+late 3-2 comeback against Egypt is paused here at 88 minutes, still 2-2 before the stoppage-time
+winner, alongside the full event timeline and reviewed source details.
+
+<p align="center">
+  <a href="https://eriic-builds.github.io/sled-mywcbracket/">
+    <img src="docs/assets/readme/dashboard-live-standing.png"
+      alt="World Cup dashboard in light mode with navigation and six live-standing signals for confirmed, settled, live, attainable, champion, and lost points"
+      width="960">
+  </a>
+</p>
+
+Shown here in light mode, the live-standing section turns the current results into six signals you
+can read at a glance.
+
+## How to use the dashboard
+
+1. **Open the live site.** Choose **See a demo first** for a finished example, or continue with
+   your own bracket.
+2. **Add your picks.** Upload the SLED `.xlsx`, choose **Build my bracket**, reopen a bracket
+   saved on this device, or import a private pool backup.
+3. **Follow the score.** The dashboard matches your picks to public results and shows what is
+   confirmed, still attainable, or no longer possible.
+4. **Explore the bracket.** Switch between Actual path and My picks, change bracket layouts,
+   filter by team, inspect all 31 match cards, and expand the desktop table.
+5. **Share and compare.** Create a link containing one bracket. A recipient decides whether to
+   add it to their local leaderboard and pick-difference view.
+6. **Protect your pool.** Download a private backup of your bracket and locally saved rivals.
+   Importing it restores the bracket and merges missing rivals without duplicates.
+
+**[Open the live dashboard ->](https://eriic-builds.github.io/sled-mywcbracket/)**
+
+## Your bracket stays private
+
+| Data | Where it lives |
 | --- | --- |
-| Create a bracket | Pick winners round by round or import the SLED `.xlsx` file entirely in the browser. |
-| Follow the tournament | See confirmed, settled, attainable, and maximum points against bot-synced live results. |
-| Explore the bracket | Switch between Actual path and My picks in mirrored or Sideways layouts. Filter by team, inspect all 31 match cards, and expand the desktop table without map scrollbars. |
-| Open match stories | View scorers, cards, venue, attendance, referee, decider notes, and credited data portraits for completed games. |
-| Compare with friends | Send one bracket in a `#b=` URL fragment. A recipient chooses whether to add it to a local leaderboard and pick-difference view. |
-| Protect your pool | Download a private backup of your bracket and locally saved rivals. Import merges missing rivals without creating a shared server pool. |
-| Change the presentation | Use dark, light, Easy with OpenDyslexic, and Fun themes including Sticker Book. |
-| Control motion | Interact with the soccer-ball landing hero, disable it with Motion Off, and rely on reduced-motion and static WebGL fallbacks. |
+| Your bracket | Your browser |
+| Brackets you add | Your browser |
+| What-if scores | Your browser, separated by bracket |
+| Theme and Motion settings | Your browser |
+| One bracket you choose to share | Inside the URL fragment you send |
+| Pool backup | A private file downloaded on your action |
+| Public tournament results | Static JSON published with the site |
+| Match portraits | A credited external source requested after interaction |
 
-## Architecture promises
+The URL fragment containing a shared bracket never reaches GitHub Pages in an HTTP request. It
+still contains a copy of that bracket, so it cannot be revoked after someone saves it. Use the
+editable share alias when you do not want a real name in the link.
+
+## Make it yours
+
+| Choice | Options |
+| --- | --- |
+| Layout | Mirrored or Sideways bracket maps, plus an expanded desktop table |
+| Theme and type | Dark, light, Easy with OpenDyslexic, and Fun themes including Sticker Book |
+| Focus | Team filters, favorites, match facts, and credited portraits |
+| Motion and accessibility | Interactive soccer balls, Motion Off, reduced-motion support, and static WebGL fallbacks |
+
+## How this became the final version
+
+The idea started with an Excel attachment and a Microsoft Cowork design. The build then moved
+through three repositories, with each version removing the next piece of friction.
+
+| Build | Question it answered | What changed |
+| --- | --- | --- |
+| [`wc26-bracket`](https://github.com/eriic-builds/wc26-bracket) | Can my own picks become a live dashboard? | A Python generator, validated public results, and scheduled GitHub Pages updates. |
+| [`my-wc26-bracket`](https://github.com/eriic-builds/my-wc26-bracket) | Can anyone use it without repository setup? | The engine moved into the browser, with Excel import, a pick builder, and local storage. |
+| [`sled-mywcbracket`](https://github.com/eriic-builds/sled-mywcbracket) | Can friends compare without accounts or a backend? | One-bracket share links, a local leaderboard, privacy boundaries, and pool backup. |
+
+The practical capability I came away with is a repeatable way to turn varied source material--a
+private workbook, public match feeds, fallback results, and credited media--into one validated
+model, then present it through different layouts, themes, motion, typography, and accessibility
+choices without mixing source truth with visual taste.
+
+The deeper change was the method: start with the outcome, brief the work with Goal, Context,
+Source, and Expectations, then verify each handoff with tests and traceable evidence.
+
+[Read the full Bracket Journey ->](https://eriic-builds.github.io/bracket-journey/)
+
+---
+
+## Technical design and repository guide
+
+Everything above is for using the dashboard and understanding how it evolved. Everything below
+explains how it is built, tested, and deployed.
+
+### Architecture promises
 
 - **Static:** GitHub Pages serves the files in `docs/`.
 - **No build step:** the browser runs the checked-in HTML, CSS, JSON, and ES modules.
@@ -48,71 +145,45 @@ modules, and no frontend build step.
   There is no package install or CDN dependency.
 
 The app is zero-backend, not fully stateless. Browser-local persistence is intentional.
+The consent model and deliberate social omissions are specified in
+[`dev-docs/zero-backend-social-loop/BRIEF.md`](dev-docs/zero-backend-social-loop/BRIEF.md).
+Because there is no build step, a local server runs the same checked-in files that GitHub Pages
+serves.
 
-## How the product works
+### How the product works
 
 ```text
 SLED workbook ----> parse-excel.js --\
-round picker -----> builder.js -------+--> render.js --> dashboard
-topology.json ------------------------+
-results.json -------------------------+
-match-details.json --> match-details.js
+round picker -----> builder.js -------+--> picks
+topology.json ------------------------/
+
+FIFA / fallback feed --> fetch_results.py --> validators --> results + details JSON
+credited portraits ----> portrait_sync.py --> validators --> portrait metadata
+
+picks + public JSON --> render.js --> dashboard
+dashboard --> layouts / themes / filters / match stories / motion
 
 share link <-----> share.js      URL fragment, no network write
 leaderboard <----> compare.js    localStorage only
 pool backup <----> storage.js    private JSON download and merge
 
-scheduled feeds --> fetch_results.py --> validators --> committed JSON --> GitHub Pages
+GitHub Actions --> fetch + validate --> committed JSON --> GitHub Pages
 ```
 
-### Browser runtime
+#### Core components
 
-| File | Responsibility |
-| --- | --- |
-| `docs/js/render.js` | Computes scored state and renders dashboard sections. Core output is byte-locked by golden fixtures. |
-| `docs/js/bracket-tree.js` | Derives the shared 31-node, 30-edge tournament model for both bracket layouts. |
-| `docs/js/parse-excel.js` | Parses and validates the private workbook in the browser. |
-| `docs/js/builder.js` | Runs the round-by-round pick builder and shared bracket topology helpers. |
-| `docs/js/main.js` | Orchestrates landing, loading, preview modes, social controls, local backup, freshness warnings, and feature lifecycle. |
-| `docs/js/interact.js` | Runs themes, navigation, team filtering, map layout, fit-screen behavior, and stat interactions. |
-| `docs/js/share.js` | Encodes and decodes one versioned bracket in a URL fragment. |
-| `docs/js/compare.js` | Stores local rivals and computes standings and undecided-pick differences. |
-| `docs/js/storage.js` | Owns local persistence, preview isolation, and private pool backup import and export. |
-| `docs/js/match-details.js` | Shows quick facts, accessible match dialogs, and intent-gated portraits. |
-| `docs/js/trophy.js` | Owns the desktop WebGL trophy and responsive static fallback. |
-| `docs/js/landing-ballpit.js` | Owns landing-ball physics, pointer and touch input, Motion control, sleep, wake, and WebGL lifecycle. |
+| Area | Main files | Responsibility |
+| --- | --- | --- |
+| Inputs and validation | `parse-excel.js`, `builder.js`, `topology.json` | Turn a private workbook or browser picks into a validated bracket model. |
+| Scoring and presentation | `render.js`, `bracket-tree.js`, `interact.js` | Compute scoring once, then present it through dashboard sections, bracket layouts, filters, and themes. |
+| Sharing and local state | `main.js`, `share.js`, `compare.js`, `storage.js` | Orchestrate previews, encode one bracket in a URL, store local rivals, and manage private backup and restore. |
+| Match context and media | `match-details.js`, `match-details.json`, `match-portraits.json` | Provide generated facts, accessible dialogs, reviewed portrait mappings, and visible credits. |
+| Motion and WebGL | `trophy.js`, `landing-ballpit.js` | Run the trophy and landing physics with responsive, reduced-motion, sleep, and cleanup paths. |
+| Publishing pipeline | `fetch_results.py`, `portrait_sync.py`, validators, workflows | Normalize public sources, reject invalid generated data, commit approved JSON, and deploy the static site. |
 
-### Public data
+See [`dev-docs/CLAUDE.md`](dev-docs/CLAUDE.md) for the complete runtime and generated-data map.
 
-| File | Purpose |
-| --- | --- |
-| `docs/data/topology.json` | Fixed bracket structure, seeds, feeder graph, schedule, and host cities. |
-| `docs/data/results.json` | Canonical public scores, winners, highlights, and refresh time. |
-| `docs/data/match-details.json` | Generated facts and source coverage for completed matches. |
-| `docs/data/match-portraits.json` | Reviewed match-to-portrait mappings and credit metadata. |
-| `docs/data/demo-picks.json` | Sample picks used by the demo flow and deterministic fixtures. |
-
-## Privacy and ownership
-
-| Data | Location |
-| --- | --- |
-| Your bracket | Your browser |
-| Brackets you add | Your browser |
-| What-if scores | Your browser, namespaced per bracket |
-| Theme and Motion settings | Your browser |
-| One share link | Inside the URL fragment you send |
-| Pool backup | A private file downloaded on your action |
-| Public tournament results | Static JSON in this repository |
-| Match portraits | External credited source, requested after interaction |
-
-The URL fragment never reaches GitHub Pages in an HTTP request. A share link still contains
-a copy of the bracket, so it cannot be revoked after another person saves it. Use the
-editable share alias when you do not want a real name in the payload.
-
-The social behavior and deliberate omissions live in
-[`dev-docs/zero-backend-social-loop/BRIEF.md`](dev-docs/zero-backend-social-loop/BRIEF.md).
-
-## How this repository is built
+### How this repository is built
 
 Multi-plan work follows a spec-first process:
 
@@ -139,7 +210,7 @@ The [Technical Taste Council](dev-docs/TECHNICAL_TASTE_COUNCIL.md) is used as an
 architecture review lens. It protects simple solutions, inspectability, privacy, measurable
 verification, and the no-build contract.
 
-### Brief packages
+#### Brief packages
 
 | Workstream | Source | Result | Interactive report |
 | --- | --- | --- | --- |
@@ -152,7 +223,7 @@ The [project history](dev-docs/PROJECT-HISTORY.md) maps smaller milestones that 
 formal brief packages, including typography, themes, scoring clarity, pool backup, and the
 first soccer-ball hero delivery.
 
-## Repository map
+### Repository map
 
 ```text
 .github/workflows/   tests, score sync, Pages deploy
@@ -169,7 +240,7 @@ scripts/             result fetch, detail generation, validators
 tests/               JavaScript and Python fixtures, snapshots, and guards
 ```
 
-## Develop and verify
+### Develop and verify
 
 Use Node 22 and Python 3.12 to match GitHub Actions. No `npm install` is required.
 
@@ -177,7 +248,7 @@ Use Node 22 and Python 3.12 to match GitHub Actions. No `npm install` is require
 # Serve the deployed files
 python3 -m http.server 8000 --directory docs
 
-# Run all 16 JavaScript modules
+# Run the JavaScript test suite
 npm test
 
 # Validate committed generated data
@@ -197,7 +268,7 @@ node tests/golden.mjs --update
 Review every golden fixture diff. A passing regenerated snapshot proves consistency with the
 new output, not correctness of the change.
 
-### Main safety rails
+#### Main safety rails
 
 - `tests/fixtures/golden-sections.json` locks 15 render sections against frozen input.
 - `tests/fixtures/map-sections.frozen.json` locks both layouts, both modes, and the legend.
@@ -208,7 +279,7 @@ new output, not correctness of the change.
 - Python fixtures cover FIFA parsing, fallback details, penalty identity, portrait mappings,
   and malformed data.
 
-## Automation and deployment
+### Automation and deployment
 
 - `tests.yml` runs the JavaScript suite and both generated-data validators on pushes and pull
   requests.
@@ -218,9 +289,9 @@ new output, not correctness of the change.
 - Bot data commits dispatch Pages directly because GitHub blocks workflow recursion from the
   built-in token.
 
-## Credits and scope
+### Credits and scope
 
 This is a fan project. It is not affiliated with FIFA, GitHub, or Microsoft. Public match
-records come from FIFA with a fallback result source. Portrait credits appear in the
-application. Bundled third-party assets and libraries keep their license files beside the
-shipped files.
+records come from FIFA's public feed with football-data.org as the configured fallback.
+Portrait credits appear in the application. Bundled third-party assets and libraries keep
+their license files beside the shipped files.
