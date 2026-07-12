@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "refreshed": "2026-07-11T23:48:10Z",
+  "refreshed": "2026-07-12T03:46:26Z",
   "matches": {
     "M73": {
       "source": {
@@ -1705,6 +1705,90 @@
           "player": "Ajer",
           "minute": "117'",
           "card": "yellow"
+        }
+      ]
+    },
+    "M100": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289289",
+        "matchId": "400021537"
+      },
+      "state": "complete",
+      "home": "Argentina",
+      "away": "Switzerland",
+      "score": {
+        "home": 3,
+        "away": 1,
+        "note": ""
+      },
+      "winner": "Argentina",
+      "round": "Quarterfinal",
+      "kickoff": "2026-07-12T01:00:00Z",
+      "venue": {
+        "stadium": "Kansas City Stadium",
+        "city": "Kansas City"
+      },
+      "attendance": 69045,
+      "referee": "João Pedro Silva Pinheiro",
+      "goals": [
+        {
+          "team": "Argentina",
+          "player": "Allister",
+          "minute": "10'",
+          "kind": "goal"
+        },
+        {
+          "team": "Argentina",
+          "player": "Alvarez",
+          "minute": "112'",
+          "kind": "goal"
+        },
+        {
+          "team": "Argentina",
+          "player": "Martinez",
+          "minute": "120'+1'",
+          "kind": "goal"
+        },
+        {
+          "team": "Switzerland",
+          "player": "Ndoye",
+          "minute": "67'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Argentina",
+          "player": "Almada",
+          "minute": "97'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Martinez",
+          "minute": "98'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Lopez",
+          "minute": "114'",
+          "card": "yellow"
+        },
+        {
+          "team": "Switzerland",
+          "player": "Embolo",
+          "minute": "44'",
+          "card": "yellow"
+        },
+        {
+          "team": "Switzerland",
+          "player": "Embolo",
+          "minute": "72'",
+          "card": "red"
         }
       ]
     }
