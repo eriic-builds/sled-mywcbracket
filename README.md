@@ -11,7 +11,7 @@ Upload the SLED workbook, build a bracket in the browser, or reopen one already 
 device. No install or account is required, and your personal pool stays in your browser.
 
 <p align="center">
-  <a href="https://eriic-builds.github.io/sled-mywcbracket/">
+  <a href="docs/assets/readme/dashboard-bracket-map.png" aria-label="Open the full-size bracket dashboard image">
     <img src="docs/assets/readme/dashboard-bracket-map.png"
       alt="World Cup bracket dashboard showing the legend, actual path, match results, and champion pick"
       width="960">
@@ -39,14 +39,14 @@ Once your bracket is open, the dashboard gives you:
 - **A leaderboard you control:** add bracket links from friends and compare standings and
   undecided picks without creating a shared server pool.
 
-[![Argentina versus Egypt match details showing the final 3-2 facts and the portrait at 88 minutes with the score level at 2-2](docs/assets/readme/argentina-egypt-match-details.png)](https://eriic-builds.github.io/sled-mywcbracket/)
+[![Argentina versus Egypt match details showing the final 3-2 facts and the portrait at 88 minutes with the score level at 2-2](docs/assets/readme/argentina-egypt-match-details.png)](docs/assets/readme/argentina-egypt-match-details.png "Open the full-size match details image")
 
 Open a completed match to move beyond the bracket line and into the story of the game. Argentina's
 late 3-2 comeback against Egypt is paused here at 88 minutes, still 2-2 before the stoppage-time
 winner, alongside the full event timeline and reviewed source details.
 
 <p align="center">
-  <a href="https://eriic-builds.github.io/sled-mywcbracket/">
+  <a href="docs/assets/readme/dashboard-live-standing.png" aria-label="Open the full-size live-standing dashboard image">
     <img src="docs/assets/readme/dashboard-live-standing.png"
       alt="World Cup dashboard in light mode with navigation and six live-standing signals for confirmed, settled, live, attainable, champion, and lost points"
       width="960">
