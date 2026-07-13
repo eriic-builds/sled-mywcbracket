@@ -6,6 +6,7 @@ const css = read("../docs/css/dashboard.css");
 const fontsCss = read("../docs/css/fonts.css");
 const index = read("../docs/index.html");
 const builderJs = read("../docs/js/builder.js");
+const mainJs = read("../docs/js/main.js");
 const matchDetailsJs = read("../docs/js/match-details.js");
 const normalizedIndex = index.replace(/\s+/g, " ");
 
@@ -30,6 +31,7 @@ assert.match(index, />Back up my pool<\/button>/);
 assert.match(index, />Import pool backup<\/span>/);
 assert.doesNotMatch(index, />Save a copy<\/button>/);
 assert.match(builderJs, /Tap <b>Back up my pool<\/b>/);
+assert.doesNotMatch(mainJs, /maybeShowStaleNotice|stalenote|STALE_MIN|STALL_MIN/);
 assert.doesNotMatch(matchDetailsJs, /text:\s*"@eriic-builds"/);
 assert.doesNotMatch(matchDetailsJs, /text:\s*"in\/ericxlam"/);
 assert.match(matchDetailsJs, /label:\s*"eriic-builds on GitHub"/);
