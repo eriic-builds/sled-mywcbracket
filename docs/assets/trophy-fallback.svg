@@ -1,24 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 220">
-  <style>
-    :root { color: #d5aa35; }
-    .body { fill: currentColor; }
-    .shade { fill: #8f742b; }
-    .line { fill: none; stroke: #fff4b8; stroke-width: 2; opacity: .7; }
-  </style>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff0a6"/>
+      <stop offset=".34" stop-color="#d9b44d"/>
+      <stop offset=".7" stop-color="#9b7222"/>
+      <stop offset="1" stop-color="#f0cf68"/>
+    </linearGradient>
+    <radialGradient id="globe" cx=".35" cy=".25" r=".82">
+      <stop offset="0" stop-color="#fff4b0"/>
+      <stop offset=".3" stop-color="#e5bf53"/>
+      <stop offset=".72" stop-color="#b48729"/>
+      <stop offset="1" stop-color="#7d591a"/>
+    </radialGradient>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e5c15d"/>
+      <stop offset="1" stop-color="#9b7021"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
   <g role="presentation">
-    <circle class="body" cx="90" cy="49" r="39"/>
-    <path class="shade" d="M90 10 69 24 76 47 104 47 111 24Z" opacity=".5"/>
-    <path class="shade" d="m51 49 25-2 14 25-16 13-17-12Z" opacity=".32"/>
-    <path class="shade" d="m129 49-25-2-14 25 16 13 17-12Z" opacity=".58"/>
-    <path class="line" d="M53 42c21 12 53 12 74 0M61 69c19-9 39-9 58 0"/>
-    <ellipse class="line" cx="90" cy="49" rx="15" ry="37"/>
-    <path class="body" d="m58 84 19 1 17 74-18 5Z"/>
-    <path class="body" d="m122 84-19 1-17 74 18 5Z"/>
-    <path class="shade" d="m77 124 13 20 13-20 4 21-17 20-17-20Z"/>
-    <path class="body" d="M70 145h40v17H70z"/>
-    <path class="shade" d="m70 145 20 8 20-8v8l-20 9-20-9Z" opacity=".55"/>
-    <path class="body" d="m55 170 35-10 35 10 9 31-44 13-44-13Z"/>
-    <path class="shade" d="m46 201 44-13 44 13-44 13Z" opacity=".62"/>
-    <path class="line" d="m55 170 35 12 35-12M90 182v32" opacity=".45"/>
+    <ellipse cx="90" cy="210" rx="48" ry="7" fill="#14100b" opacity=".28" filter="url(#shadow)"/>
+
+    <path
+      d="M77 73C62 84 53 105 55 126c2 20 12 34 27 43l10-19c-10-6-15-15-15-27 0-14 6-27 16-35Z"
+      fill="url(#gold)"
+    />
+    <path
+      d="M103 73c15 11 24 32 22 53-2 20-12 34-27 43l-10-19c10-6 15-15 15-27 0-14-6-27-16-35Z"
+      fill="url(#gold)"
+    />
+    <path
+      d="M77 136c5 8 9 13 13 16 4-3 8-8 13-16l7 24c-5 9-12 15-20 20-8-5-15-11-20-20Z"
+      fill="url(#gold)"
+    />
+
+    <circle cx="90" cy="49" r="39" fill="url(#globe)"/>
+    <path d="M52 49c21 10 55 10 76 0" fill="none" stroke="#f9dd76" stroke-width="2.2" opacity=".76"/>
+    <ellipse cx="90" cy="49" rx="15" ry="37" fill="none" stroke="#f9dd76" stroke-width="2" opacity=".6"/>
+    <path d="M66 21c10 9 38 9 48 0" fill="none" stroke="#fff1a1" stroke-width="2" opacity=".45"/>
+    <ellipse cx="76" cy="32" rx="11" ry="7" fill="#fff5bc" opacity=".18" transform="rotate(-24 76 32)"/>
+
+    <path d="M71 157h38l8 15H63Z" fill="url(#base)"/>
+    <path d="M61 170h58c6 0 10 4 11 10l4 24H46l4-24c1-6 5-10 11-10Z" fill="url(#base)"/>
+    <path d="M50 184h80v10H50Z" fill="#173126" opacity=".9"/>
+    <path d="M46 201h88c4 0 7 3 7 7v3H39v-3c0-4 3-7 7-7Z" fill="#8e651e"/>
+    <path d="M49 202h82" fill="none" stroke="#f5d978" stroke-width="2" opacity=".62"/>
   </g>
 </svg>

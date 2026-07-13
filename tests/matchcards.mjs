@@ -198,6 +198,13 @@ check(
   "picked champion state keeps England gold",
   /class="team st-pending champ" data-team="England"[\s\S]*?<span class="tt">\u{1F3C6}<\/span>/u.test(picked),
 );
+check(
+  "only mirrored champions expose the celebration trigger",
+  (actual.match(/data-champion-celebration-trigger/g) || []).length === 1
+    && (picked.match(/data-champion-celebration-trigger/g) || []).length === 1
+    && !sidewaysActual.includes("data-champion-celebration-trigger")
+    && !sidewaysPicked.includes("data-champion-celebration-trigger"),
+);
 
 const completedFinal = structuredClone(frozen);
 Object.assign(completedFinal.res, {
@@ -220,12 +227,14 @@ const sidewaysPickedChampion = championChunk(completedSidewaysPicked, true);
 check(
   "completed Final shows the real champion in mirrored Actual mode",
   actualChampion.includes('class="team st-won champ" data-team="Argentina"')
+    && actualChampion.includes("data-champion-celebration-trigger")
     && actualChampion.includes("World champion")
     && !actualChampion.includes('data-team="England"'),
 );
 check(
   "completed Final keeps the entrant champion in mirrored My picks",
   pickedChampion.includes('data-team="England"')
+    && pickedChampion.includes("data-champion-celebration-trigger")
     && !pickedChampion.includes('data-team="Argentina"'),
 );
 check(

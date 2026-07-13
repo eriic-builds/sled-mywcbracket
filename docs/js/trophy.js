@@ -1,4 +1,5 @@
 import * as THREE from "./vendor/three.module.min.js";
+import { createTrophySculpture } from "./trophy-geometry.js";
 
 const DEG = Math.PI / 180;
 const AUTO_TURN_SECONDS = 32;
@@ -22,7 +23,9 @@ function createFallback() {
 }
 
 export function initTrophy(slot) {
-  if (!(slot instanceof HTMLElement)) return () => {};
+  if (!(slot instanceof HTMLElement)) {
+    throw new TypeError("initTrophy() requires a trophy slot element.");
+  }
 
   const wrap = slot.closest(".brk-wrap");
   const fallback = createFallback();
@@ -35,9 +38,7 @@ export function initTrophy(slot) {
   let scene = null;
   let camera = null;
   let sculpture = null;
-  let bodyMaterial = null;
-  let insetMaterial = null;
-  let seamMaterial = null;
+  let sculptureOwner = null;
   let intersectionObserver = null;
   let resizeObserver = null;
   let themeObserver = null;
@@ -63,9 +64,7 @@ export function initTrophy(slot) {
   let hoverZ = 0;
   let hoverTargetX = 0;
   let hoverTargetZ = 0;
-
-  const geometries = [];
-  const materials = [];
+  const externalSuspensions = new Set();
   const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   reduced = reducedQuery.matches;
   slot.classList.toggle("trophy-phone", phone);
@@ -98,7 +97,8 @@ export function initTrophy(slot) {
 
   function canAutoRotate() {
     return initialized && intersecting && !document.hidden && !phone &&
-      !paused && !reduced && !dragging && !destroyed && performance.now() >= resumeAfter;
+      !paused && !reduced && !dragging && !destroyed && externalSuspensions.size === 0 &&
+      performance.now() >= resumeAfter;
   }
 
   function animate(now) {
@@ -125,10 +125,12 @@ export function initTrophy(slot) {
   }
 
   function updateTheme() {
-    if (!bodyMaterial) return;
-    bodyMaterial.color.set(cssToken("--gold", "#d5aa35"));
-    insetMaterial.color.set(cssToken("--panel", "#1c1b21"));
-    seamMaterial.color.set(cssToken("--blue", "#0097f4"));
+    if (!sculptureOwner) return;
+    sculptureOwner.setColors({
+      body: cssToken("--gold", "#d5aa35"),
+      inset: cssToken("--panel", "#1c1b21"),
+      seam: cssToken("--blue", "#0097f4"),
+    });
     renderNow();
   }
 
@@ -146,57 +148,6 @@ export function initTrophy(slot) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height, false);
     renderNow();
-  }
-
-  function addMesh(geometry, material, x, y, z) {
-    geometries.push(geometry);
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    sculpture.add(mesh);
-    return mesh;
-  }
-
-  function buildGeometry() {
-    sculpture = new THREE.Group();
-    sculpture.rotation.order = "YXZ";
-    scene.add(sculpture);
-
-    bodyMaterial = new THREE.MeshStandardMaterial({
-      color: cssToken("--gold", "#d5aa35"),
-      flatShading: true,
-      roughness: 0.9,
-      metalness: 0.1,
-    });
-    insetMaterial = new THREE.MeshStandardMaterial({
-      color: cssToken("--panel", "#1c1b21"),
-      flatShading: true,
-      roughness: 0.95,
-      metalness: 0.05,
-    });
-    seamMaterial = new THREE.MeshStandardMaterial({
-      color: cssToken("--blue", "#0097f4"),
-      flatShading: true,
-      roughness: 0.8,
-      metalness: 0.08,
-    });
-    materials.push(bodyMaterial, insetMaterial, seamMaterial);
-
-    addMesh(new THREE.IcosahedronGeometry(0.76, 1), bodyMaterial, 0, 1.05, 0);
-
-    const seamA = addMesh(new THREE.TorusGeometry(0.77, 0.018, 5, 48), seamMaterial, 0, 1.05, 0);
-    const seamB = addMesh(new THREE.TorusGeometry(0.77, 0.018, 5, 48), seamMaterial, 0, 1.05, 0);
-    const seamC = addMesh(new THREE.TorusGeometry(0.77, 0.018, 5, 48), seamMaterial, 0, 1.05, 0);
-    seamB.rotation.x = Math.PI / 2;
-    seamC.rotation.set(Math.PI / 2, Math.PI / 3, 0);
-
-    const leftArm = addMesh(new THREE.BoxGeometry(0.28, 1.9, 0.32), bodyMaterial, -0.36, -0.33, 0);
-    const rightArm = addMesh(new THREE.BoxGeometry(0.28, 1.9, 0.32), bodyMaterial, 0.36, -0.33, 0);
-    leftArm.rotation.z = 20 * DEG;
-    rightArm.rotation.z = -20 * DEG;
-
-    addMesh(new THREE.BoxGeometry(0.96, 0.24, 0.48), insetMaterial, 0, -1.22, 0);
-    addMesh(new THREE.CylinderGeometry(0.72, 0.92, 0.44, 6), bodyMaterial, 0, -1.66, 0);
-    addMesh(new THREE.CylinderGeometry(0.5, 0.64, 0.12, 6), insetMaterial, 0, -1.39, 0);
   }
 
   function onPointerDown(event) {
@@ -321,15 +272,11 @@ export function initTrophy(slot) {
     }
     pointerId = null;
     dragging = false;
-    for (const geometry of new Set(geometries)) geometry.dispose();
-    for (const material of new Set(materials)) material.dispose();
-    geometries.length = 0;
-    materials.length = 0;
+    sculptureOwner?.dispose();
     renderer?.dispose();
     canvas?.remove();
     button?.remove();
-    renderer = scene = camera = sculpture = null;
-    bodyMaterial = insetMaterial = seamMaterial = null;
+    renderer = scene = camera = sculpture = sculptureOwner = null;
     canvas = button = null;
     initialized = false;
   }
@@ -388,7 +335,13 @@ export function initTrophy(slot) {
       const rim = new THREE.DirectionalLight(0x0097f4, 1.1);
       rim.position.set(-4, 1, -3);
       scene.add(rim);
-      buildGeometry();
+      sculptureOwner = createTrophySculpture({
+        body: cssToken("--gold", "#d5aa35"),
+        inset: cssToken("--panel", "#1c1b21"),
+        seam: cssToken("--blue", "#0097f4"),
+      });
+      sculpture = sculptureOwner.root;
+      scene.add(sculpture);
 
       button = document.createElement("button");
       button.type = "button";
@@ -404,7 +357,8 @@ export function initTrophy(slot) {
       updateTheme();
       resizeRenderer();
       startLoop();
-    } catch {
+    } catch (error) {
+      console.warn("Trophy WebGL could not initialize; using the local static trophy.", error);
       useFallback();
     }
   }
@@ -475,9 +429,103 @@ export function initTrophy(slot) {
     startLoop();
   }
 
-  return function teardown() {
+  function suspend() {
+    if (destroyed) throw new Error("Cannot suspend a destroyed trophy controller.");
+    const token = {};
+    externalSuspensions.add(token);
+    stopLoop();
+    let released = false;
+    return function release() {
+      if (released) return;
+      released = true;
+      externalSuspensions.delete(token);
+      if (!destroyed) startLoop();
+    };
+  }
+
+  function captureVisual() {
+    if (destroyed) throw new Error("Cannot capture a destroyed trophy controller.");
+    if (initialized && canvas) {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        renderNow();
+        const copy = document.createElement("canvas");
+        copy.width = canvas.width;
+        copy.height = canvas.height;
+        const context = copy.getContext("2d");
+        if (!context) throw new Error("Trophy capture could not create a 2D canvas.");
+        context.drawImage(canvas, 0, 0);
+        const pixels = context.getImageData(0, 0, copy.width, copy.height).data;
+        let minimumX = copy.width;
+        let minimumY = copy.height;
+        let maximumX = -1;
+        let maximumY = -1;
+        for (let y = 0; y < copy.height; y++) {
+          for (let x = 0; x < copy.width; x++) {
+            if (pixels[(y * copy.width + x) * 4 + 3] <= 4) continue;
+            minimumX = Math.min(minimumX, x);
+            minimumY = Math.min(minimumY, y);
+            maximumX = Math.max(maximumX, x);
+            maximumY = Math.max(maximumY, y);
+          }
+        }
+        if (maximumX < minimumX || maximumY < minimumY) {
+          throw new Error("Trophy capture contained no visible pixels.");
+        }
+        const contentWidth = maximumX - minimumX + 1;
+        const contentHeight = maximumY - minimumY + 1;
+        const cropped = document.createElement("canvas");
+        cropped.width = contentWidth;
+        cropped.height = contentHeight;
+        const croppedContext = cropped.getContext("2d");
+        if (!croppedContext) {
+          throw new Error("Trophy capture could not create a cropped 2D canvas.");
+        }
+        croppedContext.drawImage(
+          copy,
+          minimumX,
+          minimumY,
+          contentWidth,
+          contentHeight,
+          0,
+          0,
+          contentWidth,
+          contentHeight,
+        );
+        const cssScaleX = rect.width / copy.width;
+        const cssScaleY = rect.height / copy.height;
+        return {
+          node: cropped,
+          rect: {
+            left: rect.left + minimumX * cssScaleX,
+            top: rect.top + minimumY * cssScaleY,
+            width: contentWidth * cssScaleX,
+            height: contentHeight * cssScaleY,
+          },
+          kind: "canvas",
+        };
+      }
+    }
+
+    const sourceRect = fallback.getBoundingClientRect();
+    const slotRect = slot.getBoundingClientRect();
+    const rect = sourceRect.width > 0 && sourceRect.height > 0 ? sourceRect : slotRect;
+    if (rect.width <= 0 || rect.height <= 0) {
+      throw new Error("Active trophy source has no visible geometry.");
+    }
+    const image = fallback.cloneNode(true);
+    image.removeAttribute("id");
+    return {
+      node: image,
+      rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+      kind: "image",
+    };
+  }
+
+  function destroy() {
     if (destroyed) return;
     destroyed = true;
+    externalSuspensions.clear();
     intersectionObserver?.disconnect();
     resizeObserver?.disconnect();
     themeObserver?.disconnect();
@@ -490,5 +538,12 @@ export function initTrophy(slot) {
     disposeScene();
     slot.replaceChildren();
     slot.classList.remove("trophy-host", "trophy-phone", "trophy-ready", "is-fallback");
+  }
+
+  return {
+    slot,
+    destroy,
+    suspend,
+    captureVisual,
   };
 }

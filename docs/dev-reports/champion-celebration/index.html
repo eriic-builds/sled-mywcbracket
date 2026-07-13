@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <title>Champion celebration choreography mock</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+  </style>
+  <link rel="stylesheet" href="mock.css">
+</head>
+<body>
+  <main class="artifact-shell">
+    <header class="artifact-header">
+      <div>
+        <p class="eyebrow">Champion celebration</p>
+        <h1>Choreography mock</h1>
+        <p class="lede">
+         Review the production 3D cutscene directly: a side-on screen-left captain walk, crowd-hype
+         fist, staged two-hand pickup, left-step podium entry, sideways walk to center, planted teammate
+         anticipation, one trophy lift, and a flare/confetti burst visible by the apex.
+        </p>
+      </div>
+      <span class="status-chip">Production scene playback - no duplicate 3D renderer</span>
+    </header>
+
+    <section class="review-panel" aria-labelledby="controls-title">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Review controls</p>
+          <h2 id="controls-title">Shape the sequence</h2>
+        </div>
+        <p id="phaseReadout" class="phase-readout" aria-live="polite">Bracket ready</p>
+      </div>
+
+      <div class="control-grid">
+        <label class="field">
+          <span>Winning country</span>
+          <select id="teamSelect"></select>
+        </label>
+
+        <div class="field">
+          <span>Playback</span>
+          <div class="button-row">
+            <button id="playButton" class="primary" type="button">Play</button>
+            <button id="pauseButton" type="button" disabled>Pause</button>
+            <button id="resetButton" type="button">Reset</button>
+          </div>
+        </div>
+
+        <label class="field timeline-field">
+          <span>Timeline <output id="timeReadout">0.0 / 30.0s</output></span>
+          <input id="timeline" type="range" min="0" max="30" step="0.01" value="0">
+        </label>
+
+        <div class="field">
+          <span>Review modes</span>
+          <div class="button-row">
+            <button id="motionButton" type="button" aria-pressed="false">Reduced-motion preview off</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="preview-card" aria-labelledby="preview-title">
+      <div class="preview-heading">
+        <div>
+          <p class="eyebrow">Starting frame</p>
+          <h2 id="preview-title">Mirrored winner box above M104</h2>
+        </div>
+        <p>Play uses the selected country, then opens the exact scene used by the dashboard.</p>
+      </div>
+
+      <div id="mockViewport" class="mock-viewport">
+        <div class="mock-toolbar">
+          <span>Actual path</span>
+          <span>Mirrored</span>
+          <span>Hidden trigger: four activations within 2.5 seconds</span>
+        </div>
+        <div id="mockBracket" class="mock-bracket" aria-label="Simplified mirrored knockout bracket">
+          <svg id="connectorSvg" class="connector-svg" aria-hidden="true"></svg>
+          <div id="bracketGrid" class="bracket-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="review-notes">
+      <article>
+        <p class="eyebrow">Focus 01</p>
+        <h2>Continuous trophy contact</h2>
+        <p>Check that both hands remain on the trophy from pickup through carry, lift, jump, and hold.</p>
+      </article>
+      <article>
+        <p class="eyebrow">Focus 02</p>
+        <h2>Natural travel, deliberate front turn</h2>
+        <p>Check the side-on walk, crowd-hype fist, trophy-facing pickup, left-step climb, sideways center walk, and final front turn.</p>
+      </article>
+      <article>
+        <p class="eyebrow">Focus 03</p>
+        <h2>Varied celebration, lift, and flares</h2>
+        <p>Check compact pre-lift fist gestures, six distinct lift poses, one synchronized jump, the larger globe, overhead clearance, and flares/confetti already visible at the apex.</p>
+      </article>
+    </section>
+  </main>
+
+  <section id="cinematic" class="cinematic" aria-label="Champion celebration preview" aria-hidden="true">
+    <canvas id="sceneCanvas"></canvas>
+    <canvas id="dissolveCanvas"></canvas>
+    <div id="trophyMorph" class="trophy-morph" hidden aria-hidden="true">
+      <img src="../../assets/trophy-fallback.svg" alt="">
+    </div>
+    <div id="staticFallback" class="static-fallback" hidden>
+      <img id="fallbackFlag" alt="">
+      <img src="../../assets/trophy-fallback.svg" alt="">
+      <strong id="fallbackTeam"></strong>
+      <span>Champion</span>
+    </div>
+    <div class="cinematic-chrome">
+      <div>
+        <p class="eyebrow">Winner stage</p>
+        <strong id="cinematicTeam">England</strong>
+        <span id="cinematicPhase">Bracket dissolve</span>
+      </div>
+      <div class="button-row">
+        <button id="cinematicMotion" type="button" aria-pressed="false">Reduced motion</button>
+        <button id="cinematicReplay" type="button">Replay</button>
+        <button id="cinematicSkip" type="button">Skip</button>
+      </div>
+    </div>
+    <div class="cinematic-timeline">
+      <input id="cinematicScrubber" type="range" min="0" max="30" step="0.01" value="0"
+        aria-label="Celebration timeline">
+    </div>
+  </section>
+
+  <script type="module" src="mock.js"></script>
+</body>
+</html>

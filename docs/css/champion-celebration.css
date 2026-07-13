@@ -1,0 +1,324 @@
+[data-champion-celebration-trigger] {
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.champion-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #f7f5ef;
+  font-family: var(--fstack);
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.champion-celebration.is-visible {
+  opacity: 1;
+}
+
+.champion-celebration.uses-logical-clock {
+  opacity: 1;
+  transition: none;
+}
+
+.champion-celebration-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 74%, rgba(19, 92, 71, 0.46), transparent 34%),
+    radial-gradient(circle at 50% 18%, rgba(44, 74, 140, 0.36), transparent 40%),
+    linear-gradient(180deg, rgba(4, 9, 23, 0.2), rgba(3, 7, 17, 0.98));
+  opacity: 0;
+  transition: opacity 900ms ease-out;
+}
+
+.champion-celebration.is-visible .champion-celebration-backdrop {
+  opacity: 1;
+}
+
+.champion-celebration.uses-logical-clock .champion-celebration-backdrop {
+  transition: none;
+}
+
+.champion-celebration-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.champion-celebration-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+}
+
+.champion-celebration-canvas[hidden],
+.champion-celebration-fallback[hidden] {
+  display: none;
+}
+
+.champion-celebration-content {
+  position: relative;
+  z-index: 2;
+  width: min(920px, calc(100vw - 32px));
+  min-height: min(680px, calc(100dvh - 48px));
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 28px;
+  text-align: center;
+}
+
+.champion-celebration-eyebrow {
+  margin: 0;
+  color: #f5c451;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.champion-celebration-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.champion-celebration-tableau {
+  position: relative;
+  z-index: 3;
+  width: min(760px, 86vw);
+  height: min(500px, 64dvh);
+  display: grid;
+  place-items: center;
+  perspective: 900px;
+}
+
+.champion-celebration-fallback {
+  opacity: 0;
+}
+
+.champion-celebration-flag {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  width: min(46%, 310px);
+  height: auto;
+  max-height: 42%;
+  transform: translateX(-50%) rotateX(5deg);
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  box-shadow: 0 22px 42px rgba(0, 0, 0, 0.34);
+  opacity: 0.78;
+}
+
+.champion-celebration-static-trophy {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  width: min(31%, 220px);
+  height: auto;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.5));
+}
+
+.champion-celebration-trophy-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: var(--cc-source-width);
+  height: var(--cc-source-height);
+  transform:
+    translate3d(var(--cc-source-left), var(--cc-source-top), 0)
+    scale(1);
+  transform-origin: center center;
+  pointer-events: none;
+  transition: transform 3200ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.champion-celebration.uses-logical-clock .champion-celebration-trophy-ghost {
+  transition: none;
+}
+
+.champion-celebration.is-visible .champion-celebration-trophy-ghost {
+  transform:
+    translate3d(
+      calc(var(--cc-source-left) + var(--cc-trophy-dx)),
+      calc(var(--cc-source-top) + var(--cc-trophy-dy)),
+      0
+    )
+    scale(var(--cc-trophy-scale));
+}
+
+.champion-celebration-trophy-capture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.5));
+}
+
+.champion-celebration-static-team {
+  position: absolute;
+  left: 50%;
+  bottom: 16%;
+  width: min(96%, 720px);
+  height: 35%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: clamp(4px, 1.2vw, 14px);
+  transform: translateX(-50%);
+}
+
+.champion-celebration-silhouette {
+  position: relative;
+  width: clamp(34px, 7vw, 62px);
+  height: clamp(92px, 18vw, 150px);
+  border-radius: 46% 46% 22% 22% / 24% 24% 12% 12%;
+  background: linear-gradient(145deg, #27699f, #12365d);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.04);
+}
+
+.champion-celebration-silhouette::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -26%;
+  width: 52%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #c88d68;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.champion-celebration-silhouette:nth-child(2n) {
+  height: clamp(86px, 17vw, 142px);
+  background: linear-gradient(145deg, #3582b8, #174b78);
+}
+
+.champion-celebration-silhouette.is-captain {
+  z-index: 2;
+  height: clamp(106px, 20vw, 166px);
+  background: linear-gradient(145deg, #d3a931, #7f5f14);
+  transform: translateY(-9%);
+}
+
+.champion-celebration-country {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: clamp(1.45rem, 4vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.74);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.champion-celebration-controls {
+  position: fixed;
+  z-index: 5;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  gap: 8px;
+}
+
+.champion-celebration-controls button {
+  min-height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 999px;
+  background: rgba(7, 13, 28, 0.82);
+  color: #ffffff;
+  padding: 8px 16px;
+  font: 700 0.82rem/1 var(--fstack);
+  cursor: pointer;
+}
+
+.champion-celebration-controls button:hover {
+  background: rgba(24, 39, 70, 0.94);
+}
+
+.champion-celebration-controls button:focus-visible {
+  outline: 2px solid #f5c451;
+  outline-offset: 3px;
+}
+
+.champion-celebration-status {
+  position: fixed;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 6;
+  min-height: 1.25em;
+  transform: translateX(-50%);
+  color: #f7f5ef;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .champion-celebration-content {
+    width: 100%;
+    min-height: 100dvh;
+    padding: 68px 12px 24px;
+  }
+
+  .champion-celebration-tableau {
+    width: 100%;
+    height: min(560px, 70dvh);
+  }
+
+  .champion-celebration-flag {
+    top: 12%;
+    width: 62%;
+  }
+
+  .champion-celebration-static-trophy {
+    top: 27%;
+    width: 39%;
+  }
+
+  .champion-celebration-static-team {
+    bottom: 17%;
+    width: 100%;
+    gap: 3px;
+  }
+
+  .champion-celebration-country {
+    max-width: 92vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .champion-celebration,
+  .champion-celebration-backdrop,
+  .champion-celebration-trophy-ghost {
+    transition: none;
+  }
+}

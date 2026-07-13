@@ -2,13 +2,23 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const read = path => fs.readFileSync(new URL(path, import.meta.url), "utf8");
+const between = (source, start, end) => {
+  const startAt = source.indexOf(start);
+  const endAt = source.indexOf(end, startAt + start.length);
+  return startAt >= 0 && endAt > startAt ? source.slice(startAt, endAt) : "";
+};
 const css = read("../docs/css/dashboard.css");
+const celebrationCss = read("../docs/css/champion-celebration.css");
 const index = read("../docs/index.html");
 const interact = read("../docs/js/interact.js");
 const builder = read("../docs/js/builder.js");
 const render = read("../docs/js/render.js");
 const matchDetails = read("../docs/js/match-details.js");
 const trophy = read("../docs/js/trophy.js");
+const celebration = read("../docs/js/champion-celebration.js");
+const celebrationScene = read("../docs/js/champion-celebration-scene.js");
+const celebrationModels = read("../docs/js/champion-celebration-models.js");
+const celebrationEffects = read("../docs/js/champion-celebration-effects.js");
 
 function check(name, test) {
   try {
@@ -60,7 +70,7 @@ check("static match fact-card positioning remains an intentional exception", () 
 });
 
 check("runtime CSS names every transitioned property", () => {
-  const declarations = [...`${css}\n${index}`.matchAll(/transition\s*:\s*([^;}]+)/g)]
+  const declarations = [...`${css}\n${celebrationCss}\n${index}`.matchAll(/transition\s*:\s*([^;}]+)/g)]
     .map(match => match[1].trim());
   assert.ok(declarations.length > 20, "expected to audit the full runtime transition surface");
   for (const declaration of declarations) {
@@ -119,6 +129,44 @@ check("trophy bounds passive rendering and releases phone WebGL", () => {
   ]) {
     assert.ok(trophy.includes(lifecycle), `missing trophy lifecycle safeguard: ${lifecycle}`);
   }
+  assert.match(trophy, /externalSuspensions\.size === 0/);
+  assert.match(trophy, /renderNow\(\)[\s\S]*?context\.drawImage\(canvas, 0, 0\)/);
+});
+
+check("champion celebration bounds WebGL and frame-owned resources", () => {
+  assert.match(celebrationScene, /CELEBRATION_DPR_LIMIT = 1\.5/);
+  assert.match(celebrationScene, /renderer\.setPixelRatio\(Math\.min/);
+  assert.equal((celebration.match(/className = "champion-celebration-canvas"/g) || []).length, 1);
+  assert.match(celebrationModels, /MAX_CROWD_INSTANCES = 480/);
+  assert.match(celebrationModels, /PHONE_CROWD_INSTANCES = 260/);
+  assert.match(celebrationModels, /new THREE\.InstancedMesh/);
+  assert.match(celebrationEffects, /confetti: 384/);
+  assert.match(celebrationEffects, /confetti: 192/);
+  assert.match(celebrationEffects, /new THREE\.InstancedMesh/);
+  assert.doesNotMatch(celebrationCss, /transition\s*:\s*all\b/);
+  assert.match(celebration, /visibilitychange/);
+  assert.match(celebration, /ResizeObserver/);
+  assert.match(celebrationScene, /webglcontextlost/);
+});
+
+check("celebration frame paths avoid layout and resource construction", () => {
+  const sceneFrame = between(celebrationScene, "function renderFrame(timeSeconds)", "function resize(");
+  const effectsFrame = between(celebrationEffects, "function updateFlag(", "function destroy()");
+  for (const frameSource of [sceneFrame, effectsFrame]) {
+    assert.doesNotMatch(frameSource, /getBoundingClientRect|clientWidth|clientHeight|Math\.random/);
+    assert.doesNotMatch(frameSource, /new THREE\.|new Array|new Float32Array|new Uint8Array/);
+    assert.doesNotMatch(frameSource, /for\s*\([^)]*\bof\s*\[/);
+  }
+  assert.doesNotMatch(
+    celebrationScene,
+    /scene\.updateMatrixWorld\(true\)|captain\.root\.updateMatrixWorld\(true\)/,
+  );
+  assert.doesNotMatch(effectsFrame, /computeVertexNormals/);
+  assert.match(celebration, /sceneController\?\.destroy\(\)/);
+  assert.doesNotMatch(
+    [celebration, celebrationScene, celebrationModels, celebrationEffects].join("\n"),
+    /AudioContext|createOscillator|createBufferSource|audioController/,
+  );
 });
 
 console.log("\nANIMATION PERFORMANCE GUARDS OK");

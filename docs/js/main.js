@@ -25,6 +25,13 @@ let LANDING_BALLPIT_LOAD = null;
 let LANDING_BALLPIT_FAILED = false;
 let LANDING_BALLPIT_WANTED = false;
 let LANDING_BALLPIT_ENABLED = true;
+let CELEBRATION_CONTROLLER = null;
+let CELEBRATION_LOAD = null;
+let CELEBRATION_GENERATION = 0;
+let TROPHY_GENERATION = 0;
+let TROPHIES_SUSPENDED = false;
+const TROPHY_CONTROLLERS = new Map();
+const TROPHY_SUSPENSION_RELEASES = new Map();
 try { LANDING_BALLPIT_ENABLED = localStorage.getItem(LANDING_BALLPIT_KEY) !== "0"; } catch (e) {}
 
 function syncLandingBallpitToggle() {
@@ -86,10 +93,26 @@ function setLandingBallpitEnabled(nextEnabled) {
 }
 
 function teardownTrophies() {
-  (window.__trophyTeardowns || []).forEach(teardown => teardown());
-  window.__trophyTeardowns = [];
-  window.__trophyGeneration = (window.__trophyGeneration || 0) + 1;
-  return window.__trophyGeneration;
+  for (const controller of TROPHY_CONTROLLERS.values()) controller.destroy();
+  TROPHY_CONTROLLERS.clear();
+  TROPHY_SUSPENSION_RELEASES.clear();
+  TROPHIES_SUSPENDED = false;
+  TROPHY_GENERATION++;
+  return TROPHY_GENERATION;
+}
+
+function setTrophiesSuspended(active) {
+  TROPHIES_SUSPENDED = Boolean(active);
+  if (!TROPHIES_SUSPENDED) {
+    for (const release of TROPHY_SUSPENSION_RELEASES.values()) release();
+    TROPHY_SUSPENSION_RELEASES.clear();
+    return;
+  }
+  for (const controller of TROPHY_CONTROLLERS.values()) {
+    if (!TROPHY_SUSPENSION_RELEASES.has(controller)) {
+      TROPHY_SUSPENSION_RELEASES.set(controller, controller.suspend());
+    }
+  }
 }
 
 function teardownMatchDetails() {
@@ -104,6 +127,58 @@ function teardownInteractions() {
     window.__interactionCleanup();
   }
   window.__interactionCleanup = null;
+}
+
+function celebrationContextIsCurrent({ team, trigger, bracket, wrap }) {
+  if (!(trigger instanceof HTMLElement) || !(bracket instanceof HTMLElement) ||
+      !(wrap instanceof HTMLElement) || !trigger.isConnected || !bracket.isConnected ||
+      !wrap.isConnected || wrap.dataset.layout !== "mirror") return false;
+  const view = wrap.dataset.view === "picked" ? "picked" : "actual";
+  const activeBracket = wrap.querySelector(`.bracket.layout-mirror.mode-${view}`);
+  const activeTrigger = activeBracket?.querySelector("[data-champion-celebration-trigger]");
+  return activeBracket === bracket && activeTrigger === trigger && trigger.dataset.team === team;
+}
+
+function teardownChampionCelebration(reason = "dashboard-rerender") {
+  CELEBRATION_GENERATION++;
+  CELEBRATION_LOAD = null;
+  const controller = CELEBRATION_CONTROLLER;
+  CELEBRATION_CONTROLLER = null;
+  controller?.destroy(reason);
+}
+
+function requestChampionCelebration(context) {
+  if (CELEBRATION_LOAD || CELEBRATION_CONTROLLER) return;
+  const generation = CELEBRATION_GENERATION;
+  let load;
+  load = (async () => {
+    const module = await import("./champion-celebration.js");
+    if (generation !== CELEBRATION_GENERATION || !celebrationContextIsCurrent(context)) return;
+
+    let controller = null;
+    const trophySlot = context.bracket.querySelector("[data-trophy]");
+    const trophyController = trophySlot ? TROPHY_CONTROLLERS.get(trophySlot) || null : null;
+    controller = await module.startChampionCelebration({
+      ...context,
+      trophyController,
+      setTrophiesSuspended,
+      onClose: () => {
+        if (CELEBRATION_CONTROLLER === controller) CELEBRATION_CONTROLLER = null;
+      },
+    });
+    if (!controller.isActive() || generation !== CELEBRATION_GENERATION ||
+        !celebrationContextIsCurrent(context)) {
+      controller.destroy("stale-start");
+      return;
+    }
+    CELEBRATION_CONTROLLER = controller;
+  })().catch(error => {
+    console.warn("Champion celebration could not start; the bracket remains available.", error);
+  }).finally(() => {
+    if (CELEBRATION_LOAD === load) CELEBRATION_LOAD = null;
+  });
+  CELEBRATION_LOAD = load;
+  return load;
 }
 
 function hintDismissed() { try { return localStorage.getItem(HINT_KEY) === "1"; } catch (e) { return false; } }
@@ -150,6 +225,7 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   // destroying the real edits (they come back via the stash).
   if (isDemo || isShared) stashWhatIfs(); else restoreWhatIfs();
   resetWhatIfsIfChanged(picks);
+  teardownChampionCelebration("dashboard-rerender");
   teardownMatchDetails();
   teardownInteractions();
   setLandingBallpitActive(false);
@@ -176,7 +252,9 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   $("#vb-compare").textContent = "🏆 Leaderboard" + (nRivals ? ` (${nRivals + 1})` : "");
   $("#sharepop").hidden = true;
   updateShareHint(own);                                // compare-with-friends nudge (own bracket only)
-  window.__interactionCleanup = initInteractions();    // bind one dashboard lifecycle
+  window.__interactionCleanup = initInteractions({
+    onChampionCelebration: requestChampionCelebration,
+  });                                                  // bind one dashboard lifecycle
   wireRailFilter();                                    // collapsible "Filter by team" panel
   window.__matchDetailsCleanup = initMatchDetails(
     app,
@@ -186,12 +264,21 @@ function showDashboard(picks, isDemo = false, isShared = false) {
   const trophySlots = [...document.querySelectorAll("[data-trophy]")];
   if (trophySlots.length) {
     import("./trophy.js").then(module => {
-      if (window.__trophyGeneration !== trophyGeneration) return;
-      window.__trophyTeardowns = trophySlots
-        .filter(slot => slot.isConnected)
-        .map(slot => module.initTrophy(slot));
-    }).catch(() => {
-      if (window.__trophyGeneration !== trophyGeneration) return;
+      if (TROPHY_GENERATION !== trophyGeneration) return;
+      for (const slot of trophySlots.filter(candidate => candidate.isConnected)) {
+        const controller = module.initTrophy(slot);
+        if (TROPHY_GENERATION !== trophyGeneration || !slot.isConnected) {
+          controller.destroy();
+          continue;
+        }
+        TROPHY_CONTROLLERS.set(slot, controller);
+        if (TROPHIES_SUSPENDED) {
+          TROPHY_SUSPENSION_RELEASES.set(controller, controller.suspend());
+        }
+      }
+    }).catch(error => {
+      if (TROPHY_GENERATION !== trophyGeneration) return;
+      console.warn("Interactive trophies could not load; using local static trophies.", error);
       trophySlots.filter(slot => slot.isConnected).forEach(slot => {
         const fallback = document.createElement("img");
         fallback.className = "trophy-fallback";
@@ -316,6 +403,7 @@ async function onDemo() {
 function clearHash() { history.replaceState(null, "", location.pathname + location.search); }
 
 function showLanding() {
+  teardownChampionCelebration("show-landing");
   teardownMatchDetails();
   teardownInteractions();
   teardownTrophies();

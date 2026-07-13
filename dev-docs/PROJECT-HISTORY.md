@@ -22,7 +22,8 @@ Pages.
 A visitor can build or import a bracket, score it against live results, inspect two bracket
 layouts, open match facts, share one bracket through a URL fragment, save received brackets
 to a local leaderboard, back up the local pool, switch visual modes, and control decorative
-motion.
+motion. The mirrored champion box also owns a hidden, deterministic 30-second clay-stadium
+trophy celebration that remains lazy and dormant until its fourth valid activation.
 
 Personal picks and rivals stay in browser storage. Scheduled GitHub Actions update public
 match data and deploy static files.
@@ -44,6 +45,8 @@ data but do not change product architecture.
 | 8 | Jul 11 | [`1e36cdd`](https://github.com/eriic-builds/sled-mywcbracket/commit/1e36cdd) | Added the interactive low-poly soccer-ball hero, local flag decals, Motion control, reduced-motion behavior, and deterministic physics tests. | `tests/landing-ballpit.mjs` |
 | 9 | Jul 11 | [`f5696d1`](https://github.com/eriic-builds/sled-mywcbracket/commit/f5696d1) | Reduced layout, paint, RAF, and WebGL work while keeping the ball pit and trophy. | [Animation performance revision](animation-performance-revision/README.md) |
 | 10 | Jul 11 | [`7ab8948`](https://github.com/eriic-builds/sled-mywcbracket/commit/7ab8948) | Grouped legacy plans, briefs, results, and reports into a stable documentation system. | [Development briefs](README.md) |
+| 11 | Jul 12-13 | Release commit: `feat: add champion celebration and renderer performance pass` | Built and repeatedly refined the hidden champion celebration: exact modal lifecycle, shared trophy continuity, diverse premium clay avatars, lateral winners stage, articulated two-hand carry/lift, country identity, confetti, and continuous finale flares. | [Champion celebration V2](champion-celebration-v2/README.md) |
+| 12 | Jul 13 | Release commit: `feat: add champion celebration and renderer performance pass` | Proved zero dormant celebration runtime and cut active renderer submission through scoped IK matrices, rigid same-parent batching, player-local vertex colors, and selective shadow ownership while preserving the approved scene. | [Animation performance revision V2](animation-performance-revision-v2/README.md) |
 
 ## How the current process works
 
@@ -106,6 +109,9 @@ mind, and demand evidence before release.
 | [Live tournament readiness](live-tournament-readiness/README.md) | Reconstructed from six committed plans | 6 | Complete |
 | [Production match experience](production-match-experience/README.md) | Reconstructed from report and delivery | 0 standalone, 6 report phases | Complete |
 | [Animation performance revision](animation-performance-revision/README.md) | Original brief | 6 | Complete |
+| [Champion celebration](champion-celebration/README.md) | Revised completed V1 contract; [source brief preserved](%5B05%5D-champion-celebration/BRIEF.md) | 7 | Complete |
+| [Champion celebration V2](champion-celebration-v2/README.md) | Trophy Lift storyboard and owner revisions | 4 | Complete |
+| [Animation performance revision V2](animation-performance-revision-v2/README.md) | Original performance contract and measured baseline | 5 | Complete with known renderer limit |
 
 ## What remains outside a formal brief
 

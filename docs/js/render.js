@@ -372,7 +372,8 @@ function pickBox(D, team, picked, short, champ, st, feeder = null, score = null)
   const tag = champ ? '<span class="tt">\u{1F3C6}</span>' : "";
   const chev = picked && !champ ? '<span class="adv-arrow" title="you have this team advancing">\u203A</span>' : "";
   const feederAttr = feeder ? ` data-feeder="${esc(feeder)}"` : "";
-  return `<div class="${cls.join(" ")}" data-team="${esc(team)}"${feederAttr} data-round="${short}" tabindex="0">` +
+  const celebrationAttr = champ ? " data-champion-celebration-trigger" : "";
+  return `<div class="${cls.join(" ")}" data-team="${esc(team)}"${feederAttr}${celebrationAttr} data-round="${short}" tabindex="0">` +
     `<span class="fav-bar"></span>${flagImg(team, "mflag")}<span class="tname">${esc(team)}</span>` +
     `<span class="tcode" aria-hidden="true">${esc(teamCode3(team))}</span>` +
     `${score == null ? "" : `<span class="tscore">${esc(score)}</span>`}${tag}${badge}${chev}</div>`;

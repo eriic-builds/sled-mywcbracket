@@ -1,0 +1,1545 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Animation Performance Revision V2</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.55;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: var(--cp-accent-soft);
+    }
+
+    a {
+      color: var(--cp-link);
+      text-underline-offset: 0.18em;
+    }
+
+    a:hover {
+      color: var(--cp-accent-hover);
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--cp-accent);
+      outline-offset: 3px;
+    }
+
+    code,
+    pre,
+    .mono {
+      font-family: Consolas, "Courier New", Courier, monospace;
+    }
+
+    code {
+      padding: 0.08rem 0.28rem;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.375rem;
+      background: var(--cp-surface-soft);
+      font-size: 0.9em;
+    }
+
+    .mobile-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--cp-border);
+      background: var(--cp-panel-strong);
+    }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 20;
+      width: 19rem;
+      overflow-y: auto;
+      padding: 1.5rem 1rem;
+      border-right: 1px solid var(--cp-border);
+      background: var(--cp-bg-elevated);
+    }
+
+    .brand {
+      display: grid;
+      gap: 0.35rem;
+      margin-bottom: 1.5rem;
+      padding: 0.5rem;
+    }
+
+    .brand strong {
+      font-size: 1.05rem;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--cp-accent);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 0.25rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-list a {
+      display: block;
+      padding: 0.55rem 0.75rem;
+      border-left: 3px solid var(--cp-border);
+      border-radius: 0 0.625rem 0.625rem 0;
+      color: var(--cp-text-muted);
+      font-size: 0.9rem;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .nav-list a:hover,
+    .nav-list a[aria-current="location"] {
+      border-left-color: var(--cp-accent);
+      background: var(--cp-accent-soft);
+      color: var(--cp-text);
+    }
+
+    .sidebar-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.5rem;
+      padding: 0.55rem 0.8rem;
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .button:hover {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent-soft);
+    }
+
+    .button.primary {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+    }
+
+    .button.primary:hover {
+      background: var(--cp-accent-hover);
+    }
+
+    main {
+      width: min(90rem, calc(100% - 19rem));
+      margin-left: 19rem;
+      padding: clamp(1rem, 3vw, 3rem);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(1.5rem, 5vw, 4.5rem);
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      background: var(--cp-surface);
+      box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
+    }
+
+    .hero::after {
+      position: absolute;
+      right: -5rem;
+      bottom: -7rem;
+      width: 18rem;
+      height: 18rem;
+      border: 3rem solid var(--cp-accent-soft);
+      border-radius: 50%;
+      content: "";
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      max-width: 15ch;
+      margin: 0.45rem 0 1rem;
+      font-size: clamp(2.5rem, 7vw, 5.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+
+    .hero .lead {
+      max-width: 68rem;
+      margin: 0;
+      color: var(--cp-text-muted);
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+    }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.38rem 0.7rem;
+      border: 1px solid var(--cp-border);
+      border-radius: 999px;
+      background: var(--cp-surface-soft);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .status::before {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: var(--cp-border-strong);
+      content: "";
+    }
+
+    .status.good {
+      border-color: var(--cp-success);
+      color: var(--cp-success);
+    }
+
+    .status.good::before {
+      background: var(--cp-success);
+    }
+
+    .status.warn {
+      border-color: var(--cp-warning);
+      color: var(--cp-warning);
+    }
+
+    .status.warn::before {
+      background: var(--cp-warning);
+    }
+
+    .status.bad {
+      border-color: var(--cp-danger);
+      color: var(--cp-danger);
+    }
+
+    .status.bad::before {
+      background: var(--cp-danger);
+    }
+
+    .executive-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .metric-card,
+    .card {
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      background: var(--cp-surface);
+      box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
+    }
+
+    .metric-card {
+      padding: 1.2rem;
+    }
+
+    .metric-card .label {
+      color: var(--cp-text-muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .metric-card .value {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 850;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-card p {
+      margin: 0.45rem 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.9rem;
+    }
+
+    .report-section {
+      scroll-margin-top: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    details.card {
+      overflow: clip;
+    }
+
+    details.card > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+
+    details.card > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.card > summary::after {
+      display: grid;
+      width: 2rem;
+      height: 2rem;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid var(--cp-border);
+      border-radius: 50%;
+      background: var(--cp-surface-soft);
+      color: var(--cp-accent);
+      content: "+";
+      font-size: 1.2rem;
+      font-weight: 850;
+    }
+
+    details.card[open] > summary {
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    details.card[open] > summary::after {
+      content: "-";
+    }
+
+    summary h2 {
+      margin: 0;
+      font-size: clamp(1.15rem, 2vw, 1.5rem);
+    }
+
+    .section-body {
+      padding: clamp(1rem, 3vw, 1.6rem);
+    }
+
+    .section-body > :first-child {
+      margin-top: 0;
+    }
+
+    .section-body > :last-child {
+      margin-bottom: 0;
+    }
+
+    .lede {
+      max-width: 75ch;
+      color: var(--cp-text-muted);
+      font-size: 1.05rem;
+    }
+
+    .callout {
+      margin: 1rem 0;
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--cp-border);
+      border-left: 4px solid var(--cp-accent);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .callout.warning {
+      border-left-color: var(--cp-warning);
+    }
+
+    .callout.danger {
+      border-left-color: var(--cp-danger);
+    }
+
+    .callout.success {
+      border-left-color: var(--cp-success);
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 1rem;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .subcard h3,
+    .subcard h4 {
+      margin: 0 0 0.45rem;
+    }
+
+    .subcard p:last-child {
+      margin-bottom: 0;
+    }
+
+    .subcard p,
+    .subcard li {
+      color: var(--cp-text-muted);
+    }
+
+    .rank {
+      display: inline-grid;
+      width: 2rem;
+      height: 2rem;
+      margin-right: 0.45rem;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      font-weight: 850;
+    }
+
+    .score {
+      color: var(--cp-accent);
+      font-size: 0.82rem;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1rem 0;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--cp-surface);
+      font-variant-numeric: tabular-nums;
+    }
+
+    th,
+    td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--cp-border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--cp-surface-soft);
+      color: var(--cp-text);
+      font-size: 0.78rem;
+      letter-spacing: 0.035em;
+      text-transform: uppercase;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody tr:hover {
+      background: var(--cp-accent-soft);
+    }
+
+    td.number {
+      white-space: nowrap;
+      font-family: Consolas, "Courier New", Courier, monospace;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .filter[aria-pressed="true"] {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+    }
+
+    .diagram {
+      width: 100%;
+      height: auto;
+      margin: 1rem 0;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .diagram .box {
+      fill: var(--cp-surface);
+      stroke: var(--cp-border-strong);
+      stroke-width: 2;
+    }
+
+    .diagram .accent-box {
+      fill: var(--cp-accent-soft);
+      stroke: var(--cp-accent);
+      stroke-width: 2;
+    }
+
+    .diagram .good-box {
+      fill: var(--cp-surface);
+      stroke: var(--cp-success);
+      stroke-width: 2;
+    }
+
+    .diagram .bad-box {
+      fill: var(--cp-surface);
+      stroke: var(--cp-danger);
+      stroke-width: 2;
+    }
+
+    .diagram .line {
+      fill: none;
+      stroke: var(--cp-border-strong);
+      stroke-width: 2;
+    }
+
+    .diagram .accent-line {
+      fill: none;
+      stroke: var(--cp-accent);
+      stroke-width: 3;
+    }
+
+    .diagram text {
+      fill: var(--cp-text);
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .diagram text.small {
+      fill: var(--cp-text-muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .flow {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1rem 0;
+      padding: 0;
+      counter-reset: flow;
+      list-style: none;
+    }
+
+    .flow li {
+      position: relative;
+      padding: 0.85rem 0.85rem 0.85rem 3.3rem;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+    }
+
+    .flow li::before {
+      position: absolute;
+      top: 0.72rem;
+      left: 0.75rem;
+      display: grid;
+      width: 1.9rem;
+      height: 1.9rem;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      content: counter(flow);
+      counter-increment: flow;
+      font-weight: 850;
+    }
+
+    .trace-card dl {
+      display: grid;
+      grid-template-columns: minmax(8rem, 0.25fr) 1fr;
+      gap: 0.45rem 1rem;
+      margin: 0;
+    }
+
+    .trace-card dt {
+      color: var(--cp-text);
+      font-weight: 800;
+    }
+
+    .trace-card dd {
+      margin: 0;
+      color: var(--cp-text-muted);
+    }
+
+    .footer {
+      padding: 2rem 0 1rem;
+      color: var(--cp-text-muted);
+      text-align: center;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 1050px) {
+      .mobile-bar {
+        display: flex;
+      }
+
+      .sidebar {
+        width: min(21rem, 88vw);
+        transform: translateX(-105%);
+        transition: transform 180ms ease;
+        box-shadow: var(--cp-shadow);
+      }
+
+      body.nav-open .sidebar {
+        transform: translateX(0);
+      }
+
+      main {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .executive-grid,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      main {
+        padding: 0.75rem;
+      }
+
+      .hero {
+        padding: 1.35rem;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.35rem, 14vw, 4.2rem);
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      th,
+      td {
+        padding: 0.6rem;
+      }
+
+      .trace-card dl {
+        grid-template-columns: 1fr;
+      }
+
+      .trace-card dd {
+        padding-bottom: 0.65rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .sidebar {
+        transition: none;
+      }
+    }
+
+    @media print {
+      .mobile-bar,
+      .sidebar,
+      .filters,
+      .sidebar-actions {
+        display: none;
+      }
+
+      main {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      details.card {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="mobile-bar">
+    <button class="button" id="menuButton" type="button" aria-expanded="false" aria-controls="reportNav">
+      Sections
+    </button>
+    <strong>Performance V2</strong>
+    <button class="button" id="mobileThemeButton" type="button">Theme</button>
+  </header>
+
+  <aside class="sidebar" id="reportNav" aria-label="Report navigation">
+    <div class="brand">
+      <p class="eyebrow">Engineering review</p>
+      <strong>Animation Performance V2</strong>
+      <span class="mono">July 13, 2026</span>
+    </div>
+    <nav>
+      <ol class="nav-list">
+        <li><a href="#executive">1. Executive summary</a></li>
+        <li><a href="#contract">2. Project contract</a></li>
+        <li><a href="#recommendations">3. Ranked recommendations</a></li>
+        <li><a href="#discovery">4. Codebase discovery</a></li>
+        <li><a href="#architecture">5. Architecture overview</a></li>
+        <li><a href="#data-flow">6. Dependency and data flow</a></li>
+        <li><a href="#plans">7. Plan reviews</a></li>
+        <li><a href="#measurements">8. Raw measurements</a></li>
+        <li><a href="#risks">9. Risks and edge cases</a></li>
+        <li><a href="#alternatives">10. Alternatives</a></li>
+        <li><a href="#reasoning">11. Reasoning trace summary</a></li>
+        <li><a href="#learning">12. Learning mode</a></li>
+        <li><a href="#order">13. Decision and lessons</a></li>
+      </ol>
+    </nav>
+    <div class="sidebar-actions">
+      <button class="button" id="themeButton" type="button">Theme</button>
+      <button class="button" id="expandButton" type="button" aria-pressed="false">Expand</button>
+    </div>
+  </aside>
+
+  <main>
+    <section class="hero" id="executive">
+      <p class="eyebrow">Champion celebration renderer audit</p>
+      <h1>Less repeated work. Same ceremony.</h1>
+      <p class="lead">
+        The hidden reward remains free while dormant. Active scene submission was cut from about
+        626 to 303 renderer calls without reducing the approved 893k-triangle celebration. The
+        strict 16ms phone proxy gate is still red, and this report explains exactly why.
+      </p>
+      <div class="status-row" aria-label="Executive status">
+        <span class="status good">Dormant contract passes</span>
+        <span class="status good">Behavior and lifecycle pass</span>
+        <span class="status good">JavaScript floor 12.865-13.315ms p95</span>
+        <span class="status bad">Active 16ms proxy gate misses</span>
+        <span class="status warn">Other engines not run</span>
+      </div>
+    </section>
+
+    <div class="executive-grid" aria-label="Key results">
+      <article class="metric-card">
+        <span class="label">Renderer calls</span>
+        <strong class="value">626 -> 303</strong>
+        <p>Same approved scene content and approximately the same submitted triangle count.</p>
+      </article>
+      <article class="metric-card">
+        <span class="label">Phone hold p95</span>
+        <strong class="value">149.438 -> 79.893ms</strong>
+        <p>Matched 6x CPU proxy, including continuous finale flares and restore.</p>
+      </article>
+      <article class="metric-card">
+        <span class="label">Matched phone peak</span>
+        <strong class="value">78.617ms</strong>
+        <p>Isolated repeats are 77.003-85.905ms; focused renderer bypass is 12.865-13.315ms.</p>
+      </article>
+    </div>
+
+    <section class="report-section" id="contract">
+      <details class="card" open>
+        <summary><h2>2. Project Contract and Audit Rules</h2></summary>
+        <div class="section-body">
+          <p class="lede">
+            This was not a generic "make it faster" pass. It was a bounded investigation with
+            product, architecture, lifecycle, and evidence constraints.
+          </p>
+          <div class="grid-2">
+            <article class="subcard">
+              <h3>Runtime contract</h3>
+              <ul>
+                <li>Static GitHub Pages site.</li>
+                <li>Vanilla HTML, CSS, and ES modules.</li>
+                <li>Locally vendored Three.js r170.</li>
+                <li>No backend, build step, worker, CDN, or new dependency.</li>
+                <li>Existing local storage and privacy behavior unchanged.</li>
+              </ul>
+            </article>
+            <article class="subcard">
+              <h3>Behavior to preserve</h3>
+              <ul>
+                <li>Four-click hidden activation and exact bracket curtain.</li>
+                <li>Thirty-second deterministic ceremony and continuous final flares.</li>
+                <li>Seven diverse premium clay players and two-hand trophy contact.</li>
+                <li>Reduced motion, fallback, context loss, replay, Skip, and restoration.</li>
+                <li>Zero celebration scene work before valid activation.</li>
+              </ul>
+            </article>
+          </div>
+          <div class="callout warning">
+            <strong>Budget interpretation:</strong> the 16ms p95 active-frame target is stricter
+            than "the sequence finishes." It is a low-end mobile responsiveness target. This report
+            does not weaken it merely because the approved scene is expensive.
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Evidence target</th><th>Local method</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Desktop dashboard</td><td>1024x768, DPR 1, Edge, 4x and 6x CPU</td><td><span class="status good">Run</span></td></tr>
+                <tr><td>Desktop celebration</td><td>1440x900, DPR 1, Edge, 4x CPU</td><td><span class="status good">Run</span></td></tr>
+                <tr><td>Phone proxy</td><td>390x844, browser DPR 2, renderer DPR 1.5, 6x CPU</td><td><span class="status good">Run</span></td></tr>
+                <tr><td>Chrome and Firefox</td><td>Owner-run matched scenarios</td><td><span class="status warn">Not run</span></td></tr>
+                <tr><td>Safari/iOS and physical Android</td><td>Owner-run physical/browser gates</td><td><span class="status warn">Not run</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="recommendations">
+      <details class="card" open>
+        <summary><h2>3. Ranked Recommendations and Decisions</h2></summary>
+        <div class="section-body">
+          <p class="lede">
+            The recommendations were ranked by leverage before implementation. Measurement was
+            allowed to turn an implementation plan into a verification-only decision.
+          </p>
+          <div class="grid-2">
+            <article class="subcard">
+              <h3><span class="rank">1</span>Measure first</h3>
+              <p class="score">10.0 / 10 leverage - complete</p>
+              <p>Separate dormant, cold, carry, peak, hold, hidden, replay, and renderer attribution.</p>
+            </article>
+            <article class="subcard">
+              <h3><span class="rank">2</span>Protect the dashboard</h3>
+              <p class="score">9.8 / 10 leverage - verification only</p>
+              <p>The boundary already requested no heavy modules and created no scene resources.</p>
+            </article>
+            <article class="subcard">
+              <h3><span class="rank">3</span>Bound active work</h3>
+              <p class="score">9.4 / 10 leverage - implemented</p>
+              <p>Scope world matrices, batch rigid same-parent detail, consolidate player-local surfaces, and trim detail shadows.</p>
+            </article>
+            <article class="subcard">
+              <h3><span class="rank">4</span>Bound visible cold cost</h3>
+              <p class="score">8.7 / 10 leverage - documented decision</p>
+              <p>Do not preload while dormant. Keep one-time batching construction separate from steady-state claims.</p>
+            </article>
+            <article class="subcard">
+              <h3><span class="rank">5</span>Prove the integrated gate</h3>
+              <p class="score">8.5 / 10 leverage - complete</p>
+              <p>Repeat matched traces, lifecycle checks, source guards, keyframes, tests, documentation, and this report.</p>
+            </article>
+            <article class="subcard">
+              <h3>Next high-leverage option</h3>
+              <p class="score">Requires explicit product authorization</p>
+              <p>A whole-avatar rigid-skinning or authored low-draw rig rewrite could attack the renderer bottleneck, but has much higher bind-pose, ownership, and fidelity risk.</p>
+            </article>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="discovery">
+      <details class="card" open>
+        <summary><h2>4. Codebase Discovery</h2></summary>
+        <div class="section-body">
+          <div class="grid-3">
+            <article class="subcard">
+              <h3>Dormant boundary</h3>
+              <p><code>champion-celebration-trigger.js</code> owns only the click counter and lazy boundary. Three clicks remain a true near miss.</p>
+            </article>
+            <article class="subcard">
+              <h3>Active controller</h3>
+              <p><code>champion-celebration.js</code> owns stage, reusable canvas, deterministic time, pause/resume, fallback, teardown, and restoration.</p>
+            </article>
+            <article class="subcard">
+              <h3>Heavy scene</h3>
+              <p><code>champion-celebration-scene.js</code>, models, and effects own seven rigs, stadium, crowd, trophy, IK, particles, shadows, and render calls.</p>
+            </article>
+          </div>
+          <h3>What the trace changed about the investigation</h3>
+          <ol class="flow">
+            <li><strong>Layout and Paint were not the problem.</strong> The dominant work lived inside the celebration RAF callback.</li>
+            <li><strong>Renderer bypass collapsed p95 to 16ms in the baseline and about 13ms after batching.</strong> That ruled out broad controller rewrites as the main answer.</li>
+            <li><strong>Scene submission was fragmented.</strong> Baseline inventory showed 667 meshes, about 626 calls, and 659 shadow participants.</li>
+            <li><strong>Most player detail was rigid below existing animated parents.</strong> That created a safe batching boundary without crossing a joint or rig.</li>
+            <li><strong>Different colors blocked ordinary material-key batching.</strong> Player-local vertex colors provided a bounded consolidation path.</li>
+            <li><strong>Cold and steady cost moved differently.</strong> Direct buffer construction protected steady state but increased one-time work, which is reported separately.</li>
+          </ol>
+          <div class="callout success">
+            <strong>Important discovery:</strong> the final scene still submits about 893k triangles.
+            The optimization reduces CPU-side object, material, matrix, shadow, and draw fragmentation;
+            it does not disguise a visual downgrade as performance work.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="architecture">
+      <details class="card" open>
+        <summary><h2>5. Architecture Overview</h2></summary>
+        <div class="section-body">
+          <p class="lede">
+            The architecture keeps the primary product cheap, then pays for the hidden reward only
+            after the valid trigger. The optimization remains inside the scene/model ownership boundary.
+          </p>
+          <svg class="diagram" viewBox="0 0 1040 430" role="img" aria-labelledby="archTitle archDesc">
+            <title id="archTitle">Champion celebration runtime architecture</title>
+            <desc id="archDesc">Dashboard trigger lazily loads a controller, which owns a scene and lifecycle. Model batching occurs once during scene construction.</desc>
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="var(--cp-accent)"></path>
+              </marker>
+            </defs>
+            <rect class="good-box" x="35" y="55" width="220" height="110" rx="12"></rect>
+            <text x="55" y="92">Dashboard</text>
+            <text class="small" x="55" y="120">No heavy module, stage, canvas,</text>
+            <text class="small" x="55" y="140">WebGL, or RAF before click four</text>
+
+            <rect class="accent-box" x="320" y="55" width="220" height="110" rx="12"></rect>
+            <text x="340" y="92">Lazy controller</text>
+            <text class="small" x="340" y="120">Stage, focus, deterministic clock,</text>
+            <text class="small" x="340" y="140">pause, fallback, restore</text>
+
+            <rect class="box" x="605" y="35" width="390" height="150" rx="12"></rect>
+            <text x="625" y="72">Reusable Three.js scene</text>
+            <text class="small" x="625" y="100">Camera + stadium + crowd + trophy + seven rigs</text>
+            <text class="small" x="625" y="122">Confetti + continuous flares + shadows + renderer</text>
+            <text class="small" x="625" y="144">One canvas and one celebration WebGL context</text>
+
+            <path class="accent-line" d="M255 110 H310" marker-end="url(#arrow)"></path>
+            <path class="accent-line" d="M540 110 H595" marker-end="url(#arrow)"></path>
+
+            <rect class="box" x="160" y="270" width="270" height="110" rx="12"></rect>
+            <text x="180" y="307">Player model factory</text>
+            <text class="small" x="180" y="334">Animated bones and named grip pivots</text>
+            <text class="small" x="180" y="354">remain authoritative</text>
+
+            <rect class="accent-box" x="505" y="250" width="330" height="150" rx="12"></rect>
+            <text x="525" y="287">Construction-time batching</text>
+            <text class="small" x="525" y="314">Same parent + compatible attributes</text>
+            <text class="small" x="525" y="336">Direct final buffers + player-local colors</text>
+            <text class="small" x="525" y="358">Protected fingers/thumbs + safe disposal pruning</text>
+            <text class="small" x="525" y="380">No cross-bone or cross-rig merge</text>
+
+            <path class="accent-line" d="M430 325 H495" marker-end="url(#arrow)"></path>
+            <path class="line" d="M670 250 V205 H795 V185"></path>
+          </svg>
+          <div class="grid-2">
+            <article class="subcard">
+              <h3>Safe ownership boundary</h3>
+              <p>A mesh may merge only with direct leaf siblings under the same animated parent. Parent motion still moves the final merged geometry exactly as before.</p>
+            </article>
+            <article class="subcard">
+              <h3>Unsafe boundaries retained</h3>
+              <p>Separate joints, players, skinned or instanced meshes, morph targets, multi-material meshes, custom depth materials, and animated thumbs stay independent.</p>
+            </article>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="data-flow">
+      <details class="card" open>
+        <summary><h2>6. Dependency and Data Flow Analysis</h2></summary>
+        <div class="section-body">
+          <h3>Activation and lifecycle</h3>
+          <svg class="diagram" viewBox="0 0 1080 330" role="img" aria-labelledby="flowTitle flowDesc">
+            <title id="flowTitle">Activation and cleanup data flow</title>
+            <desc id="flowDesc">Valid clicks trigger lazy loading, scene construction, deterministic frames, then cleanup and exact bracket restoration.</desc>
+            <defs>
+              <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="var(--cp-accent)"></path>
+              </marker>
+            </defs>
+            <rect class="good-box" x="25" y="45" width="150" height="78" rx="12"></rect>
+            <text x="48" y="79">Clicks 1-3</text>
+            <text class="small" x="48" y="101">Stay dormant</text>
+
+            <rect class="accent-box" x="215" y="45" width="150" height="78" rx="12"></rect>
+            <text x="237" y="79">Click 4</text>
+            <text class="small" x="237" y="101">Lazy import</text>
+
+            <rect class="box" x="405" y="45" width="175" height="78" rx="12"></rect>
+            <text x="427" y="79">Construct once</text>
+            <text class="small" x="427" y="101">Batch + renderer</text>
+
+            <rect class="box" x="620" y="45" width="190" height="78" rx="12"></rect>
+            <text x="642" y="79">30s logical clock</text>
+            <text class="small" x="642" y="101">RAF updates + render</text>
+
+            <rect class="good-box" x="850" y="45" width="195" height="78" rx="12"></rect>
+            <text x="872" y="79">Skip / complete</text>
+            <text class="small" x="872" y="101">Detach + restore</text>
+
+            <path class="accent-line" d="M175 84 H205" marker-end="url(#arrow2)"></path>
+            <path class="accent-line" d="M365 84 H395" marker-end="url(#arrow2)"></path>
+            <path class="accent-line" d="M580 84 H610" marker-end="url(#arrow2)"></path>
+            <path class="accent-line" d="M810 84 H840" marker-end="url(#arrow2)"></path>
+
+            <rect class="box" x="405" y="210" width="175" height="78" rx="12"></rect>
+            <text x="427" y="244">Hidden tab</text>
+            <text class="small" x="427" y="266">Zero RAF work</text>
+
+            <rect class="box" x="620" y="210" width="190" height="78" rx="12"></rect>
+            <text x="642" y="244">Replay</text>
+            <text class="small" x="642" y="266">Reuse one canvas/context</text>
+
+            <path class="line" d="M715 123 V190 H492 V200"></path>
+            <path class="line" d="M947 123 V175 H715 V200"></path>
+          </svg>
+          <h3>Per-frame trophy and arm order</h3>
+          <ol class="flow">
+            <li>Apply deterministic rig pose and root travel for current logical time.</li>
+            <li>Place and rotate the scene-space trophy carrier from captain world position and quaternion.</li>
+            <li>Read named left and right grip anchors from the trophy.</li>
+            <li>Solve each arm with scoped ancestor-chain matrix updates.</li>
+            <li>Update crowd/effects and submit the scene once through the renderer.</li>
+          </ol>
+          <div class="callout">
+            <strong>Why order matters:</strong> reading grip anchors before trophy rotation mangles the
+            hands during travel. Solving arms before carrier placement creates a one-frame lag. A broad
+            full-scene matrix update fixes symptoms but repeats unnecessary work.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="plans">
+      <details class="card" open>
+        <summary><h2>7. Plan Reviews</h2></summary>
+        <div class="section-body">
+          <div class="grid-2">
+            <article class="subcard">
+              <h3>Plan 01 - Baseline</h3>
+              <p><strong>Observation:</strong> source guards did not prove browser cost.</p>
+              <p><strong>Decision:</strong> build matched Edge scenarios before any production edit.</p>
+              <p><strong>Lesson:</strong> dormant, cold, steady, hidden, and replay are separate performance products.</p>
+            </article>
+            <article class="subcard">
+              <h3>Plan 02 - Dashboard isolation</h3>
+              <p><strong>Evidence:</strong> zero heavy requests, stage, canvas, WebGL, or RAF before click four.</p>
+              <p><strong>Decision:</strong> no lazy-CSS or trigger rewrite.</p>
+              <p><strong>Tradeoff:</strong> retain a tiny unconditional boundary rather than add failure-prone loading complexity.</p>
+            </article>
+            <article class="subcard">
+              <h3>Plan 03 - Active frame cost</h3>
+              <p><strong>Evidence:</strong> renderer bypass isolated scene submission; inventory exposed mesh/material/shadow fragmentation.</p>
+              <p><strong>Decision:</strong> scoped matrices, rigid same-parent batching, vertex colors, selective shadows.</p>
+              <p><strong>Acceptance:</strong> fidelity, articulation, disposal, replay, context loss, and exact restoration remain correct.</p>
+            </article>
+            <article class="subcard">
+              <h3>Plan 04 - Cold activation</h3>
+              <p><strong>Observation:</strong> final buffer construction adds one-time work.</p>
+              <p><strong>Decision:</strong> report it; do not preload while dormant or add a new architecture without visible need.</p>
+              <p><strong>Lesson:</strong> a steady-state win may have a cold-start cost; keep the tables separate.</p>
+            </article>
+            <article class="subcard">
+              <h3>Plan 05 - Integrated proof</h3>
+              <p><strong>Evidence:</strong> matched traces, focused/downstream tests, browser lifecycle, current keyframes, and source guards.</p>
+              <p><strong>Decision:</strong> mark behavior commit-ready but keep the active 16ms limit explicit.</p>
+              <p><strong>Tradeoff:</strong> honest red budget status over an unapproved visual downgrade.</p>
+            </article>
+            <article class="subcard">
+              <h3>Technical Taste Council stop condition</h3>
+              <p><strong>Decision:</strong> stop after bounded batching.</p>
+              <p><strong>Reason:</strong> the next meaningful step is a much larger rig/rendering rewrite, not another small JavaScript cleanup.</p>
+              <p><strong>Guardrail:</strong> do not turn performance anxiety into architecture churn.</p>
+            </article>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="measurements">
+      <details class="card" open>
+        <summary><h2>8. Raw Before-and-After Measurements</h2></summary>
+        <div class="section-body">
+          <p class="lede">
+            Use the filters to focus the matched table. Raw values are shown because timing windows,
+            warming behavior, and noisy phone proxies make a single headline percentage misleading.
+          </p>
+          <div class="filters" aria-label="Measurement filters">
+            <button class="button filter" type="button" data-filter="all" aria-pressed="true">All</button>
+            <button class="button filter" type="button" data-filter="desktop" aria-pressed="false">Desktop</button>
+            <button class="button filter" type="button" data-filter="phone" aria-pressed="false">Phone</button>
+            <button class="button filter" type="button" data-filter="cold" aria-pressed="false">Cold</button>
+          </div>
+          <div class="table-wrap">
+            <table id="matchedTable">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>Baseline p50 / p95 / max</th>
+                  <th>Final p50 / p95 / max</th>
+                  <th>Baseline -> final logical end</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-group="desktop"><td>Carry desktop</td><td class="number">53.865 / 81.970 / 105.302ms</td><td class="number">28.402 / 40.611 / 55.904ms</td><td class="number">12.8s -> 14.1s</td></tr>
+                <tr data-group="phone"><td>Carry phone</td><td class="number">76.508 / 115.162 / 127.791ms</td><td class="number">54.537 / 75.394 / 88.870ms</td><td class="number">11.7s -> 12.5s</td></tr>
+                <tr data-group="desktop"><td>Peak desktop</td><td class="number">51.063 / 87.421 / 111.485ms</td><td class="number">36.639 / 51.800 / 89.286ms</td><td class="number">24.9s -> 25.8s</td></tr>
+                <tr data-group="phone"><td>Peak phone, full matrix</td><td class="number">89.174 / 136.386 / 147.103ms</td><td class="number">49.845 / 78.617 / 97.212ms</td><td class="number">23.4s -> 24.7s</td></tr>
+                <tr data-group="desktop"><td>Hold/restore desktop</td><td class="number">51.908 / 82.892 / 89.128ms</td><td class="number">30.887 / 41.706 / 48.570ms</td><td class="number">28.9s -> 29.9s</td></tr>
+                <tr data-group="phone"><td>Hold/restore phone</td><td class="number">104.451 / 149.438 / 185.243ms</td><td class="number">51.718 / 79.893 / 85.737ms</td><td class="number">27.7s -> 28.8s</td></tr>
+                <tr data-group="cold desktop"><td>Cold desktop 4x</td><td class="number">24.365 / 34.404 / 964.109ms</td><td class="number">20.914 / 34.432 / 1467.739ms</td><td class="number">Task max 2009.028 -> 2791.273ms</td></tr>
+                <tr data-group="cold phone"><td>Cold phone 6x</td><td class="number">44.621 / 105.389 / 114.389ms</td><td class="number">33.414 / 57.026 / 112.673ms</td><td class="number">Task max 1906.135 -> 2360.911ms</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="grid-2">
+            <article class="subcard">
+              <h3>Isolated phone peak repeats</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Run</th><th>p50</th><th>p95</th><th>Max</th></tr></thead>
+                  <tbody>
+                    <tr><td>Repeat 1</td><td class="number">55.027ms</td><td class="number">78.516ms</td><td class="number">98.534ms</td></tr>
+                    <tr><td>Repeat 2</td><td class="number">54.787ms</td><td class="number">85.905ms</td><td class="number">108.941ms</td></tr>
+                    <tr><td>Repeat 3</td><td class="number">57.595ms</td><td class="number">77.003ms</td><td class="number">91.111ms</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+            <article class="subcard">
+              <h3>Renderer attribution</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Variant</th><th>p50</th><th>p95</th><th>&gt;50ms</th></tr></thead>
+                  <tbody>
+                    <tr><td>Active, focused 1</td><td class="number">53.937ms</td><td class="number">69.262ms</td><td class="number">42</td></tr>
+                    <tr><td>Bypassed, focused 1</td><td class="number">8.459ms</td><td class="number">12.865ms</td><td class="number">0</td></tr>
+                    <tr><td>Active, focused 2</td><td class="number">56.608ms</td><td class="number">75.374ms</td><td class="number">41</td></tr>
+                    <tr><td>Bypassed, focused 2</td><td class="number">8.321ms</td><td class="number">13.315ms</td><td class="number">0</td></tr>
+                    <tr><td>Active, broad outlier</td><td class="number">89.090ms</td><td class="number">118.413ms</td><td class="number">27</td></tr>
+                    <tr><td>Bypassed, broad pass</td><td class="number">10.688ms</td><td class="number">13.433ms</td><td class="number">0</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+
+          <h3>Scene inventory</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Inventory</th><th>Baseline</th><th>Final</th><th>Interpretation</th></tr></thead>
+              <tbody>
+                <tr><td>Objects</td><td class="number">873</td><td class="number">548</td><td>Less traversal and ownership fragmentation</td></tr>
+                <tr><td>Meshes</td><td class="number">667</td><td class="number">342</td><td>Rigid leaf detail merged below existing animation owners</td></tr>
+                <tr><td>Renderer calls</td><td class="number">about 626</td><td class="number">303</td><td>Primary repeated CPU-side win</td></tr>
+                <tr><td>Shadow participants</td><td class="number">659</td><td class="number">257</td><td>Detail shadows removed; silhouettes retained</td></tr>
+                <tr><td>Materials</td><td class="number">102</td><td class="number">77</td><td>Player-local matte/polished classes plus retained special surfaces</td></tr>
+                <tr><td>Geometries</td><td class="number">321</td><td class="number">199</td><td>Superseded owned resources pruned safely</td></tr>
+                <tr><td>Triangles</td><td class="number">891,386</td><td class="number">892,858</td><td>No scene-content reduction</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout danger">
+            <strong>Do not average away variance:</strong> an earlier pre-council full matrix
+            produced 131.086ms p95, the final matched matrix produced 78.617ms, and a broad final
+            attribution pass produced 118.413ms. The focused and isolated repeats explain the
+            distribution; they do not erase any raw run.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="risks">
+      <details class="card">
+        <summary><h2>9. Risks and Edge Cases</h2></summary>
+        <div class="section-body">
+          <div class="grid-2">
+            <article class="subcard">
+              <h3>Animation boundaries</h3>
+              <ul>
+                <li>Never merge across bones, player roots, or named articulated pivots.</li>
+                <li>Animated thumbs are explicitly protected; fingers stay below independent Groups.</li>
+                <li>Backward scrub must restore trophy rest quaternion and deterministic poses.</li>
+                <li>Skipped or reordered matrices can produce a one-frame grip lag.</li>
+              </ul>
+            </article>
+            <article class="subcard">
+              <h3>Geometry and material correctness</h3>
+              <ul>
+                <li>Every vertex-colored replacement geometry needs a valid normalized color attribute.</li>
+                <li>Normals must use the normal matrix, not the position matrix.</li>
+                <li>Indices must be offset without overflowing the selected integer type.</li>
+                <li>Cross-player material sharing would erase deterministic appearance ownership.</li>
+              </ul>
+            </article>
+            <article class="subcard">
+              <h3>Disposal and replay</h3>
+              <ul>
+                <li>Prune only geometry/materials no longer referenced by the scene.</li>
+                <li>Dispose replacements and retained originals exactly once.</li>
+                <li>Keep one reusable celebration canvas/context across replay.</li>
+                <li>Connected stage/canvas counts matter more than generic inspector-retained Attr nodes.</li>
+              </ul>
+            </article>
+            <article class="subcard">
+              <h3>Evidence limits</h3>
+              <ul>
+                <li>CPU throttle is not physical-device thermals or GPU proof.</li>
+                <li>Headless Edge does not establish Safari/iOS behavior.</li>
+                <li>Transform use does not prove compositor promotion.</li>
+                <li>Cold, isolated, warmed, and full-matrix traces answer different questions.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="alternatives">
+      <details class="card">
+        <summary><h2>10. Alternative Approaches Considered</h2></summary>
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Approach</th><th>Why it looked attractive</th><th>Why it was rejected or deferred</th></tr></thead>
+              <tbody>
+                <tr><td>Lazy CSS / trigger rewrite</td><td>Could remove all celebration bytes from first load</td><td>Dormant runtime already passes; added failure and flash risk had no measured payoff.</td></tr>
+                <tr><td>Phone DPR 1</td><td>Fewer pixels</td><td>Visibly softened the scene and did not improve main-thread p95.</td></tr>
+                <tr><td>Blanket shadow removal</td><td>Simple global change</td><td>Flattened the ceremony and still missed the frame gate.</td></tr>
+                <tr><td>Static stadium batching</td><td>Lower draw count outside the cast</td><td>Measured call reduction did not produce meaningful p95 improvement, so it was reverted.</td></tr>
+                <tr><td>Flatten the crowd</td><td>Many repeated supporters</td><td>Would lose independent shirt/skin colors and articulated arm motion.</td></tr>
+                <tr><td>Render skipping</td><td>Less total work</td><td>Does not lower per-render p95 and would introduce visible cadence stutter.</td></tr>
+                <tr><td>Reduce cast/particles/triangles</td><td>Direct GPU/content savings</td><td>Violates approved visual and emotional fidelity without product authorization.</td></tr>
+                <tr><td>Whole-avatar rigid skinning rewrite</td><td>Potentially much lower draw count</td><td>Deferred due bind-pose, IK, grip, material, disposal, and maintainability risk.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="reasoning">
+      <details class="card">
+        <summary><h2>11. Reasoning Trace Summary</h2></summary>
+        <div class="section-body">
+          <p class="lede">
+            This is a concise engineering decision log, not private chain-of-thought. It records the
+            observable inputs and reviewable decisions another engineer needs.
+          </p>
+          <div class="grid-2">
+            <article class="subcard trace-card">
+              <h3>Keep Plan 02 verification-only</h3>
+              <dl>
+                <dt>Observation</dt><dd>The dashboard statically owns only a small trigger boundary and stylesheet.</dd>
+                <dt>Evidence</dt><dd>Dormant and three-click scenarios requested no heavy module and created no celebration resources or RAF.</dd>
+                <dt>Reasoning</dt><dd>A more complex loader would optimize an already-green boundary and add failure states.</dd>
+                <dt>Decision</dt><dd>Make no runtime loading change.</dd>
+                <dt>Tradeoff</dt><dd>Retain tiny first-load bytes for a simpler reliable activation.</dd>
+                <dt>Lesson</dt><dd>Zero-cost rhetoric should not replace measured materiality.</dd>
+              </dl>
+            </article>
+            <article class="subcard trace-card">
+              <h3>Remove broad matrix propagation</h3>
+              <dl>
+                <dt>Observation</dt><dd>Trophy placement and each arm solve forced broad matrix updates.</dd>
+                <dt>Evidence</dt><dd>The scene already reads world transforms through methods that update required ancestor chains.</dd>
+                <dt>Reasoning</dt><dd>Repeated full traversal was redundant and did not improve grip correctness.</dd>
+                <dt>Decision</dt><dd>Rely on scoped world reads in the protected update order.</dd>
+                <dt>Tradeoff</dt><dd>Requires stronger order tests because broad updates can hide sequencing bugs.</dd>
+                <dt>Lesson</dt><dd>Correct dependency ordering beats brute-force synchronization.</dd>
+              </dl>
+            </article>
+            <article class="subcard trace-card">
+              <h3>Batch rigid player detail</h3>
+              <dl>
+                <dt>Observation</dt><dd>Most detail meshes were rigid leaf siblings below animated parents.</dd>
+                <dt>Evidence</dt><dd>Baseline inventory showed 667 meshes and about 626 renderer calls.</dd>
+                <dt>Reasoning</dt><dd>Same-parent leaf merging preserves parent animation while reducing submission.</dd>
+                <dt>Decision</dt><dd>Use strict eligibility plus player-local vertex colors.</dd>
+                <dt>Tradeoff</dt><dd>Add one-time construction and material normalization.</dd>
+                <dt>Lesson</dt><dd>Batch below one animation owner, never across it.</dd>
+              </dl>
+            </article>
+            <article class="subcard trace-card">
+              <h3>Stop after bounded batching</h3>
+              <dl>
+                <dt>Observation</dt><dd>Final focused renderer bypass is 12.865-13.315ms, while renderer-active p95 remains 69.262-75.374ms and a broader pass reached 118.413ms.</dd>
+                <dt>Evidence</dt><dd>DPR, shadows, static stadium batching, and render skipping lacked acceptable leverage.</dd>
+                <dt>Reasoning</dt><dd>More small JavaScript edits cannot close a renderer-dominated gap.</dd>
+                <dt>Decision</dt><dd>Document the limit and require explicit authorization for a rig/render architecture rewrite.</dd>
+                <dt>Tradeoff</dt><dd>Keep a red synthetic gate rather than weaken approved fidelity.</dd>
+                <dt>Lesson</dt><dd>Knowing when to stop is part of performance engineering.</dd>
+              </dl>
+            </article>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="learning">
+      <details class="card">
+        <summary><h2>12. Learning Mode: ELI5 and Senior Review</h2></summary>
+        <div class="section-body">
+          <div class="grid-2">
+            <article class="subcard">
+              <h3>ELI5</h3>
+              <p>
+                Imagine the browser is a stage manager. Before the secret show starts, the manager
+                carries no scenery at all. Once the show starts, the manager used to hand the renderer
+                more than six hundred separate props every frame.
+              </p>
+              <p>
+                We tied safe groups of small decorations together, so the manager now hands over about
+                three hundred props. The show still has the same players, stadium, trophy, confetti,
+                and flares. It is much easier to manage, but the full set is still very large for the
+                slow-phone test.
+              </p>
+            </article>
+            <article class="subcard">
+              <h3>What a senior engineer notices</h3>
+              <ul>
+                <li>The fastest dormant feature is the one that has not allocated its world yet.</li>
+                <li>Draw calls, shadow passes, materials, and object traversal can dominate even with no Layout.</li>
+                <li>Scene graphs are ownership graphs; batching and disposal must be designed together.</li>
+                <li>A visual contract can be a stronger constraint than a synthetic budget.</li>
+                <li>A local proxy result should never be promoted into cross-browser certainty.</li>
+                <li>A failed target is still useful when attribution identifies the exact architecture boundary.</li>
+              </ul>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Core mental model:</strong> performance is not one number. It is a set of costs
+            attached to lifecycle states: before activation, first construction, steady animation,
+            hidden pause, replay, and teardown.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section" id="order">
+      <details class="card" open>
+        <summary><h2>13. Recommended Decision, Execution Order, and Lessons</h2></summary>
+        <div class="section-body">
+          <div class="callout success">
+            <strong>Recommended repository decision:</strong> treat the celebration and bounded
+            performance changes as a commit candidate with one explicit known limit. Behavior,
+            dashboard isolation, fallbacks, replay, restoration, and tests are ready. Do not label
+            the active scene as meeting the 16ms 6x-phone budget.
+          </div>
+          <div class="grid-2">
+            <article class="subcard">
+              <h3>If the 16ms target is advisory</h3>
+              <ol>
+                <li>Review the opened dashboard, choreography surface, and this report.</li>
+                <li>Commit the celebration plus bounded performance work together.</li>
+                <li>Run Chrome, Firefox, Safari/iOS, and physical Android follow-up gates.</li>
+                <li>Use real device evidence to decide whether a larger renderer rewrite is worth it.</li>
+              </ol>
+            </article>
+            <article class="subcard">
+              <h3>If the 16ms target is a hard release gate</h3>
+              <ol>
+                <li>Do not claim release readiness.</li>
+                <li>Authorize a separate rig/render architecture brief.</li>
+                <li>Prototype authored rigid skinning or lower-submission avatars behind visual comparisons.</li>
+                <li>Re-baseline cold and active cost before replacing the current implementation.</li>
+              </ol>
+            </article>
+          </div>
+          <h3>Lessons learned</h3>
+          <ol class="flow">
+            <li>Measure inactive and active features separately.</li>
+            <li>Attribute before editing; renderer bypass was the pivotal experiment.</li>
+            <li>Remove redundant synchronization before reducing visual content.</li>
+            <li>Batch only inside a clear animation and disposal owner.</li>
+            <li>Keep cold-start and steady-state evidence in separate tables.</li>
+            <li>Report full-matrix outliers, isolated repeats, and warmed runs without substitution.</li>
+            <li>Stop when the next step crosses from bounded optimization into product architecture.</li>
+          </ol>
+          <p class="mono">
+            Local evidence: BASELINE.md + RESULTS.md + focused tests + matched Edge traces +
+            dashboard/lifecycle/keyframe validators.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <footer class="footer">
+      Self-contained local engineering artifact. No external assets, scripts, fonts, or requests.
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      const body = document.body;
+      const menuButton = document.getElementById("menuButton");
+      const themeButtons = [
+        document.getElementById("themeButton"),
+        document.getElementById("mobileThemeButton"),
+      ];
+      const expandButton = document.getElementById("expandButton");
+      const details = [...document.querySelectorAll("details.card")];
+      const navLinks = [...document.querySelectorAll(".nav-list a")];
+      const filters = [...document.querySelectorAll(".filter")];
+      const metricRows = [...document.querySelectorAll("#matchedTable tbody tr")];
+
+      const toggleTheme = () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        document.documentElement.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+      };
+
+      themeButtons.forEach(button => button.addEventListener("click", toggleTheme));
+
+      menuButton.addEventListener("click", () => {
+        const open = body.classList.toggle("nav-open");
+        menuButton.setAttribute("aria-expanded", String(open));
+      });
+
+      navLinks.forEach(link => {
+        link.addEventListener("click", () => {
+          body.classList.remove("nav-open");
+          menuButton.setAttribute("aria-expanded", "false");
+        });
+      });
+
+      expandButton.addEventListener("click", () => {
+        const shouldOpen = expandButton.getAttribute("aria-pressed") !== "true";
+        details.forEach(item => {
+          item.open = shouldOpen;
+        });
+        expandButton.setAttribute("aria-pressed", String(shouldOpen));
+        expandButton.textContent = shouldOpen ? "Collapse" : "Expand";
+      });
+
+      filters.forEach(button => {
+        button.addEventListener("click", () => {
+          const filter = button.dataset.filter;
+          filters.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+          metricRows.forEach(row => {
+            row.hidden = filter !== "all" && !row.dataset.group.split(" ").includes(filter);
+          });
+        });
+      });
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        navLinks.forEach(link => {
+          const active = link.getAttribute("href") === `#${visible.target.id}`;
+          if (active) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      }, { rootMargin: "-15% 0px -70% 0px", threshold: [0, 0.2, 0.5] });
+
+      document.querySelectorAll("#executive, .report-section").forEach(section => observer.observe(section));
+    })();
+  </script>
+</body>
+</html>

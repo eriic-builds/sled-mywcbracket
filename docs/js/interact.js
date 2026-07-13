@@ -1,6 +1,8 @@
 // Interaction layer — adapted from wc26-bracket build_dashboard.py (JS constant).
 // Wrapped in initInteractions() so it runs AFTER render.js injects the dashboard DOM.
-export function initInteractions(){
+import { initChampionCelebrationTrigger } from "./champion-celebration-trigger.js";
+
+export function initInteractions({ onChampionCelebration } = {}){
 
 return (function(){
  var lifecycle=new AbortController(),signal=lifecycle.signal,timers=new Set(),frames=new Set();
@@ -64,7 +66,7 @@ return (function(){
  // ---- bracket connector lines (elbow paths, coloured by whether each pick came true) ----
  function activeBracket(){var w=document.querySelector('.brk-wrap');if(!w)return document.querySelector('.bracket');return w.querySelector('.bracket.layout-'+(w.getAttribute('data-layout')||'mirror')+'.mode-'+(w.getAttribute('data-view')||'actual'));}
  function drawConnectors(){
-   if(signal.aborted)return;
+   if(signal.aborted||document.body.classList.contains('champion-celebration-active'))return;
    var bracket=activeBracket();if(!bracket)return;
    var svg=bracket.querySelector('.bksvg');
    if(!bracket||!svg) return;
@@ -74,6 +76,18 @@ return (function(){
    var brect=bracket.getBoundingClientRect(),W=bracket.scrollWidth,Hh=bracket.scrollHeight;
    svg.setAttribute('width',W);svg.setAttribute('height',Hh);svg.setAttribute('viewBox','0 0 '+W+' '+Hh);
    function P(el){var r=el.getBoundingClientRect();return{r:r.right-brect.left+bracket.scrollLeft,l:r.left-brect.left+bracket.scrollLeft,y:(r.top+r.bottom)/2-brect.top+bracket.scrollTop};}
+   function tagCurtainPath(path,card){
+     var column=card&&card.closest('.bkcol[data-side]');if(!column)return;
+     var cards=[].slice.call(column.children).filter(function(child){return child.classList.contains('mcard')});
+     path.setAttribute('data-curtain-side',column.dataset.side||'C');
+     path.setAttribute('data-curtain-col',column.dataset.col||'5');
+     path.setAttribute('data-curtain-row',String(Math.max(0,cards.indexOf(card))));
+     path.setAttribute('data-curtain-count',String(Math.max(1,cards.length)));
+   }
+   function addCurtainPath(d,className,card){
+     var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+     path.setAttribute('d',d);path.setAttribute('class',className);tagCurtainPath(path,card);svg.appendChild(path);
+   }
    function addChampionPath(d,coreClass){
      var glow=document.createElementNS('http://www.w3.org/2000/svg','path');
      glow.setAttribute('d',d);glow.setAttribute('class','champion-link glow');svg.appendChild(glow);
@@ -110,13 +124,13 @@ return (function(){
        var source=row.dataset.team?[].slice.call(fromCard.querySelectorAll('.team[data-team]')).find(function(candidate){return candidate.dataset.team===row.dataset.team;}):null;
        var a=P(source||fromCard),b=P(row);
        var x1=side==='R'?a.l:a.r,x2=side==='R'?b.r:b.l,xm=Math.round((x1+x2)/2);
-       var d='M'+Math.round(x1)+' '+Math.round(a.y)+' H'+xm+' V'+Math.round(b.y)+' H'+Math.round(x2);
        var st=row.classList.contains('st-won')||row.classList.contains('adv')?'won':
          row.classList.contains('st-lost')||row.classList.contains('busted')?'lost':
          row.classList.contains('st-actual')||row.classList.contains('realadv')?'actual':'pending';
        var gone=row.classList.contains('gone');
-       var p=document.createElementNS('http://www.w3.org/2000/svg','path');
-       p.setAttribute('d',d);p.setAttribute('class','conn c-'+st+(gone?' gone':''));svg.appendChild(p);
+       var pathClass='conn c-'+st+(gone?' gone':'');
+       addCurtainPath('M'+Math.round(x1)+' '+Math.round(a.y)+' H'+xm,pathClass,fromCard);
+       addCurtainPath('M'+xm+' '+Math.round(a.y)+' V'+Math.round(b.y)+' H'+Math.round(x2),pathClass,parentCard);
    });
    var championTarget=bracket.querySelector('.champ-state .team.champ[data-team]');
    var finalCard=bracket.querySelector('.mcard[data-match-code="M104"]');
@@ -131,11 +145,13 @@ return (function(){
  }
  window.__drawConn=drawConnectors;
  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){if(!signal.aborted&&window.__drawConn===drawConnectors)drawConnectors();});
- document.querySelectorAll('.brk-toggle button').forEach(function(bt){bt.addEventListener('click',function(){var w=document.querySelector('.brk-wrap');w.setAttribute('data-view',bt.dataset.view);document.querySelectorAll('.brk-toggle button').forEach(function(x){x.classList.toggle('on',x===bt);});later(drawConnectors,60);});});
+ var celebrationTrigger=null;
+ document.querySelectorAll('.brk-toggle button').forEach(function(bt){bt.addEventListener('click',function(){var w=document.querySelector('.brk-wrap');if(w.getAttribute('data-view')!==bt.dataset.view&&celebrationTrigger)celebrationTrigger.reset();w.setAttribute('data-view',bt.dataset.view);document.querySelectorAll('.brk-toggle button').forEach(function(x){x.classList.toggle('on',x===bt);});later(drawConnectors,60);});});
  var layoutWrap=document.querySelector('.brk-wrap'),layoutButtons=[].slice.call(document.querySelectorAll('.layout-toggle button'));
  function setLayout(layout,persist){
    if(!layoutWrap)return;
    if(layout==='sideways'&&window.innerWidth<=860)layout='mirror';
+   if(layoutWrap.getAttribute('data-layout')!==layout&&celebrationTrigger)celebrationTrigger.reset();
    layoutWrap.setAttribute('data-layout',layout);
    syncExpandedLayout();
    layoutButtons.forEach(function(button){var on=button.dataset.layout===layout;button.classList.toggle('on',on);button.setAttribute('aria-pressed',on?'true':'false');});
@@ -145,6 +161,12 @@ return (function(){
  layoutButtons.forEach(function(button){button.addEventListener('click',function(){setLayout(button.dataset.layout,true);});});
  var savedLayout='mirror';try{savedLayout=LS.getItem(KLAYOUT)||'mirror'}catch(e){}
  setLayout(savedLayout,false);
+ if(layoutWrap)celebrationTrigger=initChampionCelebrationTrigger({
+   wrap:layoutWrap,
+   getActiveBracket:activeBracket,
+   onTrigger:typeof onChampionCelebration==='function'?onChampionCelebration:function(){},
+   signal:signal
+ });
  var mapExpandButton=document.getElementById('mapExpandToggle');
  function jumpWithoutMotion(target){
    var previous=root.style.scrollBehavior;
@@ -211,6 +233,7 @@ return (function(){
    secs.forEach(function(s){spy.observe(s);});
  }
  return function(){
+   if(celebrationTrigger)celebrationTrigger.reset();
    lifecycle.abort();
    timers.forEach(function(id){clearTimeout(id);});timers.clear();
    frames.forEach(function(id){cancelAnimationFrame(id);});frames.clear();
