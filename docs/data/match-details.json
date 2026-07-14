@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "refreshed": "2026-07-12T03:46:26Z",
+  "refreshed": "2026-07-14T21:30:38Z",
   "matches": {
     "M73": {
       "source": {
@@ -1789,6 +1789,66 @@
           "player": "Embolo",
           "minute": "72'",
           "card": "red"
+        }
+      ]
+    },
+    "M101": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289290",
+        "matchId": "400021541"
+      },
+      "state": "complete",
+      "home": "France",
+      "away": "Spain",
+      "score": {
+        "home": 0,
+        "away": 2,
+        "note": ""
+      },
+      "winner": "Spain",
+      "round": "Semifinal",
+      "kickoff": "2026-07-14T19:00:00Z",
+      "venue": {
+        "stadium": "Dallas Stadium",
+        "city": "Dallas"
+      },
+      "attendance": 70176,
+      "referee": "Ivan Arcides Barton Cisneros",
+      "goals": [
+        {
+          "team": "Spain",
+          "player": "Oyarzabal",
+          "minute": "22'",
+          "kind": "penalty"
+        },
+        {
+          "team": "Spain",
+          "player": "Porro",
+          "minute": "58'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "France",
+          "player": "Rabiot",
+          "minute": "8'",
+          "card": "yellow"
+        },
+        {
+          "team": "France",
+          "player": "Mbappe",
+          "minute": "86'",
+          "card": "yellow"
+        },
+        {
+          "team": "Spain",
+          "player": "Cucurella",
+          "minute": "31'",
+          "card": "yellow"
         }
       ]
     }

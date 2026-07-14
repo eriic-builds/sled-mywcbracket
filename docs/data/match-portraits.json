@@ -226,6 +226,14 @@
       "stage": "Quarter-final",
       "teams": ["Argentina", "Switzerland"],
       "score": [3, 1]
+    },
+    "M101": {
+      "slug": "fra-spa",
+      "externalId": "2002449",
+      "date": "2026-07-14",
+      "stage": "Semi-final",
+      "teams": ["France", "Spain"],
+      "score": [0, 2]
     }
   }
 }
