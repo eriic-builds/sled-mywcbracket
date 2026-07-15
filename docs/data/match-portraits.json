@@ -234,6 +234,14 @@
       "stage": "Semi-final",
       "teams": ["France", "Spain"],
       "score": [0, 2]
+    },
+    "M102": {
+      "slug": "eng-arg",
+      "externalId": "2005991",
+      "date": "2026-07-15",
+      "stage": "Semi-final",
+      "teams": ["England", "Argentina"],
+      "score": [1, 2]
     }
   }
 }
