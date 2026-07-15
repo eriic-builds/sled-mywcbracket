@@ -91,7 +91,7 @@ editable share alias when you do not want a real name in the link.
 | Choice | Options |
 | --- | --- |
 | Layout | Mirrored or Sideways bracket maps, plus an expanded desktop table |
-| Theme and type | Dark, light, Easy with OpenDyslexic, and Fun themes including Sticker Book |
+| Theme and type | Dark, light, Easy with OpenDyslexic, and Fun themes including Focus and Sticker Book |
 | Focus | Team filters, favorites, match facts, and credited portraits |
 | Motion and accessibility | Interactive soccer balls, Motion Off, reduced-motion support, and static WebGL fallbacks |
 
