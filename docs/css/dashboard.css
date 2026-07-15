@@ -12,6 +12,12 @@ html[data-theme="easy"]{color-scheme:dark;--bg:#1C1A17;--panel:#26231F;--text:#F
  --glass:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.025));--shadow:0 8px 22px rgba(0,0,0,.38);--hover:rgba(255,255,255,.07);
  --gold:#FFD54F;--gold-ink:#FFD54F;--win:#57D6B9;--win-ink:#72E6CB;--out:#9E9A93;--lose-ink:#FF8A80;--g1:rgba(0,151,244,.16);--g2:rgba(87,214,185,.12);--g3:rgba(87,214,185,.12);
  --fs:18px;--lh:1.8;--ls:.03em;--radius:22px;--radius-sm:15px;--gap:22px;--fstack:"OpenDyslexic","Trebuchet MS","Segoe UI",system-ui,sans-serif;}
+/* Fun · Focus — a quiet, Copilot Chat-inspired dark workspace with restrained accents. */
+html[data-theme="focus"]{color-scheme:dark;--bg:#121214;--panel:#1b1b1f;--text:#f5f5f5;--text2:#dedee3;--muted:#a5a5b0;--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.16);
+ --glass:#1b1b1f;--shadow:none;--hover:rgba(255,255,255,.07);
+ --gold:#d8b4fe;--gold-ink:#d8b4fe;--win:#6ee7b7;--win-ink:#6ee7b7;--out:#898994;--lose-ink:#fda4af;--g1:transparent;--g2:rgba(167,139,250,.09);--g3:transparent;
+ --blue:#a78bfa;--purple:#a78bfa;--pink:#f0abfc;--orange:#fbbf24;--green:#6ee7b7;--teal:#67e8f9;--grad:linear-gradient(135deg,#a78bfa,#60a5fa);
+ --radius:10px;--radius-sm:7px;--fs:16px;--lh:1.5;--ls:0em;--fstack:"Segoe UI","Segoe UI Variable","Segoe Sans Display",system-ui,-apple-system,sans-serif;}
 /* Fun · GeoCities — 90s web nostalgia: neon on midnight, rainbow headers, Comic Sans, ridge borders, tiled starfield */
 html[data-theme="geocities"]{--bg:#000018;--panel:#1a0038;--text:#FFFF66;--text2:#7CFC00;--muted:#41E0E0;--border:#FF00FF;--border2:#00FFFF;
  --glass:linear-gradient(160deg,#2b005f,#12002f);--shadow:0 0 0 2px #00FFFF,0 6px 0 #FF00FF;--hover:rgba(255,0,255,.28);
@@ -31,12 +37,6 @@ html[data-theme="winxp"]{--bg:#5B9BD5;--panel:#ECE9D8;--text:#000000;--text2:#10
  --gold:#2A5BDA;--gold-ink:#0A246A;--win:#3B9E1F;--win-ink:#2E7D18;--out:#8a94a0;--lose-ink:#C4262E;--g1:rgba(42,91,218,.10);--g2:rgba(59,158,31,.10);--g3:rgba(255,255,255,.10);
  --blue:#2A5BDA;--purple:#0A246A;--pink:#C4262E;--green:#3B9E1F;--teal:#245EDB;--grad:linear-gradient(180deg,#3D95FF,#0A3FC0);
  --radius:6px;--radius-sm:4px;--fs:15px;--lh:1.5;--ls:0em;--fstack:"Tahoma","Franklin Gothic","Segoe UI",sans-serif;}
-/* Fun · Doodle — hand-drawn pencil sketch on paper: warm off-white paper with faint ruled lines and grain, graphite strokes, wobbly hand-drawn borders, handwriting font, grayscale (penciled) flags */
-html[data-theme="doodle"]{--bg:#F4EFE1;--panel:#FBF7EC;--text:#333029;--text2:#4b473e;--muted:#8b857a;--border:#3a362f;--border2:#6f6a60;
- --glass:#FBF7EC;--shadow:2px 3px 0 rgba(58,54,47,.16);--hover:#efe7d3;
- --gold:#b1892f;--gold-ink:#8a6a20;--win:#5f7d40;--win-ink:#48602f;--out:#9a948a;--lose-ink:#a6453b;--g1:rgba(58,54,47,.05);--g2:rgba(58,54,47,.04);--g3:rgba(58,54,47,.03);
- --blue:#3b5a78;--purple:#5b4a6b;--pink:#a6453b;--orange:#b1732f;--green:#5f7d40;--teal:#3f6b64;--grad:linear-gradient(90deg,#4a463d,#6f6a60);
- --radius:14px;--radius-sm:10px;--fs:16px;--lh:1.55;--ls:.01em;--fstack:"Segoe Print","Bradley Hand","Comic Sans MS","Chalkboard SE",cursive;}
 *{box-sizing:border-box}html,body{margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:24px}
 body{font-family:var(--fstack);font-size:var(--fs);line-height:var(--lh);letter-spacing:var(--ls);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
@@ -555,17 +555,22 @@ html[data-theme="winxp"] .modes button.on,html[data-theme="winxp"] .fun-btn.on,h
 html[data-theme="winxp"] .shead h2,html[data-theme="winxp"] .hero h1,html[data-theme="winxp"] .story-title{background:linear-gradient(180deg,#2F8AF0,#0A3FC0);color:#FFF;padding:3px 10px;border-radius:6px 6px 0 0;display:inline-block;text-shadow:0 1px 1px rgba(0,0,0,.35)}
 html[data-theme="winxp"] a{color:#0A3FC0}
 html[data-theme="winxp"] .team{background:#FFFFFF;color:#000;border:1px solid #7A96DF;border-radius:4px}
-/* Fun · Doodle decorative — paper texture (faint ruled lines + red margin + grain), wobbly hand-drawn borders, wavy underlines, grayscale flags */
-html[data-theme="doodle"] body::before{display:none}
-html[data-theme="doodle"] body{background-color:#F4EFE1;background-image:repeating-linear-gradient(0deg,transparent 0 27px,rgba(90,120,160,.10) 27px 28px),linear-gradient(90deg,transparent 46px,rgba(200,90,80,.20) 46px 47px,transparent 48px),radial-gradient(circle at 18% 26%,rgba(0,0,0,.022),transparent 55%),radial-gradient(circle at 82% 72%,rgba(0,0,0,.022),transparent 55%)}
-html[data-theme="doodle"] *{text-shadow:none}
-html[data-theme="doodle"] .glass{background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none;border:2px solid var(--border);border-radius:255px 12px 225px 15px/15px 225px 18px 255px;box-shadow:2px 2px 0 rgba(58,54,47,.14),-1px 1px 0 rgba(58,54,47,.10)}
-html[data-theme="doodle"] .card,html[data-theme="doodle"] .team,html[data-theme="doodle"] .chip,html[data-theme="doodle"] .modes button,html[data-theme="doodle"] .fun-btn,html[data-theme="doodle"] .seg button,html[data-theme="doodle"] .pill{border:2px solid var(--border);border-radius:225px 15px 235px 15px/15px 235px 15px 225px;background:var(--panel)}
-html[data-theme="doodle"] .modes button.on,html[data-theme="doodle"] .fun-btn.on,html[data-theme="doodle"] .fun-menu button.on,html[data-theme="doodle"] .seg button.on{background:#e9e0cc;color:var(--text);box-shadow:inset 1px 1px 0 rgba(58,54,47,.22)}
-html[data-theme="doodle"] h1,html[data-theme="doodle"] h2,html[data-theme="doodle"] .story-title,html[data-theme="doodle"] .hero h1{background:none;color:var(--text);-webkit-text-fill-color:currentColor;text-shadow:none;text-decoration:underline wavy rgba(58,54,47,.5);text-underline-offset:6px}
-html[data-theme="doodle"] a{color:#3b5a78;text-decoration:underline wavy}
-html[data-theme="doodle"] img,html[data-theme="doodle"] .flag{filter:grayscale(1) contrast(1.15) brightness(.98)}
-html[data-theme="doodle"] .orb,html[data-theme="doodle"] .pill.live .dot,html[data-theme="doodle"] .rf-dot{filter:grayscale(1)}
+/* Fun · Focus decorative — flatter surfaces, one restrained accent, and text-first navigation. */
+html[data-theme="focus"] body::before,html[data-theme="focus"] .dab::before{display:none}
+html[data-theme="focus"] .glass{background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none;border-color:var(--border);box-shadow:none}
+html[data-theme="focus"] .hero h1 .g{background:none;-webkit-text-fill-color:currentColor;color:var(--text)}
+html[data-theme="focus"] .orb,html[data-theme="focus"] .composer .corb{box-shadow:none}
+html[data-theme="focus"] .modes,html[data-theme="focus"] .fun-menu{border-radius:10px}
+html[data-theme="focus"] .modes button,html[data-theme="focus"] .fun-btn,html[data-theme="focus"] .fun-menu button,html[data-theme="focus"] .chip,html[data-theme="focus"] .seg button{border-radius:7px}
+html[data-theme="focus"] .modes button.on,html[data-theme="focus"] .fun-btn.on,html[data-theme="focus"] .fun-menu button.on{box-shadow:none}
+html[data-theme="focus"] .kpi::before{width:2px}
+html[data-theme="focus"] .story::after{display:none}
+html[data-theme="focus"] .mi,html[data-theme="focus"] .fm-em,html[data-theme="focus"] .rail a .ic,html[data-theme="focus"] .shead .tile,html[data-theme="focus"] .syn-ic,html[data-theme="focus"] .composer .mic,html[data-theme="focus"] .navtoggle .nav-ic,html[data-theme="focus"] .kpi-ic,html[data-theme="focus"] .story-ic{display:none}
+html[data-theme="focus"] .fun-btn,html[data-theme="focus"] .fun-menu button,html[data-theme="focus"] .rail a,html[data-theme="focus"] .synbtn,html[data-theme="focus"] .navtoggle{gap:0}
+html[data-theme="focus"] .modes .mode-lbl{padding-inline:12px}
+html[data-theme="focus"] .kpi-l{padding-right:0}
+html[data-theme="focus"] .story-tag{margin-top:0}
+html[data-theme="focus"] .shead{gap:8px}
 
 /* ── mirrored map: cards & center stage (PLAN-mirrored-match-cards) ── */
 .bkgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.6fr) repeat(4,minmax(0,1fr));gap:12px;width:100%;min-height:880px;position:relative;z-index:1}

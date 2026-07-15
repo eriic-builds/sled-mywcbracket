@@ -981,14 +981,14 @@ export function renderDashboard(picks, live, topology) {
     '<button data-mode="easy" class="mode-lbl" title="Easy reading mode \u2014 larger, high-contrast text, extra spacing, sentence case, no italics, and left-aligned content. May improve readability for some people, including readers with dyslexia or low vision."><span class="mi">\u{1F453}</span> Easy</button>' +
     '<div class="fun-wrap" id="funWrap"><button class="fun-btn" id="funBtn" aria-haspopup="true" aria-expanded="false" title="Fun themes"><span class="mi">\u{1F3A8}</span> Fun <span class="fun-car">\u25BE</span></button>' +
     '<div class="fun-menu glass" id="funMenu" role="menu">' +
+    '<button data-mode="focus" role="menuitem"><span class="fm-em">\u25C6</span> Focus</button>' +
     '<button data-mode="geocities" role="menuitem"><span class="fm-em">\u{1F310}</span> GeoCities</button>' +
     '<button data-mode="minecraft" role="menuitem"><span class="fm-em">\u26CF\uFE0F</span> Minecraft</button>' +
     '<button data-mode="winxp" role="menuitem"><span class="fm-em">\u{1FA9F}</span> Windows XP</button>' +
-    '<button data-mode="doodle" role="menuitem"><span class="fm-em">\u270F\uFE0F</span> Doodle</button>' +
     '<button data-mode="sticker" role="menuitem"><span class="fm-em">\u{1F3F7}\uFE0F</span> Sticker Book</button>' +
     '</div></div></div></div>' +
     '<div class="shell"><div class="side"><nav class="rail glass" id="rail">' +
-    '<button class="navtoggle" id="navToggle" aria-expanded="false" aria-controls="railLinks">\u{1F4D1} Contents \u2630</button>' +
+    '<button class="navtoggle" id="navToggle" aria-expanded="false" aria-controls="railLinks"><span class="nav-ic">\u{1F4D1}</span> Contents \u2630</button>' +
     '<div class="links" id="railLinks"><div class="rt">On this page</div>' +
     '<a href="#intro"><span class="ic">\u{1F50E}</span> Overview</a>' +
     '<a href="#sec-standing"><span class="ic">\u{1F4CA}</span> Live standing</a>' +

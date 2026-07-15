@@ -14,8 +14,9 @@ return (function(){
  document.body.classList.remove('map-expanded','map-fit-screen','map-fit-mirror','map-fit-sideways');
  root.classList.remove('map-fit-screen-root');
  var KTHEME='wcb.theme',KFAV='wcb.favs',KFO='wcb.favonly',KSC='wcb.scores.v3',KLAYOUT='wcb.bracket-layout';
- function setTheme(t){root.setAttribute('data-theme',t);document.querySelectorAll('.modes button').forEach(function(b){if(b.dataset.mode)b.classList.toggle('on',b.dataset.mode===t)});if(funBtn)funBtn.classList.toggle('on',!!FUN[t]);try{LS.setItem(KTHEME,t)}catch(e){}closeFun();if(window.__drawConn)later(window.__drawConn,80);}
- var FUN={geocities:1,minecraft:1,winxp:1,doodle:1,sticker:1};
+ var FUN={focus:1,geocities:1,minecraft:1,winxp:1,sticker:1};
+ var THEMES={dark:1,light:1,easy:1,focus:1,geocities:1,minecraft:1,winxp:1,sticker:1};
+ function setTheme(t){if(!THEMES[t])t='dark';root.setAttribute('data-theme',t);document.querySelectorAll('.modes button').forEach(function(b){if(b.dataset.mode)b.classList.toggle('on',b.dataset.mode===t)});if(funBtn)funBtn.classList.toggle('on',!!FUN[t]);try{LS.setItem(KTHEME,t)}catch(e){}closeFun();if(window.__drawConn)later(window.__drawConn,80);}
  var funWrap=document.getElementById('funWrap'),funBtn=document.getElementById('funBtn');
  function closeFun(){if(funWrap){funWrap.classList.remove('open');if(funBtn)funBtn.setAttribute('aria-expanded','false');}}
  document.querySelectorAll('.modes button').forEach(function(b){if(b.dataset.mode)b.addEventListener('click',function(){setTheme(b.dataset.mode)})});
