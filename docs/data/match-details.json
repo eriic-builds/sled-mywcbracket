@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "refreshed": "2026-07-14T21:30:38Z",
+  "refreshed": "2026-07-15T21:29:57Z",
   "matches": {
     "M73": {
       "source": {
@@ -1848,6 +1848,77 @@
           "team": "Spain",
           "player": "Cucurella",
           "minute": "31'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M102": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289290",
+        "matchId": "400021540"
+      },
+      "state": "complete",
+      "home": "England",
+      "away": "Argentina",
+      "score": {
+        "home": 1,
+        "away": 2,
+        "note": ""
+      },
+      "winner": "Argentina",
+      "round": "Semifinal",
+      "kickoff": "2026-07-15T19:00:00Z",
+      "venue": {
+        "stadium": "Atlanta Stadium",
+        "city": "Atlanta"
+      },
+      "referee": "Ismail Elfath",
+      "goals": [
+        {
+          "team": "England",
+          "player": "Gordon",
+          "minute": "55'",
+          "kind": "goal"
+        },
+        {
+          "team": "Argentina",
+          "player": "Fernandez",
+          "minute": "85'",
+          "kind": "goal"
+        },
+        {
+          "team": "Argentina",
+          "player": "Martinez",
+          "minute": "90'+2'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "England",
+          "player": "Anderson",
+          "minute": "37'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Martinez",
+          "minute": "42'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Romero",
+          "minute": "51'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Paul",
+          "minute": "90'+4'",
           "card": "yellow"
         }
       ]
