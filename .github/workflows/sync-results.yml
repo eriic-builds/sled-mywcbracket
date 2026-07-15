@@ -5,14 +5,9 @@ name: Sync World Cup results
 # client-side, so there is no HTML to rebuild.
 on:
   schedule:
-    - cron: "0 22 * * *"   # ~6:00 PM ET  (daily baseline)
-    - cron: "30 1 * * *"   # ~9:30 PM ET  (daily baseline)
-    - cron: "0 6 * * *"    # ~2:00 AM ET  (daily baseline)
-    # Dense match-window syncs, every 30 min across the knockout kickoff hours.
-    # The job gates these to the knockout window (Jun 27 - Jul 19) so quiet days
-    # keep only the 3 baseline runs above.
-    - cron: "*/30 16-23 * * *"
-    - cron: "*/30 0-3 * * *"
+    # Final scheduled auto-sync only:
+    # Jul 19, 2026 2:22 PM PT == 21:22 UTC
+    - cron: "22 21 19 7 *"
   workflow_dispatch: {}
 
 permissions:
@@ -34,14 +29,16 @@ jobs:
       - name: Gate dense runs to the knockout window
         id: gate
         run: |
-          sched="${{ github.event.schedule }}"
-          today=$(date -u +%m-%d)
-          dense=false
-          if [ "$sched" = "*/30 16-23 * * *" ] || [ "$sched" = "*/30 0-3 * * *" ]; then dense=true; fi
-          in_window=false
-          if [[ "$today" > "06-26" && "$today" < "07-20" ]]; then in_window=true; fi
-          if [ "$dense" = "true" ] && [ "$in_window" = "false" ]; then
-            echo "Dense run outside the knockout window (Jun 27 - Jul 19). Skipping."
+          # Keep this as a one-time scheduled sync in 2026 (not a yearly repeat).
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "Non-scheduled run (workflow_dispatch). Proceeding."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          today=$(date -u +%Y-%m-%d)
+          if [ "$today" != "2026-07-19" ]; then
+            echo "Scheduled sync outside the final date (2026-07-19). Skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"

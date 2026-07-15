@@ -971,7 +971,7 @@ export function renderDashboard(picks, live, topology) {
   const syncBtn = D.SYNC_URL ? `<a class="synbtn glass" id="syncBtn" href="${esc(D.SYNC_URL)}" target="_blank" rel="noopener" title="Pull the latest results"><span class="syn-ic">\u{1F504}</span><span class="syn-tx">Sync now</span></a>` : "";
   return '<div class="topbar"><div class="brand"><span class="orb"></span><div>2026 FIFA World Cup - Bracket Dashboard - MSFT SLED<small>Live results vs your picks</small></div></div>' +
     '<div class="upd-group">' +
-    `<div class="refreshed glass" id="topRefreshed" title="Results auto-sync from FIFA\u2019s live feed a few times a day, no manual refresh needed"><span class="rf-dot"></span>Live \u00b7 updated ${localRefreshed(D.REFRESHED)}</div>` +
+    `<div class="refreshed glass" id="topRefreshed" title="Results auto-sync from FIFA\u2019s live feed a few times a day, no manual refresh needed"><span class="rf-dot"></span>Last Synced: ${localRefreshed(D.REFRESHED)}</div>` +
     syncBtn + '</div>' +
     '<div class="modes glass">' +
     '<div class="theme-toggle" role="group" aria-label="Light or dark theme">' +
