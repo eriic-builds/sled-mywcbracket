@@ -45,6 +45,8 @@ Open a completed match to move beyond the bracket line and into the story of the
 late 3-2 comeback against Egypt is paused here at 88 minutes, still 2-2 before the stoppage-time
 winner, alongside the full event timeline and reviewed source details.
 
+Inspiration came from seeing Alexandre Bogachev's [data visualization post on LinkedIn.]( https://www.linkedin.com/feed/update/urn:li:activity:7480540869184454656/)
+
 <p align="center">
   <img src="docs/assets/readme/dashboard-live-standing.png"
     alt="World Cup dashboard in light mode with navigation and six live-standing signals for confirmed, settled, live, attainable, champion, and lost points"
