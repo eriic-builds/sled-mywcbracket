@@ -12,11 +12,11 @@ device. No install or account is required, and your personal pool stays in your 
 
 <p align="center">
   <img src="docs/assets/readme/dashboard-bracket-table-trophy.png"
-    alt="World Cup bracket dashboard showing the mirrored bracket table and the new trophy hero"
+    alt="World Cup bracket dashboard showing the legend, actual path, match results, and champion pick"
     width="960">
 </p>
 
-The updated hero now highlights the new trophy alongside the mirrored bracket table.
+World Cup bracket dashboard showing the legend, actual path, match results, and champion pick.
 
 [![Sync World Cup results](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/sync-results.yml)
 [![Deploy GitHub Pages](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/deploy-pages.yml)
