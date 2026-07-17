@@ -11,10 +11,12 @@ Upload the SLED workbook, build a bracket in the browser, or reopen one already 
 device. No install or account is required, and your personal pool stays in your browser.
 
 <p align="center">
-  <img src="docs/assets/readme/dashboard-bracket-map.png"
-    alt="World Cup bracket dashboard showing the legend, actual path, match results, and champion pick"
+  <img src="docs/assets/readme/dashboard-bracket-table-trophy.png"
+    alt="World Cup bracket dashboard showing the mirrored bracket table and the new trophy hero"
     width="960">
 </p>
+
+The updated hero now highlights the new trophy alongside the mirrored bracket table.
 
 [![Sync World Cup results](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/sync-results.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/sync-results.yml)
 [![Deploy GitHub Pages](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/eriic-builds/sled-mywcbracket/actions/workflows/deploy-pages.yml)
@@ -291,3 +293,5 @@ This is a fan project. It is not affiliated with FIFA, GitHub, or Microsoft. Pub
 records come from FIFA's public feed with football-data.org as the configured fallback.
 Portrait credits appear in the application. Bundled third-party assets and libraries keep
 their license files beside the shipped files.
+
+
