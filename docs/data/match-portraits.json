@@ -242,6 +242,14 @@
       "stage": "Semi-final",
       "teams": ["England", "Argentina"],
       "score": [1, 2]
+    },
+    "M104": {
+      "slug": "spa-arg",
+      "externalId": "2007644",
+      "date": "2026-07-19",
+      "stage": "Final",
+      "teams": ["Spain", "Argentina"],
+      "score": [1, 0]
     }
   }
 }
