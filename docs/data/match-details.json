@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "refreshed": "2026-07-15T21:29:57Z",
+  "refreshed": "2026-07-19T22:12:18Z",
   "matches": {
     "M73": {
       "source": {
@@ -1919,6 +1919,78 @@
           "team": "Argentina",
           "player": "Paul",
           "minute": "90'+4'",
+          "card": "yellow"
+        }
+      ]
+    },
+    "M104": {
+      "source": {
+        "provider": "FIFA",
+        "competitionId": "17",
+        "seasonId": "285023",
+        "stageId": "289292",
+        "matchId": "400021543"
+      },
+      "state": "complete",
+      "home": "Spain",
+      "away": "Argentina",
+      "score": {
+        "home": 1,
+        "away": 0,
+        "note": ""
+      },
+      "winner": "Spain",
+      "round": "Final",
+      "kickoff": "2026-07-19T19:00:00Z",
+      "venue": {
+        "stadium": "New York/New Jersey Stadium",
+        "city": "New Jersey"
+      },
+      "attendance": 80663,
+      "referee": "Slavko Vincic",
+      "goals": [
+        {
+          "team": "Spain",
+          "player": "Torres",
+          "minute": "106'",
+          "kind": "goal"
+        }
+      ],
+      "cards": [
+        {
+          "team": "Argentina",
+          "player": "Martinez",
+          "minute": "41'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Paredes",
+          "minute": "52'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Fernandez",
+          "minute": "82'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Romero",
+          "minute": "90'+2'",
+          "card": "yellow"
+        },
+        {
+          "team": "Argentina",
+          "player": "Fernandez",
+          "minute": "90'+3'",
+          "card": "red"
+        },
+        {
+          "team": "Argentina",
+          "player": "Allister",
+          "minute": "111'",
           "card": "yellow"
         }
       ]

@@ -1,5 +1,5 @@
 {
- "refreshed": "2026-07-15T22:55:28Z",
+ "refreshed": "2026-07-19T22:12:18Z",
  "res": {
   "M73": [
    0,
@@ -180,18 +180,30 @@
    2,
    "Argentina",
    ""
-  ]
- },
- "ko_fix": {
+  ],
   "M104": [
-   "2026-07-19T19:00:00Z",
-   "Sun Jul 19",
-   "3:00 PM",
-   "2:00 PM",
-   "12:00 PM"
+   1,
+   0,
+   "Spain",
+   ""
   ]
  },
+ "ko_fix": {},
  "auto_hl": [
+  [
+   "🐂",
+   "Spain edge Argentina",
+   "Spain 1–0 Argentina",
+   "Sun Jul 19 · New Jersey",
+   "Spain left it late, snatching a 1–0 final squeaker past Argentina (Torres (106'))."
+  ],
+  [
+   "🦁",
+   "Saka hat-trick sinks France",
+   "France 4–6 England",
+   "Sat Jul 18 · Miami",
+   "The Saka show: Saka fired a hat-trick (37', 45'+1', 87' pen) powering England to a 6–4 win over France in the bronze final, with Rice (3'), Konsa (18') and Bellingham (90'+8') also on the mark."
+  ],
   [
    "💙",
    "Argentina edge England",
@@ -219,20 +231,6 @@
    "Norway 1–2 England",
    "Sat Jul 11 · Miami",
    "Bellingham struck twice (45'+2', 93') to settle England's 2–1 win over Norway in the quarterfinal."
-  ],
-  [
-   "🐂",
-   "Spain edge Belgium",
-   "Spain 2–1 Belgium",
-   "Fri Jul 10 · Los Angeles",
-   "Spain left it late, snatching a 2–1 quarterfinal squeaker past Belgium (Ruiz (30') and Merino (88'))."
-  ],
-  [
-   "🐓",
-   "France beat Morocco",
-   "France 2–0 Morocco",
-   "Thu Jul 9 · Boston",
-   "Job done for France, a composed 2–0 win over Morocco in the quarterfinal with Mbappe (60') and Dembele (66')."
   ]
  ]
 }
